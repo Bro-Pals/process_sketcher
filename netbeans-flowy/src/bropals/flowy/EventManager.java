@@ -173,6 +173,10 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         } else if (nodeLine != null) { // actions only for node lines
             
         }
+        
+        if (node == null && nodeLine == null && e.getButton() == MouseEvent.BUTTON1) {
+            selectionManager.getSelected().clear(); // clear selection if you don't click anything
+        }
         window.redrawView();
     }
 

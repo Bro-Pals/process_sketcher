@@ -18,6 +18,12 @@ public class Camera {
     private int x; //Camera X position (World coordinates)
     private int y; //Camera Y position (World coordinates)
     
+    public Camera() {
+        zoom = 1;
+        x = 0;
+        y = 0;
+    }
+    
     public Point convertCanvasToWorld(Point p) {
         p.x = convertCanvasToWorldX(p.x);
         p.y = convertCanvasToWorldY(p.y);
