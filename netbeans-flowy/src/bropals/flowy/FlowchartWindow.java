@@ -11,6 +11,7 @@ import bropals.flowy.listeners.AutoformatHorizontallyListener;
 import bropals.flowy.listeners.AutoformatVerticallyListener;
 import bropals.flowy.listeners.BorderColorListener;
 import bropals.flowy.listeners.BorderSizeListener;
+import bropals.flowy.listeners.CameraControls;
 import bropals.flowy.listeners.CopyListener;
 import bropals.flowy.listeners.CreateShapeListener;
 import bropals.flowy.listeners.CutListener;
@@ -132,6 +133,9 @@ public class FlowchartWindow extends JFrame {
         view.addMouseListener(eventManager);
         view.addKeyListener(eventManager);
         view.addMouseMotionListener(eventManager);
+        CameraControls cameraControls = new CameraControls(camera);
+        view.addMouseMotionListener(cameraControls);
+        view.addKeyListener(cameraControls);
         add(buttonPanel, BorderLayout.NORTH);
         add(view, BorderLayout.CENTER);
         revalidate();

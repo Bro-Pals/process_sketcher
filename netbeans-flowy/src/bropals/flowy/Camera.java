@@ -19,14 +19,14 @@ public class Camera {
     private int y; //Camera Y position (World coordinates)
     
     public Point convertCanvasToWorld(Point p) {
-        p.x = (int)(p.x*zoom) + x;
-        p.y = (int)(p.y*zoom) + y;
+        p.x = convertCanvasToWorldX(p.x);
+        p.y = convertCanvasToWorldY(p.y);
         return p;
     }
     
     public Point convertWorldToCanvas(Point p) {
-        p.x = (int)((p.x - x)/zoom);
-        p.y = (int)((p.y - y)/zoom);
+        p.x = convertWorldToCanvasX(p.x);
+        p.y = convertWorldToCanvasY(p.y);
         return p;
     }
     
