@@ -6,17 +6,9 @@
 package bropals.flowy;
 
 /**
- * The main class.
+ * Holds the view transformation.
  * @author Jonathon
  */
-public class Flowy {
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        FlowchartWindowManager fwm = new FlowchartWindowManager();
-        
-    }
+public class Camera {
     
 }
