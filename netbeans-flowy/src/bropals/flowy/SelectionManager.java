@@ -19,20 +19,36 @@ public class SelectionManager {
     
     private ArrayList<Selectable> selected;
     
+    public SelectionManager() {
+        selected = new ArrayList<>();
+    }
+    
     public ArrayList<Selectable> getSelected() {
         return selected;
     }
     
     public ArrayList<Node> getSelectedNodes() {
-        return null;
+        ArrayList<Node> nodes = new ArrayList<>();
+        for (int i=0; i<selected.size(); i++) {
+            if (selected.get(i) instanceof Node) {
+                nodes.add((Node)selected.get(i));
+            }
+        }
+        return nodes;
     }
     
     public ArrayList<NodeLine> getSelectedNodeLines() {
-        return null;
+        ArrayList<NodeLine> nodelines = new ArrayList<>();
+        for (int i=0; i<selected.size(); i++) {
+            if (selected.get(i) instanceof NodeLine) {
+                nodelines.add((NodeLine)selected.get(i));
+            }
+        }
+        return nodelines;
     }
     
     public Selectable getLastSelected() {
-        return null;
+        return selected.get(selected.size() - 1);
     }
     
 }

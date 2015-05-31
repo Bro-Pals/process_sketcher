@@ -16,6 +16,13 @@ public class Flowchart {
     private ArrayList<Node> nodes;
     private ArrayList<NodeLine> nodeLines;
 
+    public Flowchart() {
+        nodes = new ArrayList<>();
+        nodeLines = new ArrayList<>();
+        Node firstNode = new Node(100, 100);
+        nodes.add(firstNode);
+    }
+    
     public ArrayList<Node> getNodes() {
         return nodes;
     }

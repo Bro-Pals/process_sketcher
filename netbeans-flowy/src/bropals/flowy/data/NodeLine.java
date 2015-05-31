@@ -25,7 +25,7 @@ public class NodeLine implements Selectable {
     public NodeLine(Node parent, Node child) {
         this.parent = parent;
         this.child = child;
-        style = null;
+        style = new LineStyle();
         tailText = "";
         centerText = "";
         headText = "";

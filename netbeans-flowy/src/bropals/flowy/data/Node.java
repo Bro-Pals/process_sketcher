@@ -25,11 +25,12 @@ public class Node implements Selectable {
     private String innerText;
     
     public Node(int x, int y) {
-        style = null; // ???
+        style = new NodeStyle(); // ???
         this.x = x;
         this.y = y;
         width = 100;
         height = 80;
+        linesConnected = new ArrayList<>();
     }
     
     @Override
@@ -87,6 +88,16 @@ public class Node implements Selectable {
 
     public void setInnerText(String innerText) {
         this.innerText = innerText;
+    }
+    
+    @Override
+    public Object clone() {
+        Node other = new Node(getX(), getY());
+        other.setWidth(getWidth());
+        other.setHeight(getHeight());
+        other.setStyle((NodeStyle)style.clone()); // same style
+        other.setInnerText(""); // initially no text
+        return other;
     }
 
 
