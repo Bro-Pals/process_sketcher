@@ -6,7 +6,7 @@
 package bropals.flowy;
 
 /**
- *
+ * The main class.
  * @author Jonathon
  */
 public class Flowy {

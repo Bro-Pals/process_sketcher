@@ -6,7 +6,7 @@
 package bropals.flowy;
 
 /**
- *
+ * Keeps track of and manages all open FlowchartWindows.
  * @author Jonathon
  */
 public class FlowchartWindowManager {

@@ -7,7 +7,7 @@ package bropals.flowy;
  */
 
 /**
- *
+ * Manages the drag-move operation.
  * @author Jonathon
  */
 public class DragManager {

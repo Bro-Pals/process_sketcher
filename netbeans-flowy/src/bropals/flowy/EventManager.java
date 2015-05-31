@@ -6,7 +6,7 @@
 package bropals.flowy;
 
 /**
- *
+ * Gets events from the view and StyleManager and handles them.
  * @author Jonathon
  */
 public class EventManager {

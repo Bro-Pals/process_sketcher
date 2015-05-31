@@ -6,7 +6,8 @@
 package bropals.flowy;
 
 /**
- *
+ * Manages the current selection and enables other objects to 
+ * act on them.
  * @author Jonathon
  */
 public class SelectionManager {

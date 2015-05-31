@@ -6,7 +6,7 @@
 package bropals.flowy;
 
 /**
- *
+ * Used for editing a Flowchart.
  * @author Jonathon
  */
 public class FlowchartWindow {
