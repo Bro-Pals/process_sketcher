@@ -5,11 +5,34 @@
  */
 package bropals.flowy;
 
+import bropals.flowy.data.Node;
+import bropals.flowy.data.NodeLine;
+import bropals.flowy.data.Selectable;
+import java.util.ArrayList;
+
 /**
  * Manages the current selection and enables other objects to 
  * act on them.
  * @author Jonathon
  */
 public class SelectionManager {
+    
+    private ArrayList<Selectable> selected;
+    
+    public ArrayList<Selectable> getSelected() {
+        return selected;
+    }
+    
+    public ArrayList<Node> getSelectedNodes() {
+        return null;
+    }
+    
+    public ArrayList<NodeLine> getSelectedNodeLines() {
+        return null;
+    }
+    
+    public Selectable getLastSelected() {
+        return null;
+    }
     
 }

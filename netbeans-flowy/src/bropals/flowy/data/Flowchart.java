@@ -5,10 +5,24 @@
  */
 package bropals.flowy.data;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Jonathon
  */
 public class Flowchart {
+    
+    private ArrayList<Node> nodes;
+    private ArrayList<NodeLine> nodeLines;
+
+    public ArrayList<Node> getNodes() {
+        return nodes;
+    }
+
+    public ArrayList<NodeLine> getNodeLines() {
+        return nodeLines;
+    }
+    
     
 }

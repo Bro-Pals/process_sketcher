@@ -5,10 +5,16 @@
  */
 package bropals.flowy;
 
+import bropals.flowy.data.Flowchart;
+import javax.swing.JFrame;
+
 /**
  * Used for editing a Flowchart.
  * @author Jonathon
  */
-public class FlowchartWindow {
+public class FlowchartWindow extends JFrame {
+    
+    private Flowchart flowchart;
+    private EventManager eventManager;
     
 }
