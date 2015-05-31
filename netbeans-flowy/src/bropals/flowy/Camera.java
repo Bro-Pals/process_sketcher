@@ -13,14 +13,36 @@ import java.awt.Point;
  */
 public class Camera {
     
+    // 1 = no zoom
+    private float zoom;
+    private int x; //Camera X position (World coordinates)
+    private int y; //Camera Y position (World coordinates)
+    
     public Point convertCanvasToWorld(Point p) {
-        
+        p.x = convertCanvasToWorldX(p.x);
+        p.y = convertCanvasToWorldY(p.y);
         return p;
     }
     
     public Point convertWorldToCanvas(Point p) {
-        
+        p.x = convertWorldToCanvasX(p.x);
+        p.y = convertWorldToCanvasY(p.y);
         return p;
     }
     
+    public int convertCanvasToWorldX(int x) {
+        return (int)(x*zoom) + this.x;
+    }
+    
+    public int convertCanvasToWorldY(int y) {
+        return (int)(y*zoom) + this.y;
+    }
+    
+    public int convertWorldToCanvasX(int x) {
+        return (int)((x - this.x)/zoom);
+    }
+    
+    public int convertWorldToCanvasY(int y) {
+        return (int)((y - this.y)/zoom);
+    }
 }

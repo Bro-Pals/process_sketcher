@@ -129,6 +129,8 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
     @Override
     public void mousePressed(MouseEvent e) {
         Point mousePosition = window.getCamera().convertCanvasToWorld(e.getPoint());
+        System.out.println(mousePosition);
+        System.out.println(e.getPoint());
         
         Selectable clickedOnThing = getSelectableUnderPoint(mousePosition);
         
