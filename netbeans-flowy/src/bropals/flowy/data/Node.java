@@ -5,11 +5,10 @@
  */
 package bropals.flowy.data;
 
-import bropals.flowy.style.Shape;
+import bropals.flowy.Camera;
 import bropals.flowy.style.NodeStyle;
 import java.awt.Graphics;
 import java.util.ArrayList;
-import javafx.scene.Camera;
 
 /**
  *
@@ -35,7 +34,7 @@ public class Node implements Selectable {
     
     @Override
     public void render(Camera camera, Graphics g) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
     }
     
     public NodeStyle getStyle() {
@@ -90,5 +89,5 @@ public class Node implements Selectable {
         this.innerText = innerText;
     }
 
-    
+
 }

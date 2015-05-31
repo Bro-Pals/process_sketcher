@@ -7,7 +7,7 @@ package bropals.flowy.data;
 
 import bropals.flowy.style.LineStyle;
 import java.awt.Graphics;
-import javafx.scene.Camera;
+import bropals.flowy.Camera;
 
 /**
  *
