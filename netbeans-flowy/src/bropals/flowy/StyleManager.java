@@ -10,5 +10,5 @@ package bropals.flowy;
  * @author Jonathon
  */
 public class StyleManager {
-    
+    // no plan yet :(
 }

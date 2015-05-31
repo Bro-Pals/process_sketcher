@@ -13,3 +13,5 @@ hs_err_pid*
 
 /netbeans-flowy/nbproject/private/
 
+/netbeans-flowy/build/
+/netbeans-flowy/dist/
