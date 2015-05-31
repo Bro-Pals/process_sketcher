@@ -6,7 +6,10 @@
 package bropals.flowy;
 
 import bropals.flowy.data.Flowchart;
+import bropals.flowy.data.Node;
+import bropals.flowy.data.NodeLine;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.io.File;
 import javax.swing.BoxLayout;
@@ -35,7 +38,7 @@ public class FlowchartWindow extends JFrame {
         if (file != null) {
             //Load the flowchart here
         } else {
-            flowchart = null;
+            flowchart = new Flowchart(); // a new empty flowchart with one default node
         }
         flowchartWindowManager = manager;
         eventManager = new EventManager(this);
@@ -58,8 +61,25 @@ public class FlowchartWindow extends JFrame {
         view.requestFocus();
     }
     
+    public void redrawView() {
+        paintView(view.getGraphics());
+    }
+    
     public void paintView(Graphics g) {
-        
+        g.setColor(Color.WHITE);
+        g.fillRect(0, 0, view.getWidth(), view.getHeight());
+        for (Node n : flowchart.getNodes()) {
+            n.getStyle().getShape().renderShape(n, camera,  g);
+            if (eventManager.isSelected(n)) {
+                g.setColor(Color.red);
+                int offset = 3; // for the selection box
+                g.drawRect(n.getX() - offset, n.getY() - offset, 
+                        n.getWidth() + (2*offset), n.getHeight() + (2*offset));
+            }
+            for (NodeLine nl : n.getLinesConnected()) {
+                nl.getStyle().getType().renderLine(nl, camera, g);
+            }
+        }
     }
     
     public Camera getCamera() {

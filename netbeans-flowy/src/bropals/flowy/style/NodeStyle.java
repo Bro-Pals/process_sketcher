@@ -18,6 +18,13 @@ public class NodeStyle {
     private Color borderColor;
     private int borderSize;
 
+    public NodeStyle() {
+        shape = Shape.SQUARE;
+        fillColor = Color.WHITE;
+        borderColor = Color.BLACK;
+        borderSize = 1;
+    }
+    
     public Shape getShape() {
         return shape;
     }
@@ -50,5 +57,15 @@ public class NodeStyle {
         this.borderSize = borderSize;
     }
     
+    @Override
+
+    public Object clone() {
+        NodeStyle other = new NodeStyle();
+        other.setBorderColor(borderColor);
+        other.setBorderSize(borderSize);
+        other.setFillColor(fillColor);
+        other.setShape(shape);
+        return other;
+    }
     
 }

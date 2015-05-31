@@ -1,5 +1,7 @@
 package bropals.flowy;
 
+import bropals.flowy.data.Node;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -15,7 +17,19 @@ public class DragManager {
     private boolean dragging;
     private int offsetX;
     private int offsetY;
-
+    private int initialX;
+    private int initialY;
+    private Node newlyMadeNode;
+    
+    public DragManager() {
+        dragging = false;
+        offsetX = 0;
+        offsetY = 0;
+        initialX = 0;
+        initialY = 0;
+        newlyMadeNode = null;
+    }
+    
     public boolean isDragging() {
         return dragging;
     }
@@ -39,5 +53,30 @@ public class DragManager {
     public void setOffsetY(int offsetY) {
         this.offsetY = offsetY;
     }
+
+    public int getInitialX() {
+        return initialX;
+    }
+
+    public void setInitialX(int initialX) {
+        this.initialX = initialX;
+    }
+
+    public int getInitialY() {
+        return initialY;
+    }
+
+    public void setInitialY(int initialY) {
+        this.initialY = initialY;
+    }
+
+    public Node getNewlyMadeNode() {
+        return newlyMadeNode;
+    }
+
+    public void setNewlyMadeNode(Node newlyMadeNode) {
+        this.newlyMadeNode = newlyMadeNode;
+    }
+    
     
 }

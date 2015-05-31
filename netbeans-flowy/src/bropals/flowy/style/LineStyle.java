@@ -17,6 +17,12 @@ public class LineStyle extends FontStyle {
     private Color lineColor;
     private int lineSize;
 
+    public LineStyle() {
+        type = LineType.SOLID;
+        lineColor = Color.BLACK;
+        lineSize = 1;
+    }
+    
     public LineType getType() {
         return type;
     }
