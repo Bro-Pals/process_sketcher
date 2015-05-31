@@ -5,10 +5,13 @@
  */
 package bropals.flowy.data;
 
+import java.awt.Graphics;
+import javafx.scene.Camera;
+
 /**
  *
  * @author Jonathon
  */
 public interface Selectable {
-    
+    void render(Camera camera, Graphics g);
 }

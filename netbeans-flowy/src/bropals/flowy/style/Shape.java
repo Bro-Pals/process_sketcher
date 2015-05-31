@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package bropals.flowy.data;
+package bropals.flowy.style;
 
 /**
  *
  * @author Jonathon
  */
 public enum Shape {
-    
+    SQUARE, TRIANGLE, OVAL, DIAMOND, THING;
 }
