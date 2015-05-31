@@ -22,6 +22,7 @@ import javax.swing.JPanel;
  */
 public class FlowchartWindow extends JFrame {
     
+    private FlowchartWindowManager flowchartWindowManager;
     private Flowchart flowchart;
     private EventManager eventManager;
     private JPanel buttonPanel;
@@ -53,16 +54,17 @@ public class FlowchartWindow extends JFrame {
     private JButton autoformatHorizontally;
     private JButton autoformatVertically;
     
-    public FlowchartWindow() {
-        this(null);
+    public FlowchartWindow(FlowchartWindowManager manager) {
+        this(manager, null);
     }
     
-    public FlowchartWindow(File file) {
+    public FlowchartWindow(FlowchartWindowManager manager, File file) {
         if (file != null) {
             //Load the flowchart here
         } else {
             flowchart = null;
         }
+        flowchartWindowManager = manager;
         eventManager = new EventManager(this);
         buttonPanel = new JPanel();
         camera = new Camera();
@@ -79,6 +81,8 @@ public class FlowchartWindow extends JFrame {
         add(buttonPanel, BorderLayout.NORTH);
         add(view, BorderLayout.CENTER);
         setSize(640, 480);
+        view.setFocusable(true);
+        view.requestFocus();
     }
     
     public void paintView(Graphics g) {
@@ -100,6 +104,9 @@ public class FlowchartWindow extends JFrame {
     public Flowchart getFlowchart() {
         return flowchart;
     }
-    
+
+    public FlowchartWindowManager getFlowchartWindowManager() {
+        return flowchartWindowManager;
+    }
     
 }

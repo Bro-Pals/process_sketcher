@@ -77,7 +77,7 @@ public class FlowchartWindowManager implements WindowListener {
      * Creates a new flowchart.
      */
     public void newFlowchart() {
-        FlowchartWindow window = new FlowchartWindow();
+        FlowchartWindow window = new FlowchartWindow(this);
         window.setTitle("Flowy | Untitled" + chartCounter);
         chartCounter++;
         addToStack(window);
@@ -88,7 +88,7 @@ public class FlowchartWindowManager implements WindowListener {
      * @param file the file to open the flowchart from.
      */
     public void openFlowchart(File file) {
-        FlowchartWindow window = new FlowchartWindow(file);
+        FlowchartWindow window = new FlowchartWindow(this, file);
         window.setTitle("Flowy | " + file.getPath());
         addToStack(window);
     }
