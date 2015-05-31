@@ -11,7 +11,8 @@ import bropals.flowy.data.Selectable;
 import java.util.ArrayList;
 
 /**
- *
+ * Manages the current selection and enables other objects to 
+ * act on them.
  * @author Jonathon
  */
 public class SelectionManager {
