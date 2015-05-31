@@ -136,6 +136,8 @@ public class FlowchartWindow extends JFrame {
         CameraControls cameraControls = new CameraControls(camera);
         view.addMouseMotionListener(cameraControls);
         view.addKeyListener(cameraControls);
+        view.addMouseWheelListener(cameraControls);
+        view.addMouseListener(cameraControls);
         add(buttonPanel, BorderLayout.NORTH);
         add(view, BorderLayout.CENTER);
         revalidate();

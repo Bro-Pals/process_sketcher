@@ -13,6 +13,9 @@ import java.awt.Point;
  */
 public class Camera {
     
+    public static final float ZOOM_MIN = 0.1f;
+    public static final float ZOOM_MAX = 10;
+    
     // 1 = no zoom
     private float zoom;
     private int x; //Camera X position (World coordinates)
@@ -44,5 +47,54 @@ public class Camera {
     
     public int convertWorldToCanvasY(int y) {
         return (int)((y - this.y)/zoom);
+    }
+    
+    public void setWorldLocationX(int x) {
+        this.x = x;
+    }
+    
+    public void setWorldLocationY(int y) {
+        this.y = y;
+    }
+    
+    public int getWorldLocationX() {
+        return x;
+    }
+    
+    public int getWorldLocationY() {
+        return y;
+    }
+
+    public int getCanvasLocationX() {
+        return convertWorldToCanvasX(x);
+    }
+    
+    public int getCanvasLocationY() {
+        return convertWorldToCanvasY(y);
+    }
+    
+    public void setCanvasLocationX(int x) {
+        this.x = convertCanvasToWorldX(x);
+    }
+    
+    public void setCanvasLocationY(int y) {
+        this.y = convertCanvasToWorldY(x);
+    }
+
+    public float getZoom() {
+        return zoom;
+    }
+    
+    public void setZoom(float zoom) {
+        this.zoom = zoom;
+    }
+    
+    public void zoom(float zoom) {
+        this.zoom += zoom;
+        if (this.zoom < ZOOM_MIN) {
+            this.zoom = ZOOM_MIN;
+        } else if (this.zoom > ZOOM_MAX) {
+            this.zoom = ZOOM_MAX;
+        }
     }
 }
