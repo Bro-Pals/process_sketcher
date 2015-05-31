@@ -83,18 +83,27 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 if (selectionManager.getLastSelected() != null &&
                         selectionManager.getLastSelected() instanceof Node) {
                     Node selectedNode = (Node)selectionManager.getLastSelected();
+                    
+                    System.out.println("This node has " + selectedNode.getLinesConnected().size() + " lines connecting");
+                    for (NodeLine nl : selectedNode.getLinesConnected()) {
+                        System.out.println("parent: " + nl.getParent() + "   |  child: " + nl.getChild());
+                    }
+                    
+                    boolean nextNodeIsThere = false;
                     if (!selectedNode.getLinesConnected().isEmpty()) {
                         Node nextNode = null;
                         if (!e.isShiftDown()) { // find the next child if shift was being held down
                             for (int i=0; i<selectedNode.getLinesConnected().size(); i++) {
-                                if (selectedNode.getLinesConnected().get(i).getChild() != null) {
+                                if (selectedNode.getLinesConnected().get(i).getChild() != selectedNode &&
+                                        selectedNode.getLinesConnected().get(i).getChild()!= null) {
                                     nextNode = selectedNode.getLinesConnected().get(i).getChild();
                                     break;
                                 }
                             }
                         } else { // if shift is being held down then find the next parent
                             for (int i=0; i<selectedNode.getLinesConnected().size(); i++) {
-                                if (selectedNode.getLinesConnected().get(i).getParent() != null) {
+                                if (selectedNode.getLinesConnected().get(i).getParent() != selectedNode &&
+                                        selectedNode.getLinesConnected().get(i).getParent()!= null) {
                                     nextNode = selectedNode.getLinesConnected().get(i).getParent();
                                     break;
                                 }
@@ -103,15 +112,35 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                         
                         // if you found the next node, select it
                         if (nextNode != null) {
+                            nextNodeIsThere = true;
                             selectionManager.getSelected().clear();
                             selectionManager.getSelected().add(nextNode);
-                        } else { // otherwise create a new node
-                            if (!e.isShiftDown()) { /// ... if shift was not held down
-                                
-                            }
+                            System.out.println("selecting next node");
                         }
                     }
+                    
+                    if (!nextNodeIsThere && !e.isShiftDown()) { /// ... if shift was not held down
+                            Node createdNode = (Node)selectedNode.clone();
+                           // System.out.println(node + " and " + createdNode);
+                            createdNode.setX(selectedNode.getX() + selectedNode.getWidth() + 120);
+                            createdNode.setY(selectedNode.getY());
+                            createdNode.getLinesConnected().clear();
+                            window.getFlowchart().getNodes().add(createdNode);
+                            // connect the two nodes with a line
+                            NodeLine line = new NodeLine(selectedNode, createdNode);
+                            createdNode.getLinesConnected().add(line);
+                            selectedNode.getLinesConnected().add(line);
+                            dragManager.setNewlyMadeNode(createdNode);
+                            selectionManager.getSelected().clear();
+                            selectionManager.getSelected().add(createdNode); // select your newly created node
+                            window.redrawView();
+                        }
                 }
+                window.redrawView();
+                break;
+            case KeyEvent.VK_A:
+                window.getCamera().setWorldLocationX(window.getCamera().getWorldLocationX() - 5);
+                window.getCamera().setWorldLocationY(window.getCamera().getWorldLocationY() - 3);
                 window.redrawView();
                 break;
         }
@@ -129,8 +158,8 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
     @Override
     public void mousePressed(MouseEvent e) {
         Point mousePosition = window.getCamera().convertCanvasToWorld(e.getPoint());
-        System.out.println(mousePosition);
-        System.out.println(e.getPoint());
+        //System.out.println(mousePosition);
+        //System.out.println(e.getPoint());
         
         Selectable clickedOnThing = getSelectableUnderPoint(mousePosition);
         
@@ -141,7 +170,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         } else if (clickedOnThing instanceof NodeLine) {
             nodeLine = (NodeLine)clickedOnThing;
         }
-        System.out.println(node);
+        //System.out.println(node);
         // actions involving a node
         if (node != null) {
             if (!dragManager.isDragging()) { // not yet dragging anything...
@@ -153,11 +182,15 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     dragManager.setOffsetY(0);
                     
                     Node createdNode = (Node)node.clone();
+                  //  System.out.println(node + " and " + createdNode);
                     createdNode.setX(dragManager.getInitialX());
                     createdNode.setY(dragManager.getInitialY());
+                    createdNode.getLinesConnected().clear();
                     window.getFlowchart().getNodes().add(createdNode);
                     // connect the two nodes with a line
-                    createdNode.getLinesConnected().add(new NodeLine(node, createdNode));
+                    NodeLine line = new NodeLine(node, createdNode);
+                    createdNode.getLinesConnected().add(line);
+                    node.getLinesConnected().add(line);
                     dragManager.setNewlyMadeNode(createdNode);
                     window.redrawView();
                 }

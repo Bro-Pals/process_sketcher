@@ -48,7 +48,11 @@ public class SelectionManager {
     }
     
     public Selectable getLastSelected() {
-        return selected.get(selected.size() - 1);
+        if (!selected.isEmpty()) {
+            return selected.get(selected.size() - 1);
+        } else {
+            return null;
+        }
     }
     
 }

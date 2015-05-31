@@ -9,6 +9,7 @@ import bropals.flowy.Camera;
 import bropals.flowy.data.Node;
 import bropals.flowy.data.NodeLine;
 import java.awt.Graphics;
+import java.awt.Point;
 
 /**
  *
@@ -23,10 +24,17 @@ public enum LineType {
                 g.setColor(n.getStyle().getLineColor());
                 Node par = n.getParent();
                 Node chi = n.getChild();
-                g.drawLine(par.getX() + (par.getWidth()/2), 
-                        par.getY() + (par.getHeight()/2), 
-                        chi.getX() + (chi.getWidth()/2), 
-                        chi.getY() + (chi.getHeight()/2));
+                
+                Point p1 = new Point(par.getX() + (int)((par.getWidth() / camera.getZoom())/2), 
+                        par.getY() + (int)((par.getHeight() / camera.getZoom())/2));
+                Point p2 = new Point(chi.getX() + (int)((chi.getWidth() / camera.getZoom())/2), 
+                        chi.getY() + (int)((chi.getHeight() / camera.getZoom())/2));
+                
+                p1 = camera.convertWorldToCanvas(p1);
+                p2 = camera.convertWorldToCanvas(p2);
+                
+                g.drawLine((int)p1.getX(), (int)p1.getY(), 
+                        (int)p2.getX(), (int)p2.getY());
                 break;
         }
     }

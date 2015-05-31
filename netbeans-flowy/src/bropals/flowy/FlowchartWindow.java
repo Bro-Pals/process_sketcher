@@ -44,6 +44,9 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -136,20 +139,27 @@ public class FlowchartWindow extends JFrame {
         view.addMouseListener(eventManager);
         view.addKeyListener(eventManager);
         view.addMouseMotionListener(eventManager);
-        CameraControls cameraControls = new CameraControls(camera);
+        CameraControls cameraControls = new CameraControls(camera, this);
         view.addMouseMotionListener(cameraControls);
         view.addKeyListener(cameraControls);
         view.addMouseWheelListener(cameraControls);
         view.addMouseListener(cameraControls);
+        view.addMouseListener(new MouseAdapter() {
+           @Override
+           public void mouseEntered(MouseEvent e) {
+               view.requestFocus();
+           }
+        });
         add(buttonPanel, BorderLayout.NORTH);
         add(view, BorderLayout.CENTER);
-        revalidate();
+        setSize(800, 600);
         view.setFocusable(true);
-        view.requestFocus();
+        view.setFocusTraversalKeysEnabled(false);
+        revalidate();
     }
     
     public void redrawView() {
-        paintView(view.getGraphics());
+        view.repaint();
     }
     
     public void paintView(Graphics g) {
@@ -159,9 +169,12 @@ public class FlowchartWindow extends JFrame {
             n.getStyle().getShape().renderShape(n, camera,  g);
             if (eventManager.isSelected(n)) {
                 g.setColor(Color.red);
-                int offset = 3; // for the selection box
-                g.drawRect(n.getX() - offset, n.getY() - offset, 
-                        n.getWidth() + (2*offset), n.getHeight() + (2*offset));
+                float offset = 3 / camera.getZoom(); // for the selection box
+                Point topLeftCorner = camera.convertWorldToCanvas(new Point(n.getX(), n.getY()));
+                g.drawRect((int)(topLeftCorner.getX() - offset), 
+                        (int)(topLeftCorner.getY() - offset), 
+                        (int)(n.getWidth()/camera.getZoom() + (2*offset)),
+                        (int)(n.getHeight()/camera.getZoom() + (2*offset)));
             }
             for (NodeLine nl : n.getLinesConnected()) {
                 nl.getStyle().getType().renderLine(nl, camera, g);
@@ -177,6 +190,12 @@ public class FlowchartWindow extends JFrame {
         return eventManager;
     }
 
+    public JComponent getView() {
+        return view;
+    }
+
+    
+    
     /**
      * The flowchart currently being edited.
      * @return 
