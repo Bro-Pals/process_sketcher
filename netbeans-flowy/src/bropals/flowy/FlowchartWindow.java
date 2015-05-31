@@ -10,8 +10,10 @@ import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.io.File;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
@@ -25,7 +27,32 @@ public class FlowchartWindow extends JFrame {
     private JPanel buttonPanel;
     private JComponent view;
     private Camera camera;
-
+    /*
+        The mudball of GUI elements
+    */
+    private JButton createShape;
+    private JButton selectNextNode;
+    private JButton selectPreviousNode;
+    
+    private JButton undo;
+    private JButton resetView;
+    private JButton fitToView;
+    private JButton zoomIn;
+    private JButton zoomOut;
+    private JButton copy;
+    private JButton cut;
+    private JButton paste;
+    private JLabel nodesSelectedCounter;
+    private JButton newFlowchart;
+    private JButton saveFlowchart;
+    private JButton saveAsFlowchart;
+    private JButton openFlowchart;
+    private JButton printFlowchart;
+    private JButton exportChartToPDF;
+    private JButton exportChartToImage;
+    private JButton autoformatHorizontally;
+    private JButton autoformatVertically;
+    
     public FlowchartWindow() {
         this(null);
     }
