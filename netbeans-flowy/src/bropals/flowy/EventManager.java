@@ -262,7 +262,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         if (e.getButton() == MouseEvent.BUTTON1 && dragManager.isBoxSelecting()) {
             System.out.println("Finished box selecting");
             ArrayList<Selectable> selectedItems = getSelectablesUnderBox(
-                    new Point(dragManager.getInitialX(), dragManager.getInitialY()), 
+                    new Point((int)dragManager.getInitialX(), (int)dragManager.getInitialY()), 
                     dragManager.getOffsetX(), dragManager.getOffsetY());
             // clear selection
             selectionManager.getSelected().clear();

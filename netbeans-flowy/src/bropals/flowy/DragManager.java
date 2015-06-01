@@ -15,11 +15,12 @@ import bropals.flowy.data.Node;
 public class DragManager {
     
     private boolean dragging, boxSelecting;
-    private int offsetX;
-    private int offsetY;
-    private int initialX;
-    private int initialY;
+    private float offsetX; //In world coords
+    private float offsetY; //In world coords
+    private float initialX; //In world coords
+    private float initialY; //In world coords
     private Node newlyMadeNode;
+    private Node moveDragging;
     
     public DragManager() {
         dragging = false;
@@ -29,6 +30,7 @@ public class DragManager {
         initialY = 0;
         newlyMadeNode = null;
         boxSelecting = false;
+        moveDragging = null;
     }
 
     public void setBoxSelecting(boolean boxSelecting) {
@@ -47,31 +49,31 @@ public class DragManager {
         this.dragging = dragging;
     }
 
-    public int getOffsetX() {
+    public float getOffsetX() {
         return offsetX;
     }
 
-    public void setOffsetX(int offsetX) {
+    public void setOffsetX(float offsetX) {
         this.offsetX = offsetX;
     }
 
-    public int getOffsetY() {
+    public float getOffsetY() {
         return offsetY;
     }
 
-    public void setOffsetY(int offsetY) {
+    public void setOffsetY(float offsetY) {
         this.offsetY = offsetY;
     }
 
-    public int getInitialX() {
+    public float getInitialX() {
         return initialX;
     }
 
-    public void setInitialX(int initialX) {
+    public void setInitialX(float initialX) {
         this.initialX = initialX;
     }
 
-    public int getInitialY() {
+    public float getInitialY() {
         return initialY;
     }
 
@@ -87,5 +89,8 @@ public class DragManager {
         this.newlyMadeNode = newlyMadeNode;
     }
     
-    
+    public void startMoveDragging(Node moveDragging, float mouseX, float mouseY) {
+        
+    }
+        
 }

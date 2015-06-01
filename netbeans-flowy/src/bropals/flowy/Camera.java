@@ -21,6 +21,7 @@ public class Camera {
     private float zoom;
     private float x; //Camera X position (World coordinates)
     private float y; //Camera Y position (World coordinates)
+    private boolean locked = false;
     
     public Camera() {
         zoom = 1;
@@ -60,11 +61,15 @@ public class Camera {
     }
     
     public void setWorldLocationX(float x) {
-        this.x = x;
+        if (!locked) {
+            this.x = x;
+        }
     }
     
     public void setWorldLocationY(float y) {
-        this.y = y;
+        if (!locked) {
+            this.y = y;
+        }
     }
     
     public float getWorldLocationX() {
@@ -84,11 +89,15 @@ public class Camera {
     }
     
     public void setCanvasLocationX(int x) {
-        this.x = convertCanvasToWorldX(x);
+        if (!locked) {
+            this.x = convertCanvasToWorldX(x);
+        }
     }
     
     public void setCanvasLocationY(int y) {
-        this.y = convertCanvasToWorldY(y);
+        if (!locked) {
+            this.y = convertCanvasToWorldY(y);
+        }
     }
 
     public float getZoom() {
@@ -96,15 +105,27 @@ public class Camera {
     }
     
     public void setZoom(float zoom) {
-        this.zoom = zoom;
+        if (!locked) {
+            this.zoom = zoom;
+        }
     }
     
     public void zoom(float zoom) {
-        this.zoom += zoom;
-        if (this.zoom < ZOOM_MIN) {
-            this.zoom = ZOOM_MIN;
-        } else if (this.zoom > ZOOM_MAX) {
-            this.zoom = ZOOM_MAX;
+        if (!locked) {
+            this.zoom += zoom;
+            if (this.zoom < ZOOM_MIN) {
+                this.zoom = ZOOM_MIN;
+            } else if (this.zoom > ZOOM_MAX) {
+                this.zoom = ZOOM_MAX;
+            }
         }
+    }
+    
+    public void lock() {
+        locked = true;
+    }
+    
+    public void unlock() {
+        locked = false;
     }
 }
