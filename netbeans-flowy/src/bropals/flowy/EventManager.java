@@ -84,11 +84,6 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                         selectionManager.getLastSelected() instanceof Node) {
                     Node selectedNode = (Node)selectionManager.getLastSelected();
                     
-                    System.out.println("This node has " + selectedNode.getLinesConnected().size() + " lines connecting");
-                    for (NodeLine nl : selectedNode.getLinesConnected()) {
-                        System.out.println("parent: " + nl.getParent() + "   |  child: " + nl.getChild());
-                    }
-                    
                     boolean nextNodeIsThere = false;
                     if (!selectedNode.getLinesConnected().isEmpty()) {
                         Node nextNode = null;
@@ -115,13 +110,15 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                             nextNodeIsThere = true;
                             selectionManager.getSelected().clear();
                             selectionManager.getSelected().add(nextNode);
-                            System.out.println("selecting next node");
+                            //System.out.println("selecting next node");
                         }
                     }
                     
                     if (!nextNodeIsThere && !e.isShiftDown()) { /// ... if shift was not held down
+                            // create a new node
                             Node createdNode = (Node)selectedNode.clone();
                            // System.out.println(node + " and " + createdNode);
+                            // position it to the right of the previously selected node
                             createdNode.setX(selectedNode.getX() + selectedNode.getWidth() + 120);
                             createdNode.setY(selectedNode.getY());
                             createdNode.getLinesConnected().clear();
@@ -131,8 +128,10 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                             createdNode.getLinesConnected().add(line);
                             selectedNode.getLinesConnected().add(line);
                             dragManager.setNewlyMadeNode(createdNode);
+                             // select your newly created node
                             selectionManager.getSelected().clear();
-                            selectionManager.getSelected().add(createdNode); // select your newly created node
+                            selectionManager.getSelected().add(createdNode);
+                            // redraw the window
                             window.redrawView();
                         }
                 }
@@ -208,7 +207,9 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         }
         
         if (node == null && nodeLine == null && e.getButton() == MouseEvent.BUTTON1) {
-            selectionManager.getSelected().clear(); // clear selection if you don't click anything
+             // clear selection if you don't click anything
+            selectionManager.getSelected().clear();
+            
         }
         window.redrawView();
     }
