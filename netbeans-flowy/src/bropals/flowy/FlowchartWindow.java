@@ -249,6 +249,14 @@ public class FlowchartWindow extends JFrame {
         exportChartToPDF.addActionListener(new ExportChartToPDFListener(this));
         exportChartToImage.addActionListener(new ExportChartToImageListener(this));
         
+        newFlowchart.setToolTipText("Create a new flowchart");
+        saveFlowchart.setToolTipText("Saves this flowchart to disk");
+        saveAsFlowchart.setToolTipText("Saves this flowchart to disk as");
+        openFlowchart.setToolTipText("Open a flowchart from disk");
+        printFlowchart.setToolTipText("Print this flowchart");
+        exportChartToPDF.setToolTipText("Export this flowchart as a PDF");
+        exportChartToImage.setToolTipText("Export this flowchart as an image");
+        
         fileTab.add(newFlowchart);
         fileTab.add(saveFlowchart);
         fileTab.add(saveAsFlowchart);
@@ -292,6 +300,16 @@ public class FlowchartWindow extends JFrame {
         autoformatHorizontally.addActionListener(new AutoformatHorizontallyListener(this));
         autoformatVertically.addActionListener(new AutoformatVerticallyListener(this));
         
+        copy.setToolTipText("Copies the selection to the clipboard");
+        cut.setToolTipText("Cuts the selection to the clipboard");
+        paste.setToolTipText("Pastes the clipboard's contents");
+        undo.setToolTipText("Undo the last action taken");
+        createShape.setToolTipText("Create a new node");
+        selectNextNode.setToolTipText("Select the next node in this process");
+        selectPreviousNode.setToolTipText("Select the previous node in this process");
+        autoformatHorizontally.setToolTipText("Formats the flowchart horizontally");
+        autoformatVertically.setToolTipText("Formats the flowchart vertically");
+        
         buttonPanel.addTab("Edit", editTab);
         
         JPanel viewTab = new JPanel();
@@ -306,6 +324,11 @@ public class FlowchartWindow extends JFrame {
         zoomOut.addActionListener(new ZoomOutListener(this));
         resetView.addActionListener(new ResetViewListener(this));
         fitToView.addActionListener(new FitToViewListener(this));
+        
+        zoomIn.setToolTipText("Zooms the camera in");
+        zoomOut.setToolTipText("Zooms the camera out");
+        resetView.setToolTipText("Reset the camera view");
+        fitToView.setToolTipText("Fits the entire flowchart in the view of the camera");
         
         viewTab.add(zoomIn);
         viewTab.add(zoomOut);
@@ -333,6 +356,10 @@ public class FlowchartWindow extends JFrame {
         fontSize.addChangeListener(new FontSizeListener(this));
         fontColor.addActionListener(new FontColorListener(this));
         
+        font.setToolTipText("Sets the font of the selected object(s)");
+        fontSize.setToolTipText("Sets the font size of the selected object(s)");
+        fontColor.setToolTipText("Sets the font color of the selected object(s)");
+        
         stylesTab.add(fontStylePanel);
         
         lineStylePanel = new JPanel();
@@ -349,6 +376,10 @@ public class FlowchartWindow extends JFrame {
         lineStyle.addActionListener(new LineStyleListener(this));
         lineSize.addChangeListener(new LineSizeListener(this));
         lineColor.addActionListener(new LineColorListener(this));
+        
+        lineStyle.setToolTipText("Sets the line style of the selected lines(s)");
+        lineSize.setToolTipText("Sets the line size of the selected lines(s)");
+        lineColor.setToolTipText("Sets the line color of the selected lines(s)");
         
         stylesTab.add(lineStylePanel);
         
@@ -369,6 +400,11 @@ public class FlowchartWindow extends JFrame {
         borderColor.addActionListener(new BorderColorListener(this));
         fillColor.addActionListener(new FillColorListener(this));
         borderSize.addChangeListener(new BorderSizeListener(this));
+        
+        shape.setToolTipText("Sets the shape of the selected node(s)");
+        borderColor.setToolTipText("Sets the border color of the selected node(s)");
+        fillColor.setToolTipText("Sets the fill color of the selected node(s)");
+        borderSize.setToolTipText("Sets the border size of the selected node(s)");
         
         stylesTab.add(nodeStylePanel);
         
