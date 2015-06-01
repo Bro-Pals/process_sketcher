@@ -14,7 +14,7 @@ import bropals.flowy.data.Node;
  */
 public class DragManager {
     
-    private boolean dragging;
+    private boolean dragging, boxSelecting;
     private int offsetX;
     private int offsetY;
     private int initialX;
@@ -28,6 +28,15 @@ public class DragManager {
         initialX = 0;
         initialY = 0;
         newlyMadeNode = null;
+        boxSelecting = false;
+    }
+
+    public void setBoxSelecting(boolean boxSelecting) {
+        this.boxSelecting = boxSelecting;
+    }
+
+    public boolean isBoxSelecting() {
+        return boxSelecting;
     }
     
     public boolean isDragging() {

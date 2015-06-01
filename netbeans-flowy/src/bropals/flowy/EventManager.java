@@ -14,6 +14,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
 
 /**
  * Gets events from the view and StyleManager and handles them.
@@ -62,6 +63,26 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         
         return thing;
     }
+    
+    /**
+     * Get a list of all the selectables that are completely inside of the given box
+     * @param p The top left corner of the box in world units
+     * @param width The width of the box in world units
+     * @param height The height of the box in world units
+     * @return A list of all selectables (nodes and node-lines) that were completely inside of the box
+     */
+    private ArrayList<Selectable> getSelectablesUnderBox(Point p, float width, float height) {
+        ArrayList<Selectable> list = new ArrayList<>();
+        for (Node n : window.getFlowchart().getNodes()) {
+            if (p.getX() > n.getX() && p.getX() + width < n.getX() + n.getWidth() &&
+                    p.getY() > n.getY() && p.getY() + height < n.getY() + n.getHeight()) {
+                list.add(n);
+            }
+        }
+        
+        
+        return list;
+    }
 
     @Override
     public void keyTyped(KeyEvent e) {
@@ -70,7 +91,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
 
     @Override
     public void keyPressed(KeyEvent e) {
-        System.out.println("PRESSED A KEY " + e.getKeyCode());
+        //System.out.println("PRESSED A KEY " + e.getKeyCode());
         switch (e.getKeyCode()) {
             case KeyEvent.VK_N:
                 if (e.isControlDown()) {
@@ -115,32 +136,39 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     }
                     
                     if (!nextNodeIsThere && !e.isShiftDown()) { /// ... if shift was not held down
-                            // create a new node
-                            Node createdNode = (Node)selectedNode.clone();
-                           // System.out.println(node + " and " + createdNode);
-                            // position it to the right of the previously selected node
-                            createdNode.setX(selectedNode.getX() + selectedNode.getWidth() + 120);
-                            createdNode.setY(selectedNode.getY());
-                            createdNode.getLinesConnected().clear();
-                            window.getFlowchart().getNodes().add(createdNode);
-                            // connect the two nodes with a line
-                            NodeLine line = new NodeLine(selectedNode, createdNode);
-                            createdNode.getLinesConnected().add(line);
-                            selectedNode.getLinesConnected().add(line);
-                            dragManager.setNewlyMadeNode(createdNode);
-                             // select your newly created node
-                            selectionManager.getSelected().clear();
-                            selectionManager.getSelected().add(createdNode);
-                            // redraw the window
-                            window.redrawView();
-                        }
+                        // create a new node
+                        Node createdNode = (Node)selectedNode.clone();
+                       // System.out.println(node + " and " + createdNode);
+                        // position it to the right of the previously selected node
+                        createdNode.setX(selectedNode.getX() + selectedNode.getWidth() + 120);
+                        createdNode.setY(selectedNode.getY());
+                        createdNode.getLinesConnected().clear();
+                        window.getFlowchart().getNodes().add(createdNode);
+                        // connect the two nodes with a line
+                        NodeLine line = new NodeLine(selectedNode, createdNode);
+                        createdNode.getLinesConnected().add(line);
+                        selectedNode.getLinesConnected().add(line);
+                        dragManager.setNewlyMadeNode(createdNode);
+                         // select your newly created node
+                        selectionManager.getSelected().clear();
+                        selectionManager.getSelected().add(createdNode);
+                        // redraw the window
+                        window.redrawView();
+                    }
                 }
                 window.redrawView();
                 break;
             case KeyEvent.VK_A:
-                window.getCamera().setWorldLocationX(window.getCamera().getWorldLocationX() - 5);
-                window.getCamera().setWorldLocationY(window.getCamera().getWorldLocationY() - 3);
-                window.redrawView();
+                if (e.isControlDown()) {
+                    // select everything with ctrl+a
+                    selectionManager.getSelected().clear();
+                    for (int i=0; i<window.getFlowchart().getNodes().size(); i++) {
+                        selectionManager.getSelected().add(window.getFlowchart().getNodes().get(i));
+                    }
+                    for (int i=0; i<window.getFlowchart().getNodeLines().size(); i++) {
+                        selectionManager.getSelected().add(window.getFlowchart().getNodeLines().get(i));
+                    }
+                }
                 break;
         }
     }
@@ -210,6 +238,13 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
              // clear selection if you don't click anything
             selectionManager.getSelected().clear();
             
+            // begin dragging a box for selection in a box
+            if (!dragManager.isDragging()) {
+                dragManager.setInitialX((int)mousePosition.getX());
+                dragManager.setInitialY((int)mousePosition.getY());
+                dragManager.setBoxSelecting(true);
+                dragManager.setDragging(true);
+            }
         }
         window.redrawView();
     }
@@ -219,10 +254,21 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         Point mousePosition = window.getCamera().convertCanvasToWorld(e.getPoint());
         
         if (dragManager.isDragging()) {
-            if (dragManager.getNewlyMadeNode() != null) {
+            if (e.getButton() == MouseEvent.BUTTON3 && dragManager.getNewlyMadeNode() != null) {
                 dragManager.setNewlyMadeNode(null);
                 dragManager.setDragging(false); // done dragging the newly created node
             }
+        }
+        if (e.getButton() == MouseEvent.BUTTON1 && dragManager.isBoxSelecting()) {
+            System.out.println("Finished box selecting");
+            ArrayList<Selectable> selectedItems = getSelectablesUnderBox(
+                    new Point(dragManager.getInitialX(), dragManager.getInitialY()), 
+                    dragManager.getOffsetX(), dragManager.getOffsetY());
+            // clear selection
+            selectionManager.getSelected().clear();
+            selectionManager.getSelected().addAll(selectedItems);
+            dragManager.setBoxSelecting(false);
+            dragManager.setDragging(false);
         }
     }
 
@@ -244,6 +290,8 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
             if (dragManager.getNewlyMadeNode() != null) {
                 dragManager.getNewlyMadeNode().setX((int)mousePos.getX());
                 dragManager.getNewlyMadeNode().setY((int)mousePos.getY());
+            } else if (dragManager.isBoxSelecting()) {
+                
             }
         }
                 
@@ -255,5 +303,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         
     }
     
-    
+    public DragManager getDragManager() {
+        return dragManager;
+    }
 }

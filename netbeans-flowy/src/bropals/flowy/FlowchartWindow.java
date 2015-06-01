@@ -180,6 +180,16 @@ public class FlowchartWindow extends JFrame {
                 nl.getStyle().getType().renderLine(nl, camera, g);
             }
         }
+        
+        // draw the box for the selection
+        if (eventManager.getDragManager().isBoxSelecting()) {
+            int startX = camera.convertWorldToCanvasX(eventManager.getDragManager().getInitialX());
+            int startY = camera.convertWorldToCanvasY(eventManager.getDragManager().getInitialY());
+            g.setColor(Color.BLUE);
+            g.drawRect(startX, startY, 
+                    (int)(eventManager.getDragManager().getOffsetX() / camera.getZoom()), 
+                    (int)(eventManager.getDragManager().getOffsetY() / camera.getZoom()));
+        }
     }
     
     public Camera getCamera() {
