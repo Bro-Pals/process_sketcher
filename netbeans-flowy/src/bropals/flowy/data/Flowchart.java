@@ -14,11 +14,9 @@ import java.util.ArrayList;
 public class Flowchart {
     
     private ArrayList<Node> nodes;
-    private ArrayList<NodeLine> nodeLines;
 
     public Flowchart() {
         nodes = new ArrayList<>();
-        nodeLines = new ArrayList<>();
         Node firstNode = new Node(100, 100);
         nodes.add(firstNode);
     }
@@ -28,7 +26,15 @@ public class Flowchart {
     }
 
     public ArrayList<NodeLine> getNodeLines() {
-        return nodeLines;
+        ArrayList<NodeLine> lines = new ArrayList<>();
+        for (Node n : getNodes()) {
+            for (NodeLine nl : n.getLinesConnected()) {
+                if (!lines.contains(nl)) {
+                    lines.add(nl);
+                }
+            }
+        }
+        return lines;
     }
     
     

@@ -163,12 +163,16 @@ public class FlowchartWindow extends JFrame {
     }
     
     public void paintView(Graphics g) {
+        // draw the background
         g.setColor(Color.WHITE);
         g.fillRect(0, 0, view.getWidth(), view.getHeight());
+        // the color used for showing that something is selected
+        Color selectionColor = Color.RED;
         for (Node n : flowchart.getNodes()) {
             n.getStyle().getShape().renderShape(n, camera,  g);
             if (eventManager.isSelected(n)) {
-                g.setColor(Color.red);
+                // draw the box around the node if it's being selected
+                g.setColor(selectionColor);
                 float offset = 3 / camera.getZoom(); // for the selection box
                 Point topLeftCorner = camera.convertWorldToCanvas(new Point.Float(n.getX(), n.getY()));
                 g.drawRect((int)(topLeftCorner.getX() - offset), 
@@ -177,7 +181,36 @@ public class FlowchartWindow extends JFrame {
                         (int)(n.getHeight()/camera.getZoom() + (2*offset)));
             }
             for (NodeLine nl : n.getLinesConnected()) {
-                nl.getStyle().getType().renderLine(nl, camera, g);
+                Point[] linePoints = nl.getStyle().getType().renderLine(nl, camera, g);
+                if (eventManager.isSelected(nl)) {
+                    g.setColor(selectionColor);
+                    float offset = 3 / camera.getZoom();
+                    g.drawLine((int)(linePoints[0].getX() + offset), 
+                            (int)(linePoints[0].getY() + offset), 
+                            (int)(linePoints[1].getX() + offset), 
+                            (int)(linePoints[1].getY() + offset));
+                    g.drawLine((int)(linePoints[0].getX() - offset), 
+                            (int)(linePoints[0].getY() - offset), 
+                            (int)(linePoints[1].getX() - offset), 
+                            (int)(linePoints[1].getY() - offset));
+                    /*
+                    int boxWidth = (int)(linePoints[1].getX() - linePoints[0].getX());
+                    int boxHeight = (int)(linePoints[1].getY() - linePoints[0].getY());
+                    if (boxWidth < 0) {
+                        linePoints[0].setLocation(linePoints[0].getX() + boxWidth, linePoints[0].getY());
+                        boxWidth = Math.abs(boxWidth);
+                    }
+                    if (boxHeight < 0) {
+                        linePoints[0].setLocation(linePoints[0].getX(), linePoints[0].getY() + boxHeight);
+                        boxHeight = Math.abs(boxHeight);
+                    }
+                    
+                    g.drawRect((int)(linePoints[0].getX() - offset), 
+                        (int)(linePoints[0].getY() - offset), 
+                        boxWidth + (int)(2*offset),
+                        boxHeight + (int)(2*offset));
+                    */
+                }
             }
         }
         

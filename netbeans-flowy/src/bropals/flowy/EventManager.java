@@ -89,7 +89,13 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 list.add(n);
             }
         }
-        
+        for (NodeLine nl : window.getFlowchart().getNodeLines()) {
+            if (list.contains(nl.getChild()) && list.contains(nl.getParent())
+                    && !list.contains(nl)) {
+                System.out.println("Adding a line to the selection");
+                list.add(nl);
+            }
+        }
         
         return list;
     }
@@ -247,7 +253,9 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         
         if (node == null && nodeLine == null && e.getButton() == MouseEvent.BUTTON1) {
              // clear selection if you don't click anything
-            selectionManager.getSelected().clear();
+            if (!e.isShiftDown()) {
+                selectionManager.getSelected().clear();
+            }
             
             // begin dragging a box for selection in a box
             if (!dragManager.isDragging()) {
