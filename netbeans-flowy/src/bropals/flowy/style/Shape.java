@@ -21,21 +21,21 @@ public enum Shape {
         switch(this) {
             case SQUARE:
                 g.setColor(node.getStyle().getBorderColor());
-                Point p1 = new Point(node.getX(), node.getY());
-                Point p2 = new Point(node.getX() + node.getWidth(), node.getY());
-                Point p3 = new Point(node.getX() + node.getWidth(), node.getY() + node.getHeight());
-                Point p4 = new Point(node.getX(), node.getY() + node.getHeight());
+                Point.Float p1 = new Point.Float(node.getX(), node.getY());
+                Point.Float p2 = new Point.Float(node.getX() + node.getWidth(), node.getY());
+                Point.Float p3 = new Point.Float(node.getX() + node.getWidth(), node.getY() + node.getHeight());
+                Point.Float p4 = new Point.Float(node.getX(), node.getY() + node.getHeight());
                 
                 // use canvas units to draw the node
-                p1 = camera.convertWorldToCanvas(p1);
-                p2 = camera.convertWorldToCanvas(p2);
-                p3 = camera.convertWorldToCanvas(p3);
-                p4 = camera.convertWorldToCanvas(p4);
+                Point _p1 = camera.convertWorldToCanvas(p1);
+                Point _p2 = camera.convertWorldToCanvas(p2);
+                Point _p3 = camera.convertWorldToCanvas(p3);
+                Point _p4 = camera.convertWorldToCanvas(p4);
                 
-                g.drawLine((int)p1.getX(), (int)p1.getY(),(int)p2.getX(), (int)p2.getY());
-                g.drawLine((int)p2.getX(), (int)p2.getY(),(int)p3.getX(), (int)p3.getY());
-                g.drawLine((int)p3.getX(), (int)p3.getY(),(int)p4.getX(), (int)p4.getY());
-                g.drawLine((int)p4.getX(), (int)p4.getY(),(int)p1.getX(), (int)p1.getY());
+                g.drawLine((int)_p1.getX(), (int)_p1.getY(),(int)_p2.getX(), (int)_p2.getY());
+                g.drawLine((int)_p2.getX(), (int)_p2.getY(),(int)_p3.getX(), (int)_p3.getY());
+                g.drawLine((int)_p3.getX(), (int)_p3.getY(),(int)_p4.getX(), (int)_p4.getY());
+                g.drawLine((int)_p4.getX(), (int)_p4.getY(),(int)_p1.getX(), (int)_p1.getY());
                 break;
         }
     }

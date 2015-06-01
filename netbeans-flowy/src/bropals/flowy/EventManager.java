@@ -45,7 +45,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      * @param p A point that is in world units
      * @return The thing that is closest under the mouse, or null if nothing was close.
      */
-    private Selectable getSelectableUnderPoint(Point p) {
+    private Selectable getSelectableUnderPoint(Point.Float p) {
         Selectable thing = null; // initially nothing
         for (Node n : window.getFlowchart().getNodes()) {
             if (p.getX() > n.getX() && p.getX() < n.getX() + n.getWidth() &&
@@ -156,7 +156,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
 
     @Override
     public void mousePressed(MouseEvent e) {
-        Point mousePosition = window.getCamera().convertCanvasToWorld(e.getPoint());
+        Point.Float mousePosition = window.getCamera().convertCanvasToWorld(e.getPoint());
         //System.out.println(mousePosition);
         //System.out.println(e.getPoint());
         
@@ -216,7 +216,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        Point mousePosition = window.getCamera().convertCanvasToWorld(e.getPoint());
+        Point.Float mousePosition = window.getCamera().convertCanvasToWorld(e.getPoint());
         
         if (dragManager.isDragging()) {
             if (dragManager.getNewlyMadeNode() != null) {
@@ -237,7 +237,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
     @Override
     public void mouseDragged(MouseEvent e) {
         if (dragManager.isDragging()) {
-            Point mousePos = window.getCamera().convertCanvasToWorld(e.getPoint());
+            Point.Float mousePos = window.getCamera().convertCanvasToWorld(e.getPoint());
             dragManager.setOffsetX((int)mousePos.getX() - dragManager.getInitialX());
             dragManager.setOffsetY((int)mousePos.getY() - dragManager.getInitialY());
             

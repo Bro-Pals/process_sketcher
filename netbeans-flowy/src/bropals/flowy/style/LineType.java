@@ -25,16 +25,16 @@ public enum LineType {
                 Node par = n.getParent();
                 Node chi = n.getChild();
                 
-                Point p1 = new Point(par.getX() + (int)((par.getWidth() / camera.getZoom())/2), 
-                        par.getY() + (int)((par.getHeight() / camera.getZoom())/2));
-                Point p2 = new Point(chi.getX() + (int)((chi.getWidth() / camera.getZoom())/2), 
-                        chi.getY() + (int)((chi.getHeight() / camera.getZoom())/2));
+                Point.Float p1 = new Point.Float((par.getX() + ((par.getWidth() / camera.getZoom())/2)), 
+                        par.getY() + ((par.getHeight() / camera.getZoom())/2));
+                Point.Float p2 = new Point.Float(chi.getX() + ((chi.getWidth() / camera.getZoom())/2), 
+                        chi.getY() + ((chi.getHeight() / camera.getZoom())/2));
                 
-                p1 = camera.convertWorldToCanvas(p1);
-                p2 = camera.convertWorldToCanvas(p2);
+                Point int_p1 = camera.convertWorldToCanvas(p1);
+                Point int_p2 = camera.convertWorldToCanvas(p2);
                 
-                g.drawLine((int)p1.getX(), (int)p1.getY(), 
-                        (int)p2.getX(), (int)p2.getY());
+                g.drawLine((int)int_p1.getX(),(int)int_p1.getY(), 
+                        (int)int_p2.getX(), (int)int_p2.getY());
                 break;
         }
     }
