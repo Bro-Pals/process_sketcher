@@ -170,7 +170,7 @@ public class FlowchartWindow extends JFrame {
             if (eventManager.isSelected(n)) {
                 g.setColor(Color.red);
                 float offset = 3 / camera.getZoom(); // for the selection box
-                Point topLeftCorner = camera.convertWorldToCanvas(new Point(n.getX(), n.getY()));
+                Point topLeftCorner = camera.convertWorldToCanvas(new Point.Float(n.getX(), n.getY()));
                 g.drawRect((int)(topLeftCorner.getX() - offset), 
                         (int)(topLeftCorner.getY() - offset), 
                         (int)(n.getWidth()/camera.getZoom() + (2*offset)),

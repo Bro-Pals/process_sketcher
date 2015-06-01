@@ -20,11 +20,11 @@ public class Node implements Selectable {
      * If the style is null, revert to a default style.
      */
     private NodeStyle style;
-    private int x, y, width, height;
+    private float x, y, width, height;
     private ArrayList<NodeLine> linesConnected;
     private String innerText;
     
-    public Node(int x, int y) {
+    public Node(float x, float y) {
         style = new NodeStyle(); // ???
         this.x = x;
         this.y = y;
@@ -46,35 +46,35 @@ public class Node implements Selectable {
         this.style = style;
     }
 
-    public int getX() {
+    public float getX() {
         return x;
     }
 
-    public void setX(int x) {
+    public void setX(float x) {
         this.x = x;
     }
 
-    public int getY() {
+    public float getY() {
         return y;
     }
 
-    public void setY(int y) {
+    public void setY(float y) {
         this.y = y;
     }
 
-    public int getWidth() {
+    public float getWidth() {
         return width;
     }
 
-    public void setWidth(int width) {
+    public void setWidth(float width) {
         this.width = width;
     }
 
-    public int getHeight() {
+    public float getHeight() {
         return height;
     }
 
-    public void setHeight(int height) {
+    public void setHeight(float height) {
         this.height = height;
     }
 

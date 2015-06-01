@@ -6,6 +6,7 @@
 package bropals.flowy;
 
 import java.awt.Point;
+import java.awt.geom.Point2D;
 
 /**
  * Holds the view transformation.
@@ -18,8 +19,8 @@ public class Camera {
     
     // 1 = no zoom
     private float zoom;
-    private int x; //Camera X position (World coordinates)
-    private int y; //Camera Y position (World coordinates)
+    private float x; //Camera X position (World coordinates)
+    private float y; //Camera Y position (World coordinates)
     
     public Camera() {
         zoom = 1;
@@ -27,47 +28,50 @@ public class Camera {
         y = 0;
     }
     
-    public Point convertCanvasToWorld(Point p) {
-        p.x = convertCanvasToWorldX(p.x);
-        p.y = convertCanvasToWorldY(p.y);
-        return p;
+    public Point.Float convertCanvasToWorld(Point p) {
+        return new Point.Float(
+                convertCanvasToWorldX(p.x),
+                convertCanvasToWorldY(p.y)
+        );
+        
     }
     
-    public Point convertWorldToCanvas(Point p) {
-        p.x = convertWorldToCanvasX(p.x);
-        p.y = convertWorldToCanvasY(p.y);
-        return p;
+    public Point convertWorldToCanvas(Point.Float p) {
+        return new Point(
+                convertWorldToCanvasX(p.x),
+                convertWorldToCanvasY(p.y)
+        );
     }
     
-    public int convertCanvasToWorldX(int x) {
-        return (int)(x*zoom) + this.x;
+    public float convertCanvasToWorldX(int x) {
+        return ((float)x*zoom) + this.x;
     }
     
-    public int convertCanvasToWorldY(int y) {
-        return (int)(y*zoom) + this.y;
+    public float convertCanvasToWorldY(int y) {
+        return ((float)y*zoom) + this.y;
     }
     
-    public int convertWorldToCanvasX(int x) {
+    public int convertWorldToCanvasX(float x) {
         return (int)((x - this.x)/zoom);
     }
     
-    public int convertWorldToCanvasY(int y) {
+    public int convertWorldToCanvasY(float y) {
         return (int)((y - this.y)/zoom);
     }
     
-    public void setWorldLocationX(int x) {
+    public void setWorldLocationX(float x) {
         this.x = x;
     }
     
-    public void setWorldLocationY(int y) {
+    public void setWorldLocationY(float y) {
         this.y = y;
     }
     
-    public int getWorldLocationX() {
+    public float getWorldLocationX() {
         return x;
     }
     
-    public int getWorldLocationY() {
+    public float getWorldLocationY() {
         return y;
     }
 
@@ -84,7 +88,7 @@ public class Camera {
     }
     
     public void setCanvasLocationY(int y) {
-        this.y = convertCanvasToWorldY(x);
+        this.y = convertCanvasToWorldY(y);
     }
 
     public float getZoom() {

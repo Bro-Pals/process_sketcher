@@ -29,9 +29,9 @@ public class CreateShapeListener extends AbstractFlowyListener implements Action
         getFlowchartWindow().getFlowchart().getNodes().add(node);
         
         // get the center of the screen in world coordinates
-        int centerX = getFlowchartWindow().getCamera().convertCanvasToWorldX(
+        float centerX = getFlowchartWindow().getCamera().convertCanvasToWorldX(
                 getFlowchartWindow().getView().getWidth()/2);
-        int centerY = getFlowchartWindow().getCamera().convertCanvasToWorldY(
+        float centerY = getFlowchartWindow().getCamera().convertCanvasToWorldY(
                 getFlowchartWindow().getView().getHeight()/2);
         
         // position the node to the center
