@@ -72,10 +72,20 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      * @return A list of all selectables (nodes and node-lines) that were completely inside of the box
      */
     private ArrayList<Selectable> getSelectablesUnderBox(Point p, float width, float height) {
+        // readjust the position of the box with negative width or heights
+        if (width < 0) {
+            p.setLocation(p.getX() + width, p.getY());
+            width = Math.abs(width);
+        }
+        if (height < 0) {
+            p.setLocation(p.getX(), p.getY() + height);
+            height = Math.abs(height);
+        }
+        
         ArrayList<Selectable> list = new ArrayList<>();
         for (Node n : window.getFlowchart().getNodes()) {
-            if (p.getX() > n.getX() && p.getX() + width < n.getX() + n.getWidth() &&
-                    p.getY() > n.getY() && p.getY() + height < n.getY() + n.getHeight()) {
+            if (p.getX() < n.getX() && p.getX() + width > n.getX() + n.getWidth() &&
+                    p.getY() < n.getY() && p.getY() + height > n.getY() + n.getHeight()) {
                 list.add(n);
             }
         }
@@ -246,8 +256,11 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
             
             // begin dragging a box for selection in a box
             if (!dragManager.isDragging()) {
+                System.out.println("Start box selecting");
                 dragManager.setInitialX((int)mousePosition.getX());
                 dragManager.setInitialY((int)mousePosition.getY());
+                dragManager.setOffsetX(0);
+                dragManager.setOffsetY(0);
                 dragManager.setBoxSelecting(true);
                 dragManager.setDragging(true);
             }
@@ -274,11 +287,15 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     new Point((int)dragManager.getInitialX(), (int)dragManager.getInitialY()), 
                     dragManager.getOffsetX(), dragManager.getOffsetY());
             // clear selection
-            selectionManager.getSelected().clear();
+            if (!e.isShiftDown()) {
+                selectionManager.getSelected().clear();
+            }
+            System.out.println("Adding " + selectedItems.size() + " to the selection");
             selectionManager.getSelected().addAll(selectedItems);
             dragManager.setBoxSelecting(false);
             dragManager.setDragging(false);
         }
+        window.redrawView();
     }
 
     @Override

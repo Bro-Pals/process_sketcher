@@ -182,13 +182,24 @@ public class FlowchartWindow extends JFrame {
         }
         
         // draw the box for the selection
-        if (eventManager.getDragManager().isBoxSelecting()) {
+        if (eventManager.getDragManager().isBoxSelecting() &&
+                Math.abs(eventManager.getDragManager().getOffsetX()) > 3 &&
+                Math.abs(eventManager.getDragManager().getOffsetY()) > 3) {
             int startX = camera.convertWorldToCanvasX(eventManager.getDragManager().getInitialX());
             int startY = camera.convertWorldToCanvasY(eventManager.getDragManager().getInitialY());
+            int offsetX = (int)(eventManager.getDragManager().getOffsetX() / camera.getZoom());
+            int offsetY = (int)(eventManager.getDragManager().getOffsetY() / camera.getZoom());
+            
+            // adjust values if there are negative values for the offset
+            if (offsetX < 0) {
+                startX = startX + offsetX;
+            }
+            if (offsetY < 0) {
+                startY = startY + offsetY;
+            }
+            
             g.setColor(Color.BLUE);
-            g.drawRect(startX, startY, 
-                    (int)(eventManager.getDragManager().getOffsetX() / camera.getZoom()), 
-                    (int)(eventManager.getDragManager().getOffsetY() / camera.getZoom()));
+            g.drawRect(startX, startY, Math.abs(offsetX), Math.abs(offsetY));
         }
     }
     
