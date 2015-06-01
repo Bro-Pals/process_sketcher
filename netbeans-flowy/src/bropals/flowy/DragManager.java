@@ -68,7 +68,7 @@ public class DragManager {
         return initialY;
     }
 
-    public void setInitialY(int initialY) {
+    public void setInitialY(float initialY) {
         this.initialY = initialY;
     }
 
@@ -80,8 +80,5 @@ public class DragManager {
         this.newlyMadeNode = newlyMadeNode;
     }
     
-    public void startMoveDragging(Node moveDragging, float mouseX, float mouseY) {
-        
-    }
-        
+    
 }
