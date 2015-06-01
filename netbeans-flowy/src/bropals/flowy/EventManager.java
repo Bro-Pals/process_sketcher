@@ -33,8 +33,8 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
     
     public EventManager(FlowchartWindow instance) {
         window = instance;
-        dragManager = new DragManager();
         selectionManager = new SelectionManager();
+        dragManager = new DragManager(selectionManager);
     }
 
     public boolean isSelected(Selectable s) {
@@ -169,6 +169,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                         selectionManager.getSelected().add(window.getFlowchart().getNodeLines().get(i));
                     }
                 }
+                window.redrawView();
                 break;
         }
     }
