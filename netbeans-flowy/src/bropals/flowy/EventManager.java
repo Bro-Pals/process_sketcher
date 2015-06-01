@@ -218,12 +218,12 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         // actions involving a node
         if (node != null) {
             if (!dragManager.isDragging()) { // not yet dragging anything...
+                dragManager.setDragging(true); // start dragging
+                dragManager.setInitialX((int)mousePosition.getX());
+                dragManager.setInitialY((int)mousePosition.getY());
+                dragManager.setOffsetX(0); // initially
+                dragManager.setOffsetY(0);
                 if (e.getButton() == MouseEvent.BUTTON3) {
-                    dragManager.setDragging(true); // start dragging
-                    dragManager.setInitialX((int)mousePosition.getX());
-                    dragManager.setInitialY((int)mousePosition.getY());
-                    dragManager.setOffsetX(0); // initially
-                    dragManager.setOffsetY(0);
                     
                     Node createdNode = (Node)node.clone();
                   //  System.out.println(node + " and " + createdNode);
@@ -246,6 +246,11 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     selectionManager.getSelected().clear();
                 }
                 selectionManager.getSelected().add(clickedOnThing);
+                if (clickedOnThing != null && clickedOnThing.equals(selectionManager.getLastSelected())) {
+                    dragManager.startDragMove(mousePosition.x, mousePosition.y);
+                } else {
+                    dragManager.endDragMove();
+                }
             }
         } else if (nodeLine != null) { // actions only for node lines
             
@@ -279,6 +284,9 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
             if (e.getButton() == MouseEvent.BUTTON3 && dragManager.getNewlyMadeNode() != null) {
                 dragManager.setNewlyMadeNode(null);
                 dragManager.setDragging(false); // done dragging the newly created node
+            }
+            if (dragManager.isDragMoving()) {
+                dragManager.endDragMove();
             }
         }
         if (e.getButton() == MouseEvent.BUTTON1 && dragManager.isBoxSelecting()) {
@@ -316,6 +324,10 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
             if (dragManager.getNewlyMadeNode() != null) {
                 dragManager.getNewlyMadeNode().setX((int)mousePos.getX());
                 dragManager.getNewlyMadeNode().setY((int)mousePos.getY());
+            } else if (dragManager.isBoxSelecting()) {
+                
+            } else if (dragManager.isDragMoving()) {
+                dragManager.updateDragMove((float)mousePos.getX(), (float)mousePos.getY());
             }
         }
                 

@@ -21,7 +21,8 @@ public class DragManager {
     private float initialX; //In world coords
     private float initialY; //In world coords
     private Node newlyMadeNode;
-    private Node moveDragging;
+    private Node[] moveDragging; //List of stuff that is being dragged
+    private float[][] moveDragOffsets; //World coords
     
     public DragManager(SelectionManager manager) {
         dragging = false;
@@ -91,5 +92,35 @@ public class DragManager {
         this.newlyMadeNode = newlyMadeNode;
     }
     
+    /**
+     * Start move dragging.
+     * @param mouseX the current mouse X position in world coordinates.
+     * @param mouseY the current mouse Y position in world coordinates.
+     */
+    public void startDragMove(float mouseX, float mouseY) {
+        moveDragging = (Node[])selectionManager.getSelectedNodes().toArray(new Node[0]);
+        moveDragOffsets = new float[moveDragging.length][2];
+        for (int i=0; i<moveDragging.length; i++) {
+            moveDragOffsets[i][0] = moveDragging[i].getX() - mouseX;
+            moveDragOffsets[i][1] = moveDragging[i].getY() - mouseY;
+        }
+        dragging = true;
+    }
     
+    public boolean isDragMoving() {
+        return moveDragging != null;
+    }
+    
+    public void updateDragMove(float mouseX, float mouseY) {
+        for (int i=0; i<moveDragging.length; i++) {
+            moveDragging[i].setX(initialX+offsetX+moveDragOffsets[i][0]);
+            moveDragging[i].setY(initialY+offsetY+moveDragOffsets[i][1]);
+        }
+    }
+    
+    public void endDragMove() {
+        moveDragging = null;
+        moveDragOffsets = null;
+        dragging = false;
+    }
 }
