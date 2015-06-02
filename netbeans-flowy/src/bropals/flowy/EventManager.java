@@ -30,6 +30,8 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      * 
      */
     private DragManager dragManager;
+    /** The variable to track if the spacebar is held down or not */
+    private boolean spacebar;
     
     public EventManager(FlowchartWindow instance) {
         window = instance;
@@ -55,11 +57,29 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 return thing;
             }
         }
-        
+
+         // it must be a minimum of 10 pixels away
+        double nearestDistance = 10 * (window.getCamera().getZoom()); 
         // if no nodes were found, find the nearest line.
-        
-        // do that stuff here
-        
+        for (NodeLine nl : window.getFlowchart().getNodeLines()) {
+            // drag so we can get the points of the line
+            Point[] linePoints = nl.getStyle().getType().renderLine(nl, window.getCamera(), window.getView().getGraphics());
+            Point.Float p1 = window.getCamera().convertCanvasToWorld(linePoints[0]);
+            Point.Float p2 = window.getCamera().convertCanvasToWorld(linePoints[1]);
+            
+            // copied the formula from:
+            // http://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line
+            
+            double distance = Math.abs(((p2.getY() - p1.getY()) * p.getX())- 
+                    ((p2.getX() - p1.getX()) * p.getY()) + (p2.getX() * p1.getY()) -
+                    (p2.getY() * p1.getX())) / Math.sqrt(Math.pow(p2.getY() - p1.getY(), 2) +
+                     Math.pow(p2.getX() - p1.getX(), 2));
+                        
+            if (distance < nearestDistance) {
+                nearestDistance = distance;
+                thing = nl;
+            }
+        }
         
         return thing;
     }
@@ -92,7 +112,6 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         for (NodeLine nl : window.getFlowchart().getNodeLines()) {
             if (list.contains(nl.getChild()) && list.contains(nl.getParent())
                     && !list.contains(nl)) {
-                System.out.println("Adding a line to the selection");
                 list.add(nl);
             }
         }
@@ -107,8 +126,10 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
 
     @Override
     public void keyPressed(KeyEvent e) {
-        //System.out.println("PRESSED A KEY " + e.getKeyCode());
         switch (e.getKeyCode()) {
+            case KeyEvent.VK_SPACE:
+                spacebar = true;
+                break;
             case KeyEvent.VK_N:
                 if (e.isControlDown()) {
                     System.out.println("Creating a flowchart");
@@ -116,7 +137,6 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 }
                 break;
             case KeyEvent.VK_TAB:
-                System.out.println("TAB");
                 if (selectionManager.getLastSelected() != null &&
                         selectionManager.getLastSelected() instanceof Node) {
                     Node selectedNode = (Node)selectionManager.getLastSelected();
@@ -154,7 +174,6 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     if (!nextNodeIsThere && !e.isShiftDown()) { /// ... if shift was not held down
                         // create a new node
                         Node createdNode = (Node)selectedNode.clone();
-                       // System.out.println(node + " and " + createdNode);
                         // position it to the right of the previously selected node
                         createdNode.setX(selectedNode.getX() + selectedNode.getWidth() + 120);
                         createdNode.setY(selectedNode.getY());
@@ -192,7 +211,11 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
 
     @Override
     public void keyReleased(KeyEvent e) {
-
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_SPACE:
+                spacebar = false;
+                break;
+        }
     }
 
     @Override
@@ -202,8 +225,6 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
     @Override
     public void mousePressed(MouseEvent e) {
         Point.Float mousePosition = window.getCamera().convertCanvasToWorld(e.getPoint());
-        //System.out.println(mousePosition);
-        //System.out.println(e.getPoint());
         
         Selectable clickedOnThing = getSelectableUnderPoint(mousePosition);
         
@@ -226,7 +247,6 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 if (e.getButton() == MouseEvent.BUTTON3) {
                     
                     Node createdNode = (Node)node.clone();
-                  //  System.out.println(node + " and " + createdNode);
                     createdNode.setX(dragManager.getInitialX());
                     createdNode.setY(dragManager.getInitialY());
                     createdNode.getLinesConnected().clear();
@@ -253,8 +273,12 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 }
             }
         } else if (nodeLine != null) { // actions only for node lines
-            
+            if (!e.isShiftDown()) {
+                selectionManager.getSelected().clear();
+            }
+            selectionManager.getSelected().add(clickedOnThing);
         }
+        
         
         if (node == null && nodeLine == null && e.getButton() == MouseEvent.BUTTON1) {
              // clear selection if you don't click anything
@@ -262,15 +286,16 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 selectionManager.getSelected().clear();
             }
             
+            // you only start dragging a box when the spacebar is not held down
             // begin dragging a box for selection in a box
-            if (!dragManager.isDragging()) {
-                System.out.println("Start box selecting");
+            if (!spacebar && !dragManager.isDragging()) {
                 dragManager.setInitialX((int)mousePosition.getX());
                 dragManager.setInitialY((int)mousePosition.getY());
                 dragManager.setOffsetX(0);
                 dragManager.setOffsetY(0);
                 dragManager.setBoxSelecting(true);
                 dragManager.setDragging(true);
+                window.getCamera().lock();
             }
         }
         window.redrawView();
@@ -290,7 +315,6 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
             }
         }
         if (e.getButton() == MouseEvent.BUTTON1 && dragManager.isBoxSelecting()) {
-            System.out.println("Finished box selecting");
             ArrayList<Selectable> selectedItems = getSelectablesUnderBox(
                     new Point((int)dragManager.getInitialX(), (int)dragManager.getInitialY()), 
                     dragManager.getOffsetX(), dragManager.getOffsetY());
@@ -298,10 +322,10 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
             if (!e.isShiftDown()) {
                 selectionManager.getSelected().clear();
             }
-            System.out.println("Adding " + selectedItems.size() + " to the selection");
             selectionManager.getSelected().addAll(selectedItems);
             dragManager.setBoxSelecting(false);
             dragManager.setDragging(false);
+            window.getCamera().unlock();
         }
         window.redrawView();
     }

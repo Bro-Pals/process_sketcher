@@ -109,7 +109,7 @@ public class CameraControls implements MouseMotionListener, KeyListener, MouseLi
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        camera.zoom(e.getWheelRotation());
+        camera.zoom(e.getWheelRotation() / 4.0f);
         window.redrawView();
     }
 }
