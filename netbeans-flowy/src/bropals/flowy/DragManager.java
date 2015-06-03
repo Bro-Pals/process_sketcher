@@ -15,7 +15,7 @@ import bropals.flowy.data.Node;
 public class DragManager {
     
     private SelectionManager selectionManager;
-    private boolean dragging, boxSelecting;
+    private boolean dragging, boxSelecting, leftMouseDown, rightMouseDown;
     private float offsetX; //In world coords
     private float offsetY; //In world coords
     private float initialX; //In world coords
@@ -34,6 +34,8 @@ public class DragManager {
         boxSelecting = false;
         moveDragging = null;
         selectionManager = manager;
+        leftMouseDown = false;
+        rightMouseDown = false;
     }
 
     public void setBoxSelecting(boolean boxSelecting) {
@@ -84,6 +86,22 @@ public class DragManager {
         this.initialY = initialY;
     }
 
+    public boolean isLeftMouseDown() {
+        return leftMouseDown;
+    }
+
+    public void setLeftMouseDown(boolean leftMouseDown) {
+        this.leftMouseDown = leftMouseDown;
+    }
+
+    public boolean isRightMouseDown() {
+        return rightMouseDown;
+    }
+
+    public void setRightMouseDown(boolean rightMouseDown) {
+        this.rightMouseDown = rightMouseDown;
+    }
+    
     public Node getNewlyMadeNode() {
         return newlyMadeNode;
     }
@@ -93,12 +111,22 @@ public class DragManager {
     }
     
     /**
-     * Start move dragging.
+     * Start move dragging. It will move every node that is selected.
      * @param mouseX the current mouse X position in world coordinates.
      * @param mouseY the current mouse Y position in world coordinates.
      */
     public void startDragMove(float mouseX, float mouseY) {
-        moveDragging = (Node[])selectionManager.getSelectedNodes().toArray(new Node[0]);
+        moveDragging = (Node[])selectionManager.getSelectedNodes().toArray(
+                new Node[0]);
+        
+        System.out.println("Dragging the following:");
+        for (Node n : moveDragging)
+            System.out.println(n);
+        
+        initialX = mouseX;
+        initialY = mouseY;
+        offsetX = 0;
+        offsetY = 0;
         moveDragOffsets = new float[moveDragging.length][2];
         for (int i=0; i<moveDragging.length; i++) {
             moveDragOffsets[i][0] = moveDragging[i].getX() - mouseX;
