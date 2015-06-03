@@ -118,6 +118,33 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         return list;
     }
 
+    /**
+     * Remove everything in stuff from the flowchart.
+     * @param stuff What will be removed from flowchart.
+     */
+    private void removeSelectables(ArrayList<Selectable> stuff) {
+        for (Selectable s : stuff) {
+            if (s instanceof Node) {
+                for (int i=0; i<((Node)s).getLinesConnected().size(); i++) {
+                    ((Node)s).getLinesConnected().remove(i);
+                    NodeLine nl = ((Node)s).getLinesConnected().get(i);
+                    if (((Node)s) == nl.getChild()) {
+                        nl.getParent().getLinesConnected().remove(nl);
+                    } else {
+                        nl.getChild().getLinesConnected().remove(nl);
+                    }
+                    break;
+                }
+            }
+            for (int i=0; i<window.getFlowchart().getNodes().size(); i++) {
+                if (window.getFlowchart().getNodes().get(i) == s) {
+                    window.getFlowchart().getNodes().remove(i);
+                    break;
+                }
+            }
+        }
+    }
+    
     @Override
     public void keyTyped(KeyEvent e) {
         
@@ -129,11 +156,33 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
             case KeyEvent.VK_SPACE:
                 spacebar = true;
                 break;
+            case KeyEvent.VK_DELETE:
+                removeSelectables(selectionManager.getSelected());
+                selectionManager.getSelected().clear();
+                window.redrawView();
+                break;
             case KeyEvent.VK_N:
                 if (e.isControlDown()) {
                     System.out.println("Creating a flowchart");
                     window.getFlowchartWindowManager().newFlowchart();
                 }
+                window.redrawView();
+                break;
+            case KeyEvent.VK_C:
+                if (!selectionManager.getSelected().isEmpty()) {
+                    dragManager.setStuffInClipboard(selectionManager.getSelected());
+                }
+                break;
+            case KeyEvent.VK_X:
+                if (!selectionManager.getSelected().isEmpty()) {
+                    dragManager.setStuffInClipboard(selectionManager.getSelected());
+                    removeSelectables(selectionManager.getSelected());
+                    selectionManager.getSelected().clear();
+                }
+                window.redrawView();
+                break;
+            case KeyEvent.VK_V:
+                // paste everything into the center of the screen?
                 break;
             case KeyEvent.VK_TAB:
                 if (selectionManager.getLastSelected() != null &&

@@ -1,6 +1,8 @@
 package bropals.flowy;
 
 import bropals.flowy.data.Node;
+import bropals.flowy.data.Selectable;
+import java.util.ArrayList;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -15,6 +17,7 @@ import bropals.flowy.data.Node;
 public class DragManager {
     
     private SelectionManager selectionManager;
+    private ArrayList<Selectable> clipboard;
     private boolean dragging, boxSelecting, leftMouseDown, rightMouseDown;
     private float offsetX; //In world coords
     private float offsetY; //In world coords
@@ -36,8 +39,18 @@ public class DragManager {
         selectionManager = manager;
         leftMouseDown = false;
         rightMouseDown = false;
+        clipboard = new ArrayList<>();
     }
 
+    public void setStuffInClipboard(ArrayList<Selectable> selectables) {
+        clipboard.clear();
+        clipboard.addAll(selectables);
+    }
+    
+    public ArrayList<Selectable> getClipboard() {
+        return clipboard;
+    }
+    
     public void setBoxSelecting(boolean boxSelecting) {
         this.boxSelecting = boxSelecting;
     }
