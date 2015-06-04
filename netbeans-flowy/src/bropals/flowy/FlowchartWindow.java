@@ -68,6 +68,7 @@ public class FlowchartWindow extends JFrame {
     private FlowchartWindowManager flowchartWindowManager;
     private Flowchart flowchart;
     private EventManager eventManager;
+    private CameraControls cameraControls;
     private JTabbedPane buttonPanel;
     private JComponent view;
     private Camera camera;
@@ -140,7 +141,7 @@ public class FlowchartWindow extends JFrame {
         view.addMouseListener(eventManager);
         view.addKeyListener(eventManager);
         view.addMouseMotionListener(eventManager);
-        CameraControls cameraControls = new CameraControls(camera, this);
+        cameraControls = new CameraControls(camera, this);
         view.addMouseMotionListener(cameraControls);
         view.addKeyListener(cameraControls);
         view.addMouseWheelListener(cameraControls);
@@ -243,6 +244,10 @@ public class FlowchartWindow extends JFrame {
 
     public EventManager getEventManager() {
         return eventManager;
+    }
+    
+    public CameraControls getCameraControls() {
+        return cameraControls;
     }
 
     public JComponent getView() {
