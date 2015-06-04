@@ -21,6 +21,7 @@ public CutListener(FlowchartWindow window) {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        getFlowchartWindow().getEventManager().cutSelected();
     }
     
 }

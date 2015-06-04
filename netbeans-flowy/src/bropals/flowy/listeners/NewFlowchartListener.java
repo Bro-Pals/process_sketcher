@@ -21,6 +21,7 @@ public class NewFlowchartListener extends AbstractFlowyListener implements Actio
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        getFlowchartWindow().getEventManager().createNewFlowchart();
     }
     
 }

@@ -21,6 +21,7 @@ public class ZoomOutListener extends AbstractFlowyListener implements ActionList
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        getFlowchartWindow().getCameraControls().zoomOut();
     }
     
 }

@@ -21,6 +21,7 @@ public class CopyListener extends AbstractFlowyListener implements ActionListene
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        getFlowchartWindow().getEventManager().copySelected();
     }
     
 }
