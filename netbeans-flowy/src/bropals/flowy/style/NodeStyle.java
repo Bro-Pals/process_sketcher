@@ -66,6 +66,9 @@ public class NodeStyle extends FontStyle{
         other.setBorderSize(borderSize);
         other.setFillColor(fillColor);
         other.setShape(shape);
+        other.setFontColor(getFontColor());
+        other.setFontType(getFontType());
+        other.setFontSize(getFontSize());
         return other;
     }
     

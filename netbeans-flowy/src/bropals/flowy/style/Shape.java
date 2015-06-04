@@ -57,7 +57,7 @@ public enum Shape {
             FontRenderContext frc = g2.getFontRenderContext();
             TextLayout textLayout = new TextLayout(node.getInnerText(), transformedFont, frc);
             textLayout.draw(g2, (int)(camera.convertWorldToCanvasX(node.getX()) + 5), 
-                    (int)(camera.convertWorldToCanvasY(node.getY()) + 5));
+                    (int)(camera.convertWorldToCanvasY(node.getY()) + 12));
         
         }
     }

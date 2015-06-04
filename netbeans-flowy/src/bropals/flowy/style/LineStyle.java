@@ -47,5 +47,17 @@ public class LineStyle extends FontStyle {
         this.lineSize = lineSize;
     }
     
+    @Override
+    public Object clone() {
+        LineStyle other = new LineStyle();
+        other.setLineColor(getLineColor());
+        other.setLineSize(getLineSize());
+        other.setType(type);
+        other.setFontColor(getFontColor());
+        other.setFontType(getFontType());
+        other.setFontSize(getFontSize());
+        return other;
+    }
+    
     
 }

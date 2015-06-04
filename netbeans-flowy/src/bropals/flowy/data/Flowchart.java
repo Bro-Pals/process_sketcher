@@ -25,6 +25,11 @@ public class Flowchart {
         return nodes;
     }
 
+    /**
+     * This is only used for getting the node lines. Adding a NodeLine 
+     * to the returned array will NOT add the line to the flowchart.
+     * @return 
+     */
     public ArrayList<NodeLine> getNodeLines() {
         ArrayList<NodeLine> lines = new ArrayList<>();
         for (Node n : getNodes()) {

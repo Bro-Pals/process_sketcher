@@ -83,7 +83,7 @@ public enum LineType {
         }
         
         // set the font for drawing the font
-        g.setFont(n.getStyle().getFontType());
+        g.setFont(n.getStyle().getFontType().deriveFont((float)(n.getStyle().getFontSize() / camera.getZoom())));
         g.setColor(n.getStyle().getFontColor());
         
         // draw the tail, center, and head texts

@@ -83,5 +83,15 @@ public class NodeLine implements Selectable {
     public void setHeadText(String headText) {
         this.headText = headText;
     }
+    
+    @Override
+    public Object clone() {
+        NodeLine other = new NodeLine(parent, child);
+        other.setHeadText(headText);
+        other.setTailText(tailText);
+        other.setCenterText(centerText);
+        other.setStyle((LineStyle)(style.clone()));
+        return other;
+    }
    
 }

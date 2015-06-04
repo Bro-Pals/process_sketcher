@@ -133,21 +133,22 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      */
     private void removeSelectables(ArrayList<Selectable> stuff) {
         for (Selectable s : stuff) {
-            if (s instanceof Node) {
-                for (int i=0; i<((Node)s).getLinesConnected().size(); i++) {
-                    NodeLine nl = ((Node)s).getLinesConnected().get(i);
-                    ((Node)s).getLinesConnected().remove(i);
-                    if (((Node)s) == nl.getChild()) {
-                        nl.getParent().getLinesConnected().remove(nl);
-                    } else {
-                        nl.getChild().getLinesConnected().remove(nl);
-                    }
-                    break;
-                }
-            }
             for (int i=0; i<window.getFlowchart().getNodes().size(); i++) {
                 if (window.getFlowchart().getNodes().get(i) == s) {
+                    Node removedNode = window.getFlowchart().getNodes().get(i);
                     window.getFlowchart().getNodes().remove(i);
+                    // look through the other nodes...
+                    for (Node other : window.getFlowchart().getNodes()) {
+                        // to delete any node line that references the node we're removing
+                        for (NodeLine nl : other.getLinesConnected()) {
+                            // if the line references the removed node AT ALL
+                            if (nl.getChild() == removedNode || nl.getParent() == removedNode) {
+                                other.getLinesConnected().remove(nl);
+                                break;
+                            }
+                        }
+                    }
+                     // break out of removing all the lines for that node
                     break;
                 }
             }
@@ -193,6 +194,71 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
             selectionManager.getSelected().clear();
         }
         window.redrawView();
+    }
+    
+    /**
+     * Past what's in the clipboard, placing it offset from the original copy
+     */
+    public void pasteClipboard() { 
+        if (!dragManager.getClipboard().isEmpty()) {
+            // copy every node so it's all in the same order
+            // look through the original array, and connect lines
+            //    in the next array to match the original.
+            //    both the chil and parrent node in the line have to be
+            //    in the originally copied array to copy the line
+            // translate the entire copied array slightly to offset it
+            ArrayList<Node> pastedNodes = new ArrayList<>();
+            
+            // clone in the nodes
+            for (int i=0; i<dragManager.getClipboard().size(); i++) {
+                if (dragManager.getClipboard().get(i) instanceof Node) {
+                    pastedNodes.add((Node)(((Node)dragManager.getClipboard().get(i)).clone()));
+                }
+            }
+            
+            // clone in the node lines if the parent and child nodes of the line are in the pasted array
+            for (int i=0; i<pastedNodes.size(); i++) {
+                int parentIndex = i;
+                // copy the array of the original lines from the original array
+                ArrayList<NodeLine> linesConnected = ((Node)(dragManager.getClipboard().get(i))).getLinesConnected();
+                for (int l=0; l<linesConnected.size(); l++) {
+                    int childIndex = -1;
+                    // find the location of the child in the original array for the original line
+                    for (int n=0; n<dragManager.getClipboard().size(); n++) {
+                        if (n != parentIndex && dragManager.getClipboard().get(n) == linesConnected.get(l).getChild()) {
+                            childIndex = n;
+                            break;
+                        }
+                    }
+                    
+                    // if the child was found in the original array then add the new 
+                    //  line using the same (copy) of the parent and childs
+                    if (childIndex != -1) {
+                        NodeLine clonedLine = (NodeLine)(linesConnected.get(l).clone());
+                        clonedLine.setParent(pastedNodes.get(parentIndex));
+                        clonedLine.setChild(pastedNodes.get(childIndex));
+                        pastedNodes.get(parentIndex).getLinesConnected().add(clonedLine);
+                        pastedNodes.get(childIndex).getLinesConnected().add(clonedLine);
+                    }
+                }
+            }
+            
+            selectionManager.getSelected().clear();
+            
+            // add everything to the flowchart, translating slightly, and selecting them
+            for (int i=0; i<pastedNodes.size(); i++) {
+                window.getFlowchart().getNodes().add(pastedNodes.get(i));
+                pastedNodes.get(i).setX(pastedNodes.get(i).getX() + 30);
+                pastedNodes.get(i).setY(pastedNodes.get(i).getY() + 30);
+                
+                // select the newly added nodes and their connected lines
+                selectionManager.getSelected().add(pastedNodes.get(i));
+                for (NodeLine nl : pastedNodes.get(i).getLinesConnected())
+                    selectionManager.getSelected().add(nl);
+            }
+            
+            System.out.println("Pasted " + pastedNodes.size() + " nodes");
+        }
     }
     
     /**
@@ -382,7 +448,9 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 }
                 break;
             case KeyEvent.VK_V:
-                // paste everything into the center of the screen?
+                if (e.isControlDown()) {
+                    pasteClipboard();
+                }
                 break;
             case KeyEvent.VK_TAB:
                 selectConnectedNode(e.isShiftDown());
