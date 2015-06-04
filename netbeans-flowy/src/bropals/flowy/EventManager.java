@@ -48,7 +48,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      * How close the mouse has to be to an edge of a node to be able to resize
      * it, in world coordinates.
      */
-    private final static float RESIZE_DISTANCE = 6.0f;
+    public final static float DRAG_RESIZE_DISTANCE = 6.0f;
 
     public EventManager(FlowchartWindow instance) {
         window = instance;
@@ -551,7 +551,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      * @return if the X position is ok for right/left resize
      */
     private boolean inYRegionResize(float my, Node node) {
-        return my > node.getY() - RESIZE_DISTANCE && my < node.getY() + node.getHeight() + RESIZE_DISTANCE;
+        return my > node.getY() - DRAG_RESIZE_DISTANCE && my < node.getY() + node.getHeight() + DRAG_RESIZE_DISTANCE;
     }
 
     /**
@@ -563,7 +563,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      * @return if the X position is ok for top/bottom resize
      */
     private boolean inXRegionResize(float mx, Node node) {
-        return mx > node.getX() - RESIZE_DISTANCE && mx < node.getX() + node.getWidth() + RESIZE_DISTANCE;
+        return mx > node.getX() - DRAG_RESIZE_DISTANCE && mx < node.getX() + node.getWidth() + DRAG_RESIZE_DISTANCE;
     }
 
     /**
@@ -576,7 +576,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      * @return if the node is able to be resized on the top edge
      */
     private boolean canResizeTop(float mx, float my, Node node) {
-        return inXRegionResize(mx, node) && my > node.getY() - RESIZE_DISTANCE && my < node.getY() + RESIZE_DISTANCE;
+        return inXRegionResize(mx, node) && my > node.getY() - DRAG_RESIZE_DISTANCE && my < node.getY() + DRAG_RESIZE_DISTANCE;
     }
 
     /**
@@ -589,7 +589,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      * @return if the node is able to be resized on the bottom edge
      */
     private boolean canResizeBottom(float mx, float my, Node node) {
-        return inXRegionResize(mx, node) && my > node.getY() + node.getHeight() - RESIZE_DISTANCE && my < node.getY() + node.getHeight() + RESIZE_DISTANCE;
+        return inXRegionResize(mx, node) && my > node.getY() + node.getHeight() - DRAG_RESIZE_DISTANCE && my < node.getY() + node.getHeight() + DRAG_RESIZE_DISTANCE;
     }
 
     /**
@@ -602,7 +602,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      * @return if the node is able to be resized on the left edge
      */
     private boolean canResizeLeft(float mx, float my, Node node) {
-        return inYRegionResize(my, node) && mx > node.getX() - RESIZE_DISTANCE && mx < node.getX() + RESIZE_DISTANCE;
+        return inYRegionResize(my, node) && mx > node.getX() - DRAG_RESIZE_DISTANCE && mx < node.getX() + DRAG_RESIZE_DISTANCE;
     }
 
     /**
@@ -615,7 +615,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      * @return if the node is able to be resized on the right edge
      */
     private boolean canResizeRight(float mx, float my, Node node) {
-        return inYRegionResize(my, node) && mx > node.getX() + node.getWidth() - RESIZE_DISTANCE && mx < node.getX() + node.getWidth() + RESIZE_DISTANCE;
+        return inYRegionResize(my, node) && mx > node.getX() + node.getWidth() - DRAG_RESIZE_DISTANCE && mx < node.getX() + node.getWidth() + DRAG_RESIZE_DISTANCE;
     }
 
     /**

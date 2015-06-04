@@ -186,14 +186,20 @@ public class DragManager {
     public void updateDragResize(float mouseX, float mouseY) {
         if (resizingLeft) {
             float right = resizing.getX() + resizing.getWidth();
-            resizing.setX(mouseX);
-            resizing.setWidth(right - mouseX);
+            float expectedWidth = right - mouseX;
+            if (expectedWidth >= Node.MINIMUM_SIZE) {
+                resizing.setX(mouseX);
+                resizing.setWidth(expectedWidth);
+            }
         } else if (resizingRight) {
             resizing.setWidth(mouseX - resizing.getX());
         } else if (resizingTop) {
             float bottom = resizing.getY() + resizing.getHeight();
-            resizing.setY(mouseY);
-            resizing.setHeight(bottom - mouseY);
+            float expectedHeight = bottom - mouseY;
+            if (expectedHeight >= Node.MINIMUM_SIZE) {
+                resizing.setY(mouseY);
+                resizing.setHeight(expectedHeight);
+            }
         } else if (resizingBottom) {
             resizing.setHeight(mouseY - resizing.getY());
         }

@@ -6,6 +6,7 @@
 package bropals.flowy.data;
 
 import bropals.flowy.Camera;
+import bropals.flowy.EventManager;
 import bropals.flowy.style.NodeStyle;
 import java.awt.Graphics;
 import java.util.ArrayList;
@@ -15,6 +16,11 @@ import java.util.ArrayList;
  * @author Jonathon
  */
 public class Node implements Selectable {
+    
+    /**
+     * The smallest value for width / height
+     */
+    public final static float MINIMUM_SIZE = (EventManager.DRAG_RESIZE_DISTANCE*2) + 4;
     
     /**
      * If the style is null, revert to a default style.
@@ -68,7 +74,9 @@ public class Node implements Selectable {
     }
 
     public void setWidth(float width) {
-        this.width = width;
+        if (width >= MINIMUM_SIZE) {
+            this.width = width;
+        }
     }
 
     public float getHeight() {
@@ -76,7 +84,9 @@ public class Node implements Selectable {
     }
 
     public void setHeight(float height) {
-        this.height = height;
+        if (height >= MINIMUM_SIZE) {
+            this.height = height;
+        }
     }
 
     public ArrayList<NodeLine> getLinesConnected() {
