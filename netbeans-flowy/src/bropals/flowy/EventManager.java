@@ -18,30 +18,38 @@ import java.util.ArrayList;
 
 /**
  * Gets events from the view and StyleManager and handles them.
+ *
  * @author Jonathon
  */
 public class EventManager implements KeyListener, MouseListener, MouseMotionListener {
- 
+
     private SelectionManager selectionManager;
     private FlowchartWindow window;
     /**
-     * 
-     * NOTE: Make the camera not able to be transformed when dragging to the drag offsets work
-     * 
+     *
+     * NOTE: Make the camera not able to be transformed when dragging to the
+     * drag offsets work
+     *
      */
     private DragManager dragManager;
-    /** The variable to track if the spacebar is held down or not */
-    private boolean spacebar;
-    
     /**
-     * Keep track of where on the line you're adding text (tail, head, or center)
-     * 0 = center
-     * 1 = tail
-     * 2 = head
-     * It will rotate between these three in the order 0 -> 1 -> 2 -> 0 ...
+     * The variable to track if the spacebar is held down or not
+     */
+    private boolean spacebar;
+
+    /**
+     * Keep track of where on the line you're adding text (tail, head, or
+     * center) 0 = center 1 = tail 2 = head It will rotate between these three
+     * in the order 0 -> 1 -> 2 -> 0 ...
      */
     private int linePartTyping;
-    
+
+    /**
+     * How close the mouse has to be to an edge of a node to be able to resize
+     * it, in world coordinates.
+     */
+    private final static float RESIZE_DISTANCE = 6.0f;
+
     public EventManager(FlowchartWindow instance) {
         window = instance;
         selectionManager = new SelectionManager();
@@ -51,53 +59,57 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
     public boolean isSelected(Selectable s) {
         return selectionManager.getSelected().contains(s);
     }
-    
+
     /**
      * Find the selectable selected
+     *
      * @param p A point that is in world units
-     * @return The thing that is closest under the mouse, or null if nothing was close.
+     * @return The thing that is closest under the mouse, or null if nothing was
+     * close.
      */
     private Selectable getSelectableUnderPoint(Point.Float p) {
         Selectable thing = null; // initially nothing
         for (Node n : window.getFlowchart().getNodes()) {
-            if (p.getX() > n.getX() && p.getX() < n.getX() + n.getWidth() &&
-                    p.getY() > n.getY() && p.getY() < n.getY() + n.getHeight()) {
+            if (p.getX() > n.getX() && p.getX() < n.getX() + n.getWidth()
+                    && p.getY() > n.getY() && p.getY() < n.getY() + n.getHeight()) {
                 return n;
             }
         }
 
-         // it must be a minimum of 10 pixels away
-        double nearestDistance = 10 * (window.getCamera().getZoom()); 
+        // it must be a minimum of 10 pixels away
+        double nearestDistance = 10 * (window.getCamera().getZoom());
         // if no nodes were found, find the nearest line.
         for (NodeLine nl : window.getFlowchart().getNodeLines()) {
             // drag so we can get the points of the line
             Point[] linePoints = nl.getStyle().getType().renderLine(nl, window.getCamera(), window.getView().getGraphics());
             Point.Float p1 = window.getCamera().convertCanvasToWorld(linePoints[0]);
             Point.Float p2 = window.getCamera().convertCanvasToWorld(linePoints[1]);
-            
+
             // copied the formula from:
             // http://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line
-            
-            double distance = Math.abs(((p2.getY() - p1.getY()) * p.getX())- 
-                    ((p2.getX() - p1.getX()) * p.getY()) + (p2.getX() * p1.getY()) -
-                    (p2.getY() * p1.getX())) / Math.sqrt(Math.pow(p2.getY() - p1.getY(), 2) +
-                     Math.pow(p2.getX() - p1.getX(), 2));
-                        
+            double distance = Math.abs(((p2.getY() - p1.getY()) * p.getX())
+                    - ((p2.getX() - p1.getX()) * p.getY()) + (p2.getX() * p1.getY())
+                    - (p2.getY() * p1.getX())) / Math.sqrt(Math.pow(p2.getY() - p1.getY(), 2)
+                            + Math.pow(p2.getX() - p1.getX(), 2));
+
             if (distance < nearestDistance) {
                 nearestDistance = distance;
                 thing = nl;
             }
         }
-        
+
         return thing;
     }
-    
+
     /**
-     * Get a list of all the selectables that are completely inside of the given box
+     * Get a list of all the selectables that are completely inside of the given
+     * box
+     *
      * @param p The top left corner of the box in world units
      * @param width The width of the box in world units
      * @param height The height of the box in world units
-     * @return A list of all selectables (nodes and node-lines) that were completely inside of the box
+     * @return A list of all selectables (nodes and node-lines) that were
+     * completely inside of the box
      */
     private ArrayList<Selectable> getSelectablesUnderBox(Point p, float width, float height) {
         // readjust the position of the box with negative width or heights
@@ -109,11 +121,11 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
             p.setLocation(p.getX(), p.getY() + height);
             height = Math.abs(height);
         }
-        
+
         ArrayList<Selectable> list = new ArrayList<>();
         for (Node n : window.getFlowchart().getNodes()) {
-            if (p.getX() < n.getX() && p.getX() + width > n.getX() + n.getWidth() &&
-                    p.getY() < n.getY() && p.getY() + height > n.getY() + n.getHeight()) {
+            if (p.getX() < n.getX() && p.getX() + width > n.getX() + n.getWidth()
+                    && p.getY() < n.getY() && p.getY() + height > n.getY() + n.getHeight()) {
                 list.add(n);
             }
         }
@@ -123,21 +135,22 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 list.add(nl);
             }
         }
-        
+
         return list;
     }
 
     /**
      * Remove everything in stuff from the flowchart.
+     *
      * @param stuff What will be removed from flowchart.
      */
     private void removeSelectables(ArrayList<Selectable> stuff) {
         for (Selectable s : stuff) {
             if (s instanceof Node) {
-                for (int i=0; i<((Node)s).getLinesConnected().size(); i++) {
-                    NodeLine nl = ((Node)s).getLinesConnected().get(i);
-                    ((Node)s).getLinesConnected().remove(i);
-                    if (((Node)s) == nl.getChild()) {
+                for (int i = 0; i < ((Node) s).getLinesConnected().size(); i++) {
+                    NodeLine nl = ((Node) s).getLinesConnected().get(i);
+                    ((Node) s).getLinesConnected().remove(i);
+                    if (((Node) s) == nl.getChild()) {
                         nl.getParent().getLinesConnected().remove(nl);
                     } else {
                         nl.getChild().getLinesConnected().remove(nl);
@@ -145,7 +158,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     break;
                 }
             }
-            for (int i=0; i<window.getFlowchart().getNodes().size(); i++) {
+            for (int i = 0; i < window.getFlowchart().getNodes().size(); i++) {
                 if (window.getFlowchart().getNodes().get(i) == s) {
                     window.getFlowchart().getNodes().remove(i);
                     break;
@@ -153,9 +166,10 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
             }
         }
     }
-    
-    /******* Methods for all the actions (as a level of indirection) *******/
-    
+
+    /**
+     * ***** Methods for all the actions (as a level of indirection) ******
+     */
     /**
      * Delete all the selected nodes and deselect
      */
@@ -164,7 +178,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         selectionManager.getSelected().clear();
         window.redrawView();
     }
-    
+
     /**
      * Make a new flowchart window
      */
@@ -173,7 +187,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         window.getFlowchartWindowManager().newFlowchart();
         window.redrawView();
     }
-    
+
     /**
      * Add what's selected to the clipboard
      */
@@ -182,7 +196,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
             dragManager.setStuffInClipboard(selectionManager.getSelected());
         }
     }
-    
+
     /**
      * Cut the selected items, adding them to the clipboard and deleting them
      */
@@ -194,48 +208,51 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         }
         window.redrawView();
     }
-    
+
     /**
      * Select everything in the flowchart
      */
     public void selectAll() {
         selectionManager.getSelected().clear();
-        for (int i=0; i<window.getFlowchart().getNodes().size(); i++) {
+        for (int i = 0; i < window.getFlowchart().getNodes().size(); i++) {
             if (!selectionManager.getSelected().contains(window.getFlowchart().getNodes().get(i))) {
                 selectionManager.getSelected().add(window.getFlowchart().getNodes().get(i));
             }
         }
-        for (int i=0; i<window.getFlowchart().getNodeLines().size(); i++) {
+        for (int i = 0; i < window.getFlowchart().getNodeLines().size(); i++) {
             selectionManager.getSelected().add(window.getFlowchart().getNodeLines().get(i));
         }
     }
-    
+
     /**
      * Selects the next or previous node in relation to the last selected node.
-     * If there are no next nodes but you're trying to select one, it creates a node.s
-     * @param previous If you're going to select the previous node. If it's false, it
-     * will try to select the next node or create one if there is none yet.
+     * If there are no next nodes but you're trying to select one, it creates a
+     * node.s
+     *
+     * @param previous If you're going to select the previous node. If it's
+     * false, it will try to select the next node or create one if there is none
+     * yet.
      */
     public void selectConnectedNode(boolean previous) {
-        if (selectionManager.getLastSelected() != null &&
-                selectionManager.getLastSelected() instanceof Node) {
-            Node selectedNode = (Node)selectionManager.getLastSelected();
+        if (selectionManager.getLastSelected() != null
+                && selectionManager.getLastSelected() instanceof Node) {
+            Node selectedNode = (Node) selectionManager.getLastSelected();
 
             boolean nextNodeIsThere = false;
             if (!selectedNode.getLinesConnected().isEmpty()) {
                 Node nextNode = null;
                 if (!previous) { // find the next child if shift was being held down
-                    for (int i=0; i<selectedNode.getLinesConnected().size(); i++) {
-                        if (selectedNode.getLinesConnected().get(i).getChild() != selectedNode &&
-                                selectedNode.getLinesConnected().get(i).getChild()!= null) {
+                    for (int i = 0; i < selectedNode.getLinesConnected().size(); i++) {
+                        if (selectedNode.getLinesConnected().get(i).getChild() != selectedNode
+                                && selectedNode.getLinesConnected().get(i).getChild() != null) {
                             nextNode = selectedNode.getLinesConnected().get(i).getChild();
                             break;
                         }
                     }
                 } else { // if shift is being held down then find the next parent
-                    for (int i=0; i<selectedNode.getLinesConnected().size(); i++) {
-                        if (selectedNode.getLinesConnected().get(i).getParent() != selectedNode &&
-                                selectedNode.getLinesConnected().get(i).getParent()!= null) {
+                    for (int i = 0; i < selectedNode.getLinesConnected().size(); i++) {
+                        if (selectedNode.getLinesConnected().get(i).getParent() != selectedNode
+                                && selectedNode.getLinesConnected().get(i).getParent() != null) {
                             nextNode = selectedNode.getLinesConnected().get(i).getParent();
                             break;
                         }
@@ -253,7 +270,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
 
             if (!nextNodeIsThere && !previous) { /// ... if shift was not held down
                 // create a new node
-                Node createdNode = (Node)selectedNode.clone();
+                Node createdNode = (Node) selectedNode.clone();
                 // position it to the right of the previously selected node
                 createdNode.setX(selectedNode.getX() + selectedNode.getWidth() + 120);
                 createdNode.setY(selectedNode.getY());
@@ -264,7 +281,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 createdNode.getLinesConnected().add(line);
                 selectedNode.getLinesConnected().add(line);
                 dragManager.setNewlyMadeNode(createdNode);
-                 // select your newly created node
+                // select your newly created node
                 selectionManager.getSelected().clear();
                 selectionManager.getSelected().add(createdNode);
                 System.out.println("New node " + createdNode + " from the node " + selectedNode);
@@ -272,11 +289,11 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         }
         window.redrawView();
     }
-    
+
     @Override
     public void keyTyped(KeyEvent e) {
         System.out.println("Typed a character: " + e.getKeyChar());
-        
+
         // if you're selecting soemthing that you aren't holding alt or control (for a different action)
         if (selectionManager.getLastSelected() != null && !e.isAltDown() && !e.isControlDown()) {
             if (selectionManager.getSelected().size() > 1) {
@@ -284,39 +301,45 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 selectionManager.getSelected().clear();
                 selectionManager.getSelected().add(lastSelected);
             }
-            
+
             // if a TAB key was typed
             if (e.getKeyChar() == '\t') {
                 return; // nothing else happens...
             }
-            
+
             // if you're selecting a node...
             if (selectionManager.getLastSelected() instanceof Node) {
-                Node editNode = (Node)selectionManager.getLastSelected();
-                
-                if (((int)e.getKeyChar()) == KeyEvent.VK_BACK_SPACE && editNode.getInnerText().length() > 0) {
+                Node editNode = (Node) selectionManager.getLastSelected();
+
+                if (((int) e.getKeyChar()) == KeyEvent.VK_BACK_SPACE && editNode.getInnerText().length() > 0) {
                     // take off the last character in the string
                     editNode.setInnerText(editNode.getInnerText().substring(0, editNode.getInnerText().length() - 1));
-                } else if (((int)e.getKeyChar()) == KeyEvent.VK_ENTER) {
+                } else if (((int) e.getKeyChar()) == KeyEvent.VK_ENTER) {
                     // add a new line
                     editNode.setInnerText(editNode.getInnerText() + '\n');
-                } else if (((int)e.getKeyChar()) != KeyEvent.VK_BACK_SPACE) {
+                } else if (((int) e.getKeyChar()) != KeyEvent.VK_BACK_SPACE) {
                     // add the typed character to the end
                     editNode.setInnerText(editNode.getInnerText() + e.getKeyChar());
                 }
-            // if you're selecting a node line...
-            } else if (selectionManager.getLastSelected() != null &&
-                selectionManager.getLastSelected() instanceof NodeLine) {
-                NodeLine editLine = (NodeLine)selectionManager.getLastSelected();
-            
+                // if you're selecting a node line...
+            } else if (selectionManager.getLastSelected() != null
+                    && selectionManager.getLastSelected() instanceof NodeLine) {
+                NodeLine editLine = (NodeLine) selectionManager.getLastSelected();
+
                 int lengthOfEditingLine = 0;
                 switch (linePartTyping) {
-                    case 0: lengthOfEditingLine = editLine.getCenterText().length(); break;
-                    case 1: lengthOfEditingLine = editLine.getTailText().length(); break;
-                    case 2: lengthOfEditingLine = editLine.getHeadText().length(); break;
+                    case 0:
+                        lengthOfEditingLine = editLine.getCenterText().length();
+                        break;
+                    case 1:
+                        lengthOfEditingLine = editLine.getTailText().length();
+                        break;
+                    case 2:
+                        lengthOfEditingLine = editLine.getHeadText().length();
+                        break;
                 }
-                
-                if (((int)e.getKeyChar()) == KeyEvent.VK_BACK_SPACE && lengthOfEditingLine > 0) {
+
+                if (((int) e.getKeyChar()) == KeyEvent.VK_BACK_SPACE && lengthOfEditingLine > 0) {
                     // take off the last character in the string
                     switch (linePartTyping) {
                         case 0:
@@ -329,15 +352,15 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                             editLine.setHeadText(editLine.getHeadText().substring(0, editLine.getHeadText().length() - 1));
                             break;
                     }
-                    
-                } else if (((int)e.getKeyChar()) == KeyEvent.VK_ENTER) {
+
+                } else if (((int) e.getKeyChar()) == KeyEvent.VK_ENTER) {
                     // cycle what part of the line that is being edited
                     if (linePartTyping < 2) {
                         linePartTyping++;
                     } else {
                         linePartTyping = 0;
                     }
-                } else if (((int)e.getKeyChar()) != KeyEvent.VK_BACK_SPACE) {
+                } else if (((int) e.getKeyChar()) != KeyEvent.VK_BACK_SPACE) {
                     // add the typed character to the end
                     switch (linePartTyping) {
                         case 0:
@@ -353,7 +376,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 }
             }
         }
-        
+
         window.redrawView();
     }
 
@@ -412,27 +435,48 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
     @Override
     public void mousePressed(MouseEvent e) {
         Point.Float mousePosition = window.getCamera().convertCanvasToWorld(e.getPoint());
-        
+
         Selectable clickedOnThing = getSelectableUnderPoint(mousePosition);
-        
+
         Node node = null;
         NodeLine nodeLine = null;
         if (clickedOnThing instanceof Node) {
-            node = (Node)clickedOnThing;
+            node = (Node) clickedOnThing;
         } else if (clickedOnThing instanceof NodeLine) {
-            nodeLine = (NodeLine)clickedOnThing;
+            nodeLine = (NodeLine) clickedOnThing;
+        }
+        //Is this is resize operation? (Resizing need not have a nearby item
+        Node resizing = null;
+        if (e.getButton() == MouseEvent.BUTTON1 && (resizing = findNodeCloseEnoughForResize(mousePosition.x, mousePosition.y)) != null) {
+            //Resizing "resizing"
+            dragManager.setLeftMouseDown(true);
+            dragManager.setDragging(true);
+            if (canResizeLeft(mousePosition.x, mousePosition.y, resizing)) {
+                dragManager.startDragResizeLeft(resizing);
+                window.resizeLeftCursor();
+            } else if (canResizeTop(mousePosition.x, mousePosition.y, resizing)) {
+                dragManager.startDragResizeTop(resizing);
+                window.resizeTopCursor();
+            } else if (canResizeBottom(mousePosition.x, mousePosition.y, resizing)) {
+                dragManager.startDragResizeBottom(resizing);
+                window.resizeBottomCursor();
+            } else if (canResizeRight(mousePosition.x, mousePosition.y, resizing)) {
+                dragManager.startDragResizeRight(resizing);
+                window.resizeRightCursor();
+            }
+            return;
         }
         //System.out.println(node);
         // actions involving a node
         if (node != null) {
             if (!dragManager.isDragging()) { // not yet dragging anything...
                 dragManager.setDragging(true); // start dragging
-                dragManager.setInitialX((int)mousePosition.getX());
-                dragManager.setInitialY((int)mousePosition.getY());
+                dragManager.setInitialX((int) mousePosition.getX());
+                dragManager.setInitialY((int) mousePosition.getY());
                 dragManager.setOffsetX(0); // initially
                 dragManager.setOffsetY(0);
                 if (e.getButton() == MouseEvent.BUTTON3) {
-                    Node createdNode = (Node)node.clone();
+                    Node createdNode = (Node) node.clone();
                     createdNode.setX(dragManager.getInitialX());
                     createdNode.setY(dragManager.getInitialY());
                     createdNode.getLinesConnected().clear();
@@ -447,19 +491,21 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     window.redrawView();
                 }
             }
-            
+
             if (e.getButton() == MouseEvent.BUTTON1) {
                 if (!e.isShiftDown()) {
                     selectionManager.getSelected().clear();
                 }
+
                 if (!selectionManager.getSelected().contains(clickedOnThing)) {
                     selectionManager.getSelected().add(clickedOnThing);
                 }
                 if (selectionManager.getSelectedNodes().contains(node)) {
                     System.out.println("The selected array:");
-                    for (Selectable s : selectionManager.getSelected())
+                    for (Selectable s : selectionManager.getSelected()) {
                         System.out.println(s);
-                    
+                    }
+
                     dragManager.startDragMove(mousePosition.x, mousePosition.y);
                     dragManager.setLeftMouseDown(true);
                 } else {
@@ -474,19 +520,18 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 selectionManager.getSelected().add(clickedOnThing);
             }
         }
-        
-        
+
         if (node == null && nodeLine == null && e.getButton() == MouseEvent.BUTTON1) {
-             // clear selection if you don't click anything
+            // clear selection if you don't click anything
             if (!e.isShiftDown()) {
                 selectionManager.getSelected().clear();
             }
-            
+
             // you only start dragging a box when the spacebar is not held down
             // begin dragging a box for selection in a box
             if (!spacebar && !dragManager.isDragging()) {
-                dragManager.setInitialX((int)mousePosition.getX());
-                dragManager.setInitialY((int)mousePosition.getY());
+                dragManager.setInitialX((int) mousePosition.getX());
+                dragManager.setInitialY((int) mousePosition.getY());
                 dragManager.setOffsetX(0);
                 dragManager.setOffsetY(0);
                 dragManager.setBoxSelecting(true);
@@ -497,15 +542,129 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         window.redrawView();
     }
 
+    /**
+     * Checks to see if the mouse is in the Y region of a shape to resize it.
+     * For right / left resize check functions.
+     *
+     * @param my the y position of the mouse in world coordinates.
+     * @param node the node to check against.
+     * @return if the X position is ok for right/left resize
+     */
+    private boolean inYRegionResize(float my, Node node) {
+        return my > node.getY() - RESIZE_DISTANCE && my < node.getY() + node.getHeight() + RESIZE_DISTANCE;
+    }
+
+    /**
+     * Checks to see if the mouse is in the X region of a shape to resize it.
+     * For top / bottom resize check functions.
+     *
+     * @param mx the x position of the mouse in world coordinates.
+     * @param node the node to check against.
+     * @return if the X position is ok for top/bottom resize
+     */
+    private boolean inXRegionResize(float mx, Node node) {
+        return mx > node.getX() - RESIZE_DISTANCE && mx < node.getX() + node.getWidth() + RESIZE_DISTANCE;
+    }
+
+    /**
+     * Checks to see if the mouse location is close enough to the top edge of a
+     * node to resize it.
+     *
+     * @param mx the x position of the mouse in world coordinates.
+     * @param my the y position of the mouse in world coordinates.
+     * @param node the node to check against.
+     * @return if the node is able to be resized on the top edge
+     */
+    private boolean canResizeTop(float mx, float my, Node node) {
+        return inXRegionResize(mx, node) && my > node.getY() - RESIZE_DISTANCE && my < node.getY() + RESIZE_DISTANCE;
+    }
+
+    /**
+     * Checks to see if the mouse location is close enough to the bottom edge of
+     * a node to resize it.
+     *
+     * @param mx the x position of the mouse in world coordinates.
+     * @param my the y position of the mouse in world coordinates.
+     * @param node the node to check against.
+     * @return if the node is able to be resized on the bottom edge
+     */
+    private boolean canResizeBottom(float mx, float my, Node node) {
+        return inXRegionResize(mx, node) && my > node.getY() + node.getHeight() - RESIZE_DISTANCE && my < node.getY() + node.getHeight() + RESIZE_DISTANCE;
+    }
+
+    /**
+     * Checks to see if the mouse location is close enough to the left edge of a
+     * node to resize it.
+     *
+     * @param mx the x position of the mouse in world coordinates.
+     * @param my the y position of the mouse in world coordinates.
+     * @param node the node to check against.
+     * @return if the node is able to be resized on the left edge
+     */
+    private boolean canResizeLeft(float mx, float my, Node node) {
+        return inYRegionResize(my, node) && mx > node.getX() - RESIZE_DISTANCE && mx < node.getX() + RESIZE_DISTANCE;
+    }
+
+    /**
+     * Checks to see if the mouse location is close enough to the right edge of
+     * a node to resize it.
+     *
+     * @param mx the x position of the mouse in world coordinates.
+     * @param my the y position of the mouse in world coordinates.
+     * @param node the node to check against.
+     * @return if the node is able to be resized on the right edge
+     */
+    private boolean canResizeRight(float mx, float my, Node node) {
+        return inYRegionResize(my, node) && mx > node.getX() + node.getWidth() - RESIZE_DISTANCE && mx < node.getX() + node.getWidth() + RESIZE_DISTANCE;
+    }
+
+    /**
+     * Checks to see if the mouse location is close enough to the edge of a node
+     * for a resize operation.
+     *
+     * @param mx the x position of the mouse in world coordinates.
+     * @param my the y position of the mouse in world coordinates.
+     * @param node the node to check against.
+     * @return if the node is able to be resized on any edge
+     */
+    private boolean closeEnoughForResize(float mx, float my, Node node) {
+        return canResizeLeft(mx, my, node)
+                || canResizeTop(mx, my, node)
+                || canResizeRight(mx, my, node)
+                || canResizeBottom(mx, my, node);
+    }
+
+    /**
+     * Searches through all nodes and finds one that the mouse is close enough
+     * to do a resize operation on.
+     *
+     * @param mx the x position of the mouse in world coordinates.
+     * @param my the y position of the mouse in world coordinates.
+     * @return the first found node that is able to be resized by the mouse's
+     * current position.
+     */
+    private Node findNodeCloseEnoughForResize(float mx, float my) {
+        for (Node checking : window.getFlowchart().getNodes()) {
+            if (closeEnoughForResize(mx, my, checking)) {
+                return checking;
+            }
+        }
+        return null;
+    }
+
     @Override
     public void mouseReleased(MouseEvent e) {
         Point.Float mousePosition = window.getCamera().convertCanvasToWorld(e.getPoint());
-        
+
         if (dragManager.isDragging()) {
             if (e.getButton() == MouseEvent.BUTTON3 && dragManager.getNewlyMadeNode() != null) {
                 dragManager.setRightMouseDown(false);
                 dragManager.setNewlyMadeNode(null);
                 dragManager.setDragging(false); // done dragging the newly created node
+            }
+            if (dragManager.isDragResizing()) {
+                dragManager.endDragResize();
+                window.defaultCursor();
             }
             if (dragManager.isDragMoving()) {
                 dragManager.endDragMove();
@@ -514,13 +673,13 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         if (e.getButton() == MouseEvent.BUTTON1 && dragManager.isBoxSelecting()) {
             // Find everything that was selected using the box select
             ArrayList<Selectable> selectedItems = getSelectablesUnderBox(
-                    new Point((int)dragManager.getInitialX(), (int)dragManager.getInitialY()), 
+                    new Point((int) dragManager.getInitialX(), (int) dragManager.getInitialY()),
                     dragManager.getOffsetX(), dragManager.getOffsetY());
             // clear selection
             if (!e.isShiftDown()) {
                 selectionManager.getSelected().clear();
             }
-            for (int i=0; i<selectedItems.size(); i++) {
+            for (int i = 0; i < selectedItems.size(); i++) {
                 if (!selectionManager.getSelected().contains(selectedItems.get(i))) {
                     selectionManager.getSelected().add(selectedItems.get(i));
                 }
@@ -545,25 +704,29 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
     public void mouseDragged(MouseEvent e) {
         if (dragManager.isDragging()) {
             Point.Float mousePos = window.getCamera().convertCanvasToWorld(e.getPoint());
-            dragManager.setOffsetX((int)mousePos.getX() - dragManager.getInitialX());
-            dragManager.setOffsetY((int)mousePos.getY() - dragManager.getInitialY());
-            
+            dragManager.setOffsetX((int) mousePos.getX() - dragManager.getInitialX());
+            dragManager.setOffsetY((int) mousePos.getY() - dragManager.getInitialY());
+
             if (dragManager.isRightMouseDown() && dragManager.getNewlyMadeNode() != null) {
-                dragManager.getNewlyMadeNode().setX((int)mousePos.getX());
-                dragManager.getNewlyMadeNode().setY((int)mousePos.getY());
-            } else if (dragManager.isLeftMouseDown() && dragManager.isDragMoving()) {
-                dragManager.updateDragMove((float)mousePos.getX(), (float)mousePos.getY());
+                dragManager.getNewlyMadeNode().setX((int) mousePos.getX());
+                dragManager.getNewlyMadeNode().setY((int) mousePos.getY());
+            } else if (dragManager.isLeftMouseDown()) {
+                if (dragManager.isDragMoving()) {
+                    dragManager.updateDragMove(mousePos.x, mousePos.y);
+                } else if (dragManager.isDragResizing()) {
+                    dragManager.updateDragResize(mousePos.x, mousePos.y);
+                }
             }
         }
-                
+
         window.redrawView();
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        
+
     }
-    
+
     public DragManager getDragManager() {
         return dragManager;
     }

@@ -42,6 +42,7 @@ import bropals.flowy.listeners.ZoomInListener;
 import bropals.flowy.listeners.ZoomOutListener;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Point;
@@ -442,5 +443,25 @@ public class FlowchartWindow extends JFrame {
         stylesTab.add(nodeStylePanel);
         
         buttonPanel.addTab("Styles", stylesTab);
+    }
+    
+    public void resizeTopCursor() {
+        view.setCursor(Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR));
+    }
+    
+    public void resizeBottomCursor() {
+        view.setCursor(Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR));
+    }
+    
+    public void resizeLeftCursor() {
+        view.setCursor(Cursor.getPredefinedCursor(Cursor.W_RESIZE_CURSOR));
+    }
+    
+    public void resizeRightCursor() {
+        view.setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
+    }
+    
+    public void defaultCursor() {
+        view.setCursor(Cursor.getDefaultCursor());
     }
 }
