@@ -18,12 +18,12 @@ public class DragManager {
     
     private SelectionManager selectionManager;
     private ArrayList<Selectable> clipboard;
-    private boolean dragging, boxSelecting, leftMouseDown, rightMouseDown;
+    private boolean dragging, boxSelecting, leftMouseDown, rightMouseDown, resizingLeft, resizingRight, resizingTop, resizingBottom;
     private float offsetX; //In world coords
     private float offsetY; //In world coords
     private float initialX; //In world coords
     private float initialY; //In world coords
-    private Node newlyMadeNode;
+    private Node newlyMadeNode, resizing;
     private Node[] moveDragging; //List of stuff that is being dragged
     private float[][] moveDragOffsets; //World coords
     
@@ -123,6 +123,30 @@ public class DragManager {
         this.newlyMadeNode = newlyMadeNode;
     }
     
+    public void startDragResizeTop(Node resizing) {
+        resizingTop = true;
+        this.resizing = resizing;
+    }
+    
+    public void startDragResizeBottom(Node resizing) {
+        resizingBottom = true;
+        this.resizing = resizing;
+    }
+    
+    public void startDragResizeLeft(Node resizing) {
+        resizingLeft = true;
+        this.resizing = resizing;
+    }
+    
+    public void startDragResizeRight(Node resizing) {
+        resizingRight = true;
+        this.resizing = resizing;
+    }
+    
+    public boolean isDragResizing() {
+        return (resizingRight || resizingLeft || resizingTop || resizingBottom) && dragging;
+    }
+    
     /**
      * Start move dragging. It will move every node that is selected.
      * @param mouseX the current mouse X position in world coordinates.
@@ -157,6 +181,38 @@ public class DragManager {
             moveDragging[i].setX(initialX+offsetX+moveDragOffsets[i][0]);
             moveDragging[i].setY(initialY+offsetY+moveDragOffsets[i][1]);
         }
+    }
+    
+    public void updateDragResize(float mouseX, float mouseY) {
+        if (resizingLeft) {
+            float right = resizing.getX() + resizing.getWidth();
+            float expectedWidth = right - mouseX;
+            if (expectedWidth >= Node.MINIMUM_SIZE) {
+                resizing.setX(mouseX);
+                resizing.setWidth(expectedWidth);
+            }
+        } else if (resizingRight) {
+            resizing.setWidth(mouseX - resizing.getX());
+        } else if (resizingTop) {
+            float bottom = resizing.getY() + resizing.getHeight();
+            float expectedHeight = bottom - mouseY;
+            if (expectedHeight >= Node.MINIMUM_SIZE) {
+                resizing.setY(mouseY);
+                resizing.setHeight(expectedHeight);
+            }
+        } else if (resizingBottom) {
+            resizing.setHeight(mouseY - resizing.getY());
+        }
+    }
+    
+    public void endDragResize() {
+        resizingLeft = false;
+        resizingRight = false;
+        resizingTop = false;
+        resizingBottom = false;
+        setLeftMouseDown(false);
+        dragging = false;
+        resizing = null;
     }
     
     public void endDragMove() {
