@@ -154,6 +154,125 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         }
     }
     
+    /******* Methods for all the actions (as a level of indirection) *******/
+    
+    /**
+     * Delete all the selected nodes and deselect
+     */
+    public void deleteSelected() {
+        removeSelectables(selectionManager.getSelected());
+        selectionManager.getSelected().clear();
+        window.redrawView();
+    }
+    
+    /**
+     * Make a new flowchart window
+     */
+    public void createNewFlowchart() {
+        System.out.println("Creating a flowchart");
+        window.getFlowchartWindowManager().newFlowchart();
+        window.redrawView();
+    }
+    
+    /**
+     * Add what's selected to the clipboard
+     */
+    public void copySelected() {
+        if (!selectionManager.getSelected().isEmpty()) {
+            dragManager.setStuffInClipboard(selectionManager.getSelected());
+        }
+    }
+    
+    /**
+     * Cut the selected items, adding them to the clipboard and deleting them
+     */
+    public void cutSelected() {
+        if (!selectionManager.getSelected().isEmpty()) {
+            dragManager.setStuffInClipboard(selectionManager.getSelected());
+            removeSelectables(selectionManager.getSelected());
+            selectionManager.getSelected().clear();
+        }
+        window.redrawView();
+    }
+    
+    /**
+     * Select everything in the flowchart
+     */
+    public void selectAll() {
+        selectionManager.getSelected().clear();
+        for (int i=0; i<window.getFlowchart().getNodes().size(); i++) {
+            if (!selectionManager.getSelected().contains(window.getFlowchart().getNodes().get(i))) {
+                selectionManager.getSelected().add(window.getFlowchart().getNodes().get(i));
+            }
+        }
+        for (int i=0; i<window.getFlowchart().getNodeLines().size(); i++) {
+            selectionManager.getSelected().add(window.getFlowchart().getNodeLines().get(i));
+        }
+    }
+    
+    /**
+     * Selects the next or previous node in relation to the last selected node.
+     * If there are no next nodes but you're trying to select one, it creates a node.s
+     * @param previous If you're going to select the previous node. If it's false, it
+     * will try to select the next node or create one if there is none yet.
+     */
+    public void selectConnectedNode(boolean previous) {
+        if (selectionManager.getLastSelected() != null &&
+                selectionManager.getLastSelected() instanceof Node) {
+            Node selectedNode = (Node)selectionManager.getLastSelected();
+
+            boolean nextNodeIsThere = false;
+            if (!selectedNode.getLinesConnected().isEmpty()) {
+                Node nextNode = null;
+                if (!previous) { // find the next child if shift was being held down
+                    for (int i=0; i<selectedNode.getLinesConnected().size(); i++) {
+                        if (selectedNode.getLinesConnected().get(i).getChild() != selectedNode &&
+                                selectedNode.getLinesConnected().get(i).getChild()!= null) {
+                            nextNode = selectedNode.getLinesConnected().get(i).getChild();
+                            break;
+                        }
+                    }
+                } else { // if shift is being held down then find the next parent
+                    for (int i=0; i<selectedNode.getLinesConnected().size(); i++) {
+                        if (selectedNode.getLinesConnected().get(i).getParent() != selectedNode &&
+                                selectedNode.getLinesConnected().get(i).getParent()!= null) {
+                            nextNode = selectedNode.getLinesConnected().get(i).getParent();
+                            break;
+                        }
+                    }
+                }
+
+                // if you found the next node, select it
+                if (nextNode != null) {
+                    nextNodeIsThere = true;
+                    selectionManager.getSelected().clear();
+                    selectionManager.getSelected().add(nextNode);
+                    //System.out.println("selecting next node");
+                }
+            }
+
+            if (!nextNodeIsThere && !previous) { /// ... if shift was not held down
+                // create a new node
+                Node createdNode = (Node)selectedNode.clone();
+                // position it to the right of the previously selected node
+                createdNode.setX(selectedNode.getX() + selectedNode.getWidth() + 120);
+                createdNode.setY(selectedNode.getY());
+                createdNode.getLinesConnected().clear();
+                window.getFlowchart().getNodes().add(createdNode);
+                // connect the two nodes with a line
+                NodeLine line = new NodeLine(selectedNode, createdNode);
+                createdNode.getLinesConnected().add(line);
+                selectedNode.getLinesConnected().add(line);
+                dragManager.setNewlyMadeNode(createdNode);
+                 // select your newly created node
+                selectionManager.getSelected().clear();
+                selectionManager.getSelected().add(createdNode);
+                System.out.println("New node " + createdNode + " from the node " + selectedNode);
+            }
+        }
+        window.redrawView();
+    }
+    
     @Override
     public void keyTyped(KeyEvent e) {
         System.out.println("Typed a character: " + e.getKeyChar());
@@ -245,107 +364,32 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 spacebar = true;
                 break;
             case KeyEvent.VK_DELETE:
-                removeSelectables(selectionManager.getSelected());
-                selectionManager.getSelected().clear();
-                window.redrawView();
+                deleteSelected();
                 break;
             case KeyEvent.VK_N:
                 if (e.isControlDown()) {
-                    System.out.println("Creating a flowchart");
-                    window.getFlowchartWindowManager().newFlowchart();
+                    createNewFlowchart();
                 }
-                window.redrawView();
                 break;
             case KeyEvent.VK_C:
                 if (e.isControlDown()) {
-                    if (!selectionManager.getSelected().isEmpty()) {
-                        dragManager.setStuffInClipboard(selectionManager.getSelected());
-                    }
+                    copySelected();
                 }
                 break;
             case KeyEvent.VK_X:
                 if (e.isControlDown()) {
-                    if (!selectionManager.getSelected().isEmpty()) {
-                        dragManager.setStuffInClipboard(selectionManager.getSelected());
-                        removeSelectables(selectionManager.getSelected());
-                        selectionManager.getSelected().clear();
-                    }
-                    window.redrawView();
+                    cutSelected();
                 }
                 break;
             case KeyEvent.VK_V:
                 // paste everything into the center of the screen?
                 break;
             case KeyEvent.VK_TAB:
-                if (selectionManager.getLastSelected() != null &&
-                        selectionManager.getLastSelected() instanceof Node) {
-                    Node selectedNode = (Node)selectionManager.getLastSelected();
-                    
-                    boolean nextNodeIsThere = false;
-                    if (!selectedNode.getLinesConnected().isEmpty()) {
-                        Node nextNode = null;
-                        if (!e.isShiftDown()) { // find the next child if shift was being held down
-                            for (int i=0; i<selectedNode.getLinesConnected().size(); i++) {
-                                if (selectedNode.getLinesConnected().get(i).getChild() != selectedNode &&
-                                        selectedNode.getLinesConnected().get(i).getChild()!= null) {
-                                    nextNode = selectedNode.getLinesConnected().get(i).getChild();
-                                    break;
-                                }
-                            }
-                        } else { // if shift is being held down then find the next parent
-                            for (int i=0; i<selectedNode.getLinesConnected().size(); i++) {
-                                if (selectedNode.getLinesConnected().get(i).getParent() != selectedNode &&
-                                        selectedNode.getLinesConnected().get(i).getParent()!= null) {
-                                    nextNode = selectedNode.getLinesConnected().get(i).getParent();
-                                    break;
-                                }
-                            }
-                        }
-                        
-                        // if you found the next node, select it
-                        if (nextNode != null) {
-                            nextNodeIsThere = true;
-                            selectionManager.getSelected().clear();
-                            selectionManager.getSelected().add(nextNode);
-                            //System.out.println("selecting next node");
-                        }
-                    }
-                    
-                    if (!nextNodeIsThere && !e.isShiftDown()) { /// ... if shift was not held down
-                        // create a new node
-                        Node createdNode = (Node)selectedNode.clone();
-                        // position it to the right of the previously selected node
-                        createdNode.setX(selectedNode.getX() + selectedNode.getWidth() + 120);
-                        createdNode.setY(selectedNode.getY());
-                        createdNode.getLinesConnected().clear();
-                        window.getFlowchart().getNodes().add(createdNode);
-                        // connect the two nodes with a line
-                        NodeLine line = new NodeLine(selectedNode, createdNode);
-                        createdNode.getLinesConnected().add(line);
-                        selectedNode.getLinesConnected().add(line);
-                        dragManager.setNewlyMadeNode(createdNode);
-                         // select your newly created node
-                        selectionManager.getSelected().clear();
-                        selectionManager.getSelected().add(createdNode);
-                        System.out.println("New node " + createdNode + " from the node " + selectedNode);
-                        // redraw the window
-                        window.redrawView();
-                    }
-                }
-                window.redrawView();
+                selectConnectedNode(e.isShiftDown());
                 break;
             case KeyEvent.VK_A:
                 if (e.isControlDown()) {
-                    // select everything with ctrl+a
-                    selectionManager.getSelected().clear();
-                    for (int i=0; i<window.getFlowchart().getNodes().size(); i++) {
-                        if (!selectionManager.getSelected().contains(window.getFlowchart().getNodes().get(i))) {
-                            selectionManager.getSelected().add(window.getFlowchart().getNodes().get(i));
-                        }
-                    }
-                    for (int i=0; i<window.getFlowchart().getNodeLines().size(); i++) {
-                        selectionManager.getSelected().add(window.getFlowchart().getNodeLines().get(i));
-                    }
+                    selectAll();
                 }
                 window.redrawView();
                 break;

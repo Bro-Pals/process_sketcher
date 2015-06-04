@@ -107,9 +107,21 @@ public class CameraControls implements MouseMotionListener, KeyListener, MouseLi
         return (holdingSpace && mouseButton == MouseEvent.BUTTON1) || mouseButton == MouseEvent.BUTTON2;
     }
 
+    public void zoomIn() {
+        camera.zoom(-1 / 4.0f);
+    }
+    
+    public void zoomOut() {
+        camera.zoom(1 / 4.0f);
+    }
+    
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        camera.zoom(e.getWheelRotation() / 4.0f);
+        if (e.getWheelRotation() > 0) {
+            zoomOut();
+        } else {
+            zoomIn();
+        }
         window.redrawView();
     }
 }
