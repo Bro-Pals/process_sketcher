@@ -14,16 +14,20 @@ import java.awt.Font;
  */
 public class FontStyle {
     
-    private int fontSize;
     private Color fontColor;
     private Font fontType;
 
+    public FontStyle() {
+        fontColor = Color.BLACK;
+        fontType = new Font("Arial", Font.PLAIN, 12);
+    }
+    
     public int getFontSize() {
-        return fontSize;
+        return fontType.getSize();
     }
 
     public void setFontSize(int fontSize) {
-        this.fontSize = fontSize;
+        fontType = fontType.deriveFont((float)fontSize);
     }
 
     public Color getFontColor() {

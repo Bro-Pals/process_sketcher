@@ -26,9 +26,9 @@ public class NodeLine implements Selectable {
         this.parent = parent;
         this.child = child;
         style = new LineStyle();
-        tailText = "";
-        centerText = "";
-        headText = "";
+        tailText = "tail";
+        centerText = "center";
+        headText = "head";
     }
     
     @Override

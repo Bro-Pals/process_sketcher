@@ -11,7 +11,7 @@ import java.awt.Color;
  *
  * @author Jonathon
  */
-public class NodeStyle {
+public class NodeStyle extends FontStyle{
     
     private Shape shape;
     private Color fillColor;
@@ -19,6 +19,7 @@ public class NodeStyle {
     private int borderSize;
 
     public NodeStyle() {
+        super();
         shape = Shape.SQUARE;
         fillColor = Color.WHITE;
         borderColor = Color.BLACK;

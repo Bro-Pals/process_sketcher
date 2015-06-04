@@ -7,8 +7,12 @@ package bropals.flowy.style;
 
 import bropals.flowy.Camera;
 import bropals.flowy.data.Node;
+import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
 
 /**
  *
@@ -18,6 +22,7 @@ public enum Shape {
     SQUARE, TRIANGLE, OVAL, DIAMOND, THING;
     
     public void renderShape(Node node, Camera camera, Graphics g) {
+        Graphics2D g2 = (Graphics2D) g;
         switch(this) {
             case SQUARE:
                 g.setColor(node.getStyle().getBorderColor());
@@ -37,6 +42,23 @@ public enum Shape {
                 g.drawLine((int)_p3.getX(), (int)_p3.getY(),(int)_p4.getX(), (int)_p4.getY());
                 g.drawLine((int)_p4.getX(), (int)_p4.getY(),(int)_p1.getX(), (int)_p1.getY());
                 break;
+        }
+        
+        if (node.getInnerText().length() > 0) {
+            g2.setColor(node.getStyle().getFontColor());
+            Font transformedFont = node.getStyle().getFontType().deriveFont(node.getStyle().getFontSize() / camera.getZoom());
+            g2.setFont(transformedFont);
+            /*
+            g.drawString(node.getInnerText(), 
+                    (int)(camera.convertWorldToCanvasX(node.getX()) + 5), 
+                    (int)(camera.convertWorldToCanvasY(node.getY()) + 5));
+                    */
+
+            FontRenderContext frc = g2.getFontRenderContext();
+            TextLayout textLayout = new TextLayout(node.getInnerText(), transformedFont, frc);
+            textLayout.draw(g2, (int)(camera.convertWorldToCanvasX(node.getX()) + 5), 
+                    (int)(camera.convertWorldToCanvasY(node.getY()) + 5));
+        
         }
     }
 }

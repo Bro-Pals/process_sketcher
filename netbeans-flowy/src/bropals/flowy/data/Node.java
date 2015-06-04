@@ -31,6 +31,7 @@ public class Node implements Selectable {
         width = 100;
         height = 80;
         linesConnected = new ArrayList<>();
+        innerText = "default";
     }
     
     @Override
@@ -96,7 +97,7 @@ public class Node implements Selectable {
         other.setWidth(getWidth());
         other.setHeight(getHeight());
         other.setStyle((NodeStyle)style.clone()); // same style
-        other.setInnerText(""); // initially no text
+        other.setInnerText(getInnerText()); // initially no text
         return other;
     }
 

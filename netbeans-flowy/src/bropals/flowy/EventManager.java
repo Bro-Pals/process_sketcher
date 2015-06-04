@@ -33,6 +33,15 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
     /** The variable to track if the spacebar is held down or not */
     private boolean spacebar;
     
+    /**
+     * Keep track of where on the line you're adding text (tail, head, or center)
+     * 0 = center
+     * 1 = tail
+     * 2 = head
+     * It will rotate between these three in the order 0 -> 1 -> 2 -> 0 ...
+     */
+    private int linePartTyping;
+    
     public EventManager(FlowchartWindow instance) {
         window = instance;
         selectionManager = new SelectionManager();
@@ -126,8 +135,8 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         for (Selectable s : stuff) {
             if (s instanceof Node) {
                 for (int i=0; i<((Node)s).getLinesConnected().size(); i++) {
-                    ((Node)s).getLinesConnected().remove(i);
                     NodeLine nl = ((Node)s).getLinesConnected().get(i);
+                    ((Node)s).getLinesConnected().remove(i);
                     if (((Node)s) == nl.getChild()) {
                         nl.getParent().getLinesConnected().remove(nl);
                     } else {
@@ -147,7 +156,86 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
     
     @Override
     public void keyTyped(KeyEvent e) {
+        System.out.println("Typed a character: " + e.getKeyChar());
         
+        // if you're selecting soemthing that you aren't holding alt or control (for a different action)
+        if (selectionManager.getLastSelected() != null && !e.isAltDown() && !e.isControlDown()) {
+            if (selectionManager.getSelected().size() > 1) {
+                Selectable lastSelected = selectionManager.getLastSelected();
+                selectionManager.getSelected().clear();
+                selectionManager.getSelected().add(lastSelected);
+            }
+            
+            // if a TAB key was typed
+            if (e.getKeyChar() == '\t') {
+                return; // nothing else happens...
+            }
+            
+            // if you're selecting a node...
+            if (selectionManager.getLastSelected() instanceof Node) {
+                Node editNode = (Node)selectionManager.getLastSelected();
+                
+                if (((int)e.getKeyChar()) == KeyEvent.VK_BACK_SPACE && editNode.getInnerText().length() > 0) {
+                    // take off the last character in the string
+                    editNode.setInnerText(editNode.getInnerText().substring(0, editNode.getInnerText().length() - 1));
+                } else if (((int)e.getKeyChar()) == KeyEvent.VK_ENTER) {
+                    // add a new line
+                    editNode.setInnerText(editNode.getInnerText() + '\n');
+                } else if (((int)e.getKeyChar()) != KeyEvent.VK_BACK_SPACE) {
+                    // add the typed character to the end
+                    editNode.setInnerText(editNode.getInnerText() + e.getKeyChar());
+                }
+            // if you're selecting a node line...
+            } else if (selectionManager.getLastSelected() != null &&
+                selectionManager.getLastSelected() instanceof NodeLine) {
+                NodeLine editLine = (NodeLine)selectionManager.getLastSelected();
+            
+                int lengthOfEditingLine = 0;
+                switch (linePartTyping) {
+                    case 0: lengthOfEditingLine = editLine.getCenterText().length(); break;
+                    case 1: lengthOfEditingLine = editLine.getTailText().length(); break;
+                    case 2: lengthOfEditingLine = editLine.getHeadText().length(); break;
+                }
+                
+                if (((int)e.getKeyChar()) == KeyEvent.VK_BACK_SPACE && lengthOfEditingLine > 0) {
+                    // take off the last character in the string
+                    switch (linePartTyping) {
+                        case 0:
+                            editLine.setCenterText(editLine.getCenterText().substring(0, editLine.getCenterText().length() - 1));
+                            break;
+                        case 1:
+                            editLine.setTailText(editLine.getTailText().substring(0, editLine.getTailText().length() - 1));
+                            break;
+                        case 2:
+                            editLine.setHeadText(editLine.getHeadText().substring(0, editLine.getHeadText().length() - 1));
+                            break;
+                    }
+                    
+                } else if (((int)e.getKeyChar()) == KeyEvent.VK_ENTER) {
+                    // cycle what part of the line that is being edited
+                    if (linePartTyping < 2) {
+                        linePartTyping++;
+                    } else {
+                        linePartTyping = 0;
+                    }
+                } else if (((int)e.getKeyChar()) != KeyEvent.VK_BACK_SPACE) {
+                    // add the typed character to the end
+                    switch (linePartTyping) {
+                        case 0:
+                            editLine.setCenterText(editLine.getCenterText() + e.getKeyChar());
+                            break;
+                        case 1:
+                            editLine.setTailText(editLine.getTailText() + e.getKeyChar());
+                            break;
+                        case 2:
+                            editLine.setHeadText(editLine.getHeadText() + e.getKeyChar());
+                            break;
+                    }
+                }
+            }
+        }
+        
+        window.redrawView();
     }
 
     @Override
@@ -169,17 +257,21 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 window.redrawView();
                 break;
             case KeyEvent.VK_C:
-                if (!selectionManager.getSelected().isEmpty()) {
-                    dragManager.setStuffInClipboard(selectionManager.getSelected());
+                if (e.isControlDown()) {
+                    if (!selectionManager.getSelected().isEmpty()) {
+                        dragManager.setStuffInClipboard(selectionManager.getSelected());
+                    }
                 }
                 break;
             case KeyEvent.VK_X:
-                if (!selectionManager.getSelected().isEmpty()) {
-                    dragManager.setStuffInClipboard(selectionManager.getSelected());
-                    removeSelectables(selectionManager.getSelected());
-                    selectionManager.getSelected().clear();
+                if (e.isControlDown()) {
+                    if (!selectionManager.getSelected().isEmpty()) {
+                        dragManager.setStuffInClipboard(selectionManager.getSelected());
+                        removeSelectables(selectionManager.getSelected());
+                        selectionManager.getSelected().clear();
+                    }
+                    window.redrawView();
                 }
-                window.redrawView();
                 break;
             case KeyEvent.VK_V:
                 // paste everything into the center of the screen?
