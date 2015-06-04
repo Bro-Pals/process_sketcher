@@ -21,6 +21,7 @@ public class SelectPreviousNodeListener extends AbstractFlowyListener implements
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        getFlowchartWindow().getEventManager().selectConnectedNode(true);
     }
     
 }

@@ -21,6 +21,8 @@ public class PasteListener extends AbstractFlowyListener implements ActionListen
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        getFlowchartWindow().getEventManager().pasteClipboard();
+        getFlowchartWindow().redrawView();
     }
     
 }

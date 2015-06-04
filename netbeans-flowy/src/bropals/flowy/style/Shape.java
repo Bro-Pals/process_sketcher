@@ -21,7 +21,7 @@ import java.awt.font.TextLayout;
 public enum Shape {
     SQUARE, TRIANGLE, OVAL, DIAMOND, THING;
     
-    public void renderShape(Node node, Camera camera, Graphics g) {
+    public void renderShape(Node node, Camera camera, Graphics g, boolean blinkCursor) {
         Graphics2D g2 = (Graphics2D) g;
         switch(this) {
             case SQUARE:
@@ -58,7 +58,12 @@ public enum Shape {
             TextLayout textLayout = new TextLayout(node.getInnerText(), transformedFont, frc);
             textLayout.draw(g2, (int)(camera.convertWorldToCanvasX(node.getX()) + 5), 
                     (int)(camera.convertWorldToCanvasY(node.getY()) + 12));
-        
+              
+            if (blinkCursor) {
+                g2.drawRect((int)(camera.convertWorldToCanvasX(node.getX()) + 5), 
+                    (int)(camera.convertWorldToCanvasY(node.getY()) + 12), 
+                    5, 5);
+            }
         }
     }
 }

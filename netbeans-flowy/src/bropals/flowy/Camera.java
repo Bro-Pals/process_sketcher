@@ -128,4 +128,12 @@ public class Camera {
     public void unlock() {
         locked = false;
     }
+    
+    public void resetView() {
+        if (!locked) {
+            zoom = 1f;
+            x = 0;
+            y = 0;
+        }
+    }
 }

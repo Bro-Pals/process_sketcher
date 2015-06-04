@@ -26,7 +26,7 @@ public enum LineType {
      * @return An array of two points of integers, representing the start and end point of
      *      the line in canvas units. 
      */
-    public Point[] renderLine(NodeLine n, Camera camera, Graphics g) {
+    public Point[] renderLine(NodeLine n, Camera camera, Graphics g, boolean blinkCursor) {
         Node par = n.getParent();
         Node chi = n.getChild();
 
@@ -104,6 +104,12 @@ public enum LineType {
             g.drawString(n.getHeadText(), 
                 (int)camera.convertWorldToCanvasX((float)pp.getX() + (headDist * diffX * lineLength)), 
                 (int)camera.convertWorldToCanvasY((float)pp.getY() + (headDist * diffY * lineLength)));
+        }
+        
+        if (blinkCursor) {
+            g.drawRect((int)(camera.convertWorldToCanvasX((int)pp.getX()) + 5), 
+                (int)(camera.convertWorldToCanvasY((int)pp.getY()) + 12), 
+                5, 5);
         }
         
         return new Point[]{int_p1, int_p2};

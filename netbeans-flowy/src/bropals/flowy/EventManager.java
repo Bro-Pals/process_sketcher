@@ -8,6 +8,7 @@ package bropals.flowy;
 import bropals.flowy.data.Node;
 import bropals.flowy.data.NodeLine;
 import bropals.flowy.data.Selectable;
+import bropals.flowy.util.BooleanBlinkListener;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -21,7 +22,7 @@ import java.util.ArrayList;
  *
  * @author Jonathon
  */
-public class EventManager implements KeyListener, MouseListener, MouseMotionListener {
+public class EventManager implements KeyListener, MouseListener, MouseMotionListener, BooleanBlinkListener {
 
     private SelectionManager selectionManager;
     private FlowchartWindow window;
@@ -43,6 +44,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      * in the order 0 -> 1 -> 2 -> 0 ...
      */
     private int linePartTyping;
+    private boolean showCursor;
 
     /**
      * How close the mouse has to be to an edge of a node to be able to resize
@@ -54,10 +56,16 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         window = instance;
         selectionManager = new SelectionManager();
         dragManager = new DragManager(selectionManager);
+        showCursor = false;
+        linePartTyping = 0;
     }
 
     public boolean isSelected(Selectable s) {
         return selectionManager.getSelected().contains(s);
+    }
+    
+    public SelectionManager getSelectionManager() {
+        return selectionManager;
     }
 
     /**
@@ -81,7 +89,8 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         // if no nodes were found, find the nearest line.
         for (NodeLine nl : window.getFlowchart().getNodeLines()) {
             // drag so we can get the points of the line
-            Point[] linePoints = nl.getStyle().getType().renderLine(nl, window.getCamera(), window.getView().getGraphics());
+            Point[] linePoints = nl.getStyle().getType().renderLine(nl, window.getCamera(), 
+                    window.getView().getGraphics(), isCursorShowing() && nl == selectionManager.getLastSelected());
             Point.Float p1 = window.getCamera().convertCanvasToWorld(linePoints[0]);
             Point.Float p2 = window.getCamera().convertCanvasToWorld(linePoints[1]);
 
@@ -146,24 +155,34 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      */
     private void removeSelectables(ArrayList<Selectable> stuff) {
         for (Selectable s : stuff) {
-            for (int i=0; i<window.getFlowchart().getNodes().size(); i++) {
+            if (s instanceof Node) {
+                for (int i=0; i<window.getFlowchart().getNodes().size(); i++) {
 
-                if (window.getFlowchart().getNodes().get(i) == s) {
-                    Node removedNode = window.getFlowchart().getNodes().get(i);
-                    window.getFlowchart().getNodes().remove(i);
-                    // look through the other nodes...
-                    for (Node other : window.getFlowchart().getNodes()) {
-                        // to delete any node line that references the node we're removing
-                        for (NodeLine nl : other.getLinesConnected()) {
-                            // if the line references the removed node AT ALL
-                            if (nl.getChild() == removedNode || nl.getParent() == removedNode) {
-                                other.getLinesConnected().remove(nl);
-                                break;
+                    if (window.getFlowchart().getNodes().get(i) == s) {
+                        Node removedNode = window.getFlowchart().getNodes().get(i);
+                        window.getFlowchart().getNodes().remove(i);
+                        // look through the other nodes...
+                        for (Node other : window.getFlowchart().getNodes()) {
+                            // to delete any node line that references the node we're removing
+                            for (NodeLine nl : other.getLinesConnected()) {
+                                // if the line references the removed node AT ALL
+                                if (other != removedNode && nl.getChild() == removedNode || nl.getParent() == removedNode) {
+                                    other.getLinesConnected().remove(nl);
+                                    break;
+                                }
                             }
                         }
+                         // break out of removing all the lines for that node
+                        break;
                     }
-                     // break out of removing all the lines for that node
-                    break;
+                }
+            } else if (s instanceof NodeLine) {
+                for (int i=0; i<window.getFlowchart().getNodes().size(); i++) {
+                    for (int l=0; l<window.getFlowchart().getNodes().get(i).getLinesConnected().size(); l++) {
+                        if (((NodeLine)s) == window.getFlowchart().getNodes().get(i).getLinesConnected().get(l)) {
+                            window.getFlowchart().getNodes().get(i).getLinesConnected().remove(l);
+                        }
+                    }
                 }
             }
         }
@@ -351,7 +370,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 // select your newly created node
                 selectionManager.getSelected().clear();
                 selectionManager.getSelected().add(createdNode);
-                System.out.println("New node " + createdNode + " from the node " + selectedNode);
+                //System.out.println("New node " + createdNode + " from the node " + selectedNode);
             }
         }
         window.redrawView();
@@ -359,7 +378,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
 
     @Override
     public void keyTyped(KeyEvent e) {
-        System.out.println("Typed a character: " + e.getKeyChar());
+        //System.out.println("Typed a character: " + e.getKeyChar());
 
         // if you're selecting soemthing that you aren't holding alt or control (for a different action)
         if (selectionManager.getLastSelected() != null && !e.isAltDown() && !e.isControlDown()) {
@@ -556,7 +575,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     node.getLinesConnected().add(line);
                     dragManager.setNewlyMadeNode(createdNode);
                     dragManager.setRightMouseDown(true);
-                    System.out.println("New node " + createdNode + " from the node " + node);
+                    //System.out.println("New node " + createdNode + " from the node " + node);
                     window.redrawView();
                 }
             }
@@ -570,11 +589,6 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     selectionManager.getSelected().add(clickedOnThing);
                 }
                 if (selectionManager.getSelectedNodes().contains(node)) {
-                    System.out.println("The selected array:");
-                    for (Selectable s : selectionManager.getSelected()) {
-                        System.out.println(s);
-                    }
-
                     dragManager.startDragMove(mousePosition.x, mousePosition.y);
                     dragManager.setLeftMouseDown(true);
                 } else {
@@ -799,4 +813,15 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
     public DragManager getDragManager() {
         return dragManager;
     }
+
+    @Override
+    public void booleanSwitch(boolean value) {
+        showCursor = value;
+        window.redrawView();
+    }
+    
+    public boolean isCursorShowing() {
+        return showCursor;
+    }
+
 }

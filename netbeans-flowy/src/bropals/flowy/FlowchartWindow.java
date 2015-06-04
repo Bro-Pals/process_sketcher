@@ -40,6 +40,7 @@ import bropals.flowy.listeners.ShapeListener;
 import bropals.flowy.listeners.UndoListener;
 import bropals.flowy.listeners.ZoomInListener;
 import bropals.flowy.listeners.ZoomOutListener;
+import bropals.flowy.util.BooleanBlinker;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -72,6 +73,7 @@ public class FlowchartWindow extends JFrame {
     private JTabbedPane buttonPanel;
     private JComponent view;
     private Camera camera;
+    private Thread blinkThread;
     /*
         The mudball of GUI elements
     */
@@ -157,7 +159,13 @@ public class FlowchartWindow extends JFrame {
         setSize(800, 600);
         view.setFocusable(true);
         view.setFocusTraversalKeysEnabled(false);
+        
+        BooleanBlinker blinker = new BooleanBlinker(400); // for the blinking in the cursor
+        blinker.addListener(eventManager);
+        blinkThread = new Thread(blinker);
         revalidate();
+        
+        blinkThread.start();
     }
     
     public void redrawView() {
@@ -171,7 +179,8 @@ public class FlowchartWindow extends JFrame {
         // the color used for showing that something is selected
         Color selectionColor = Color.RED;
         for (Node n : flowchart.getNodes()) {
-            n.getStyle().getShape().renderShape(n, camera,  g);
+            n.getStyle().getShape().renderShape(n, camera, g, 
+                n == eventManager.getSelectionManager().getLastSelected() && eventManager.isCursorShowing());
             if (eventManager.isSelected(n)) {
                 // draw the box around the node if it's being selected
                 g.setColor(selectionColor);
@@ -183,7 +192,8 @@ public class FlowchartWindow extends JFrame {
                         (int)(n.getHeight()/camera.getZoom() + (2*offset)));
             }
             for (NodeLine nl : n.getLinesConnected()) {
-                Point[] linePoints = nl.getStyle().getType().renderLine(nl, camera, g);
+                Point[] linePoints = nl.getStyle().getType().renderLine(nl, camera, g, 
+                        nl == eventManager.getSelectionManager().getLastSelected() && eventManager.isCursorShowing());
                 if (eventManager.isSelected(nl)) {
                     g.setColor(selectionColor);
                     float offset = 3 / camera.getZoom();

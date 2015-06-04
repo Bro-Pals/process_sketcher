@@ -22,6 +22,7 @@ public class ZoomInListener extends AbstractFlowyListener implements ActionListe
     @Override
     public void actionPerformed(ActionEvent e) {
         getFlowchartWindow().getCameraControls().zoomIn();
+        getFlowchartWindow().redrawView();
     }
     
 }

@@ -6,8 +6,10 @@
 package bropals.flowy.listeners;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.Node;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 /**
  *
@@ -21,6 +23,50 @@ public class FitToViewListener extends AbstractFlowyListener implements ActionLi
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        ArrayList<Node> nodes = getFlowchartWindow().getFlowchart().getNodes();
+        // find the bounds of the entire flowchart in world units
+        float smallestX = nodes.get(0).getX(); // world units
+        float smallestY = nodes.get(0).getY(); // world units
+        float largestX = nodes.get(0).getX() + nodes.get(0).getWidth(); // world units
+        float largestY = nodes.get(0).getY() + nodes.get(0).getHeight(); // world units
+        
+        // search through all the nodes, finding the smallest and largest bounds...
+        for (int i=1; i<nodes.size(); i++) {
+            if (nodes.get(i).getX() < smallestX) {
+                smallestX = nodes.get(i).getX();
+            }
+            
+            if (nodes.get(i).getY() < smallestY) {
+                smallestY = nodes.get(i).getY();
+            }
+            
+            if (nodes.get(i).getX() + nodes.get(i).getWidth() > largestX) {
+                largestX = nodes.get(i).getX() + nodes.get(i).getWidth();
+            }
+            
+            if (nodes.get(i).getY() + nodes.get(i).getHeight() > largestY) {
+                largestY = nodes.get(i).getY() + nodes.get(i).getHeight();
+            }
+        }
+        
+        float padding = 30; // world units of padding
+        // add the padding to the bounds
+        smallestX = smallestX - padding;
+        smallestY = smallestY - padding;
+        largestX = largestX + padding;
+        largestY = largestY + padding;
+        
+        getFlowchartWindow().getCamera().setWorldLocationX(smallestX);
+        getFlowchartWindow().getCamera().setWorldLocationY(smallestY);
+        if (largestX - smallestX > largestY - smallestY) {
+            getFlowchartWindow().getCamera().setZoom((largestX - smallestX + (padding * 3)) / getFlowchartWindow().getView().getWidth());
+        } else {
+            getFlowchartWindow().getCamera().setZoom((largestY - smallestY + (padding * 3)) / getFlowchartWindow().getView().getHeight());
+        }
+
+        System.out.println("New zoom: " + getFlowchartWindow().getCamera().getZoom());
+        
+        getFlowchartWindow().redrawView();
     }
     
 }

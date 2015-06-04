@@ -21,6 +21,8 @@ public class ResetViewListener extends AbstractFlowyListener implements ActionLi
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        getFlowchartWindow().getCamera().resetView();
+        getFlowchartWindow().redrawView();
     }
     
 }
