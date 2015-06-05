@@ -56,14 +56,42 @@ public class FitToViewListener extends AbstractFlowyListener implements ActionLi
         largestX = largestX + padding;
         largestY = largestY + padding;
         
+        int sizeToFitTo = 0;
+        int translateX = 0;
+        int translateY = 0;
+        if (getFlowchartWindow().getView().getWidth() > getFlowchartWindow().getView().getHeight()) {
+            sizeToFitTo = getFlowchartWindow().getView().getHeight();
+            translateX = (sizeToFitTo - getFlowchartWindow().getView().getWidth())/2;
+        } else {
+            sizeToFitTo = getFlowchartWindow().getView().getWidth();
+            translateY = (sizeToFitTo - getFlowchartWindow().getView().getHeight())/2;
+        }
+        
         getFlowchartWindow().getCamera().setWorldLocationX(smallestX);
         getFlowchartWindow().getCamera().setWorldLocationY(smallestY);
         if (largestX - smallestX > largestY - smallestY) {
-            getFlowchartWindow().getCamera().setZoom((largestX - smallestX + (padding * 3)) / getFlowchartWindow().getView().getWidth());
+            getFlowchartWindow().getCamera().setZoom((largestX - smallestX + (padding * 3)) / sizeToFitTo);
         } else {
-            getFlowchartWindow().getCamera().setZoom((largestY - smallestY + (padding * 3)) / getFlowchartWindow().getView().getHeight());
+            getFlowchartWindow().getCamera().setZoom((largestY - smallestY + (padding * 3)) / sizeToFitTo);
         }
 
+        // if translate X is still 0... center the flowchart to the window on the x axis
+        if (translateX == 0) {
+            translateX =  (int)((largestX - smallestX) / getFlowchartWindow().getCamera().getZoom()) - sizeToFitTo;
+            translateX = translateX / 2;
+        } else {
+            translateY = (int)((largestY - smallestY) / getFlowchartWindow().getCamera().getZoom()) - sizeToFitTo;
+            translateY = translateY / 2;
+        }
+        
+        getFlowchartWindow().getCamera().setCanvasLocationX(
+                getFlowchartWindow().getCamera().getCanvasLocationX() + 
+                        (translateX));
+        
+        getFlowchartWindow().getCamera().setCanvasLocationY(
+                getFlowchartWindow().getCamera().getCanvasLocationY() +
+                        (translateY));
+        
         System.out.println("New zoom: " + getFlowchartWindow().getCamera().getZoom());
         
         getFlowchartWindow().redrawView();

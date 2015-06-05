@@ -205,23 +205,6 @@ public class FlowchartWindow extends JFrame {
                             (int)(linePoints[0].getY() - offset), 
                             (int)(linePoints[1].getX() - offset), 
                             (int)(linePoints[1].getY() - offset));
-                    /*
-                    int boxWidth = (int)(linePoints[1].getX() - linePoints[0].getX());
-                    int boxHeight = (int)(linePoints[1].getY() - linePoints[0].getY());
-                    if (boxWidth < 0) {
-                        linePoints[0].setLocation(linePoints[0].getX() + boxWidth, linePoints[0].getY());
-                        boxWidth = Math.abs(boxWidth);
-                    }
-                    if (boxHeight < 0) {
-                        linePoints[0].setLocation(linePoints[0].getX(), linePoints[0].getY() + boxHeight);
-                        boxHeight = Math.abs(boxHeight);
-                    }
-                    
-                    g.drawRect((int)(linePoints[0].getX() - offset), 
-                        (int)(linePoints[0].getY() - offset), 
-                        boxWidth + (int)(2*offset),
-                        boxHeight + (int)(2*offset));
-                    */
                 }
             }
         }
