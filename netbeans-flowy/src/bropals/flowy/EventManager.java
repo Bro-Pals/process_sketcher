@@ -44,6 +44,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      * in the order 0 -> 1 -> 2 -> 0 ...
      */
     private int linePartTyping;
+    private int locationOfTypeCursor;
     private boolean showCursor;
 
     /**
@@ -58,6 +59,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         dragManager = new DragManager(selectionManager);
         showCursor = false;
         linePartTyping = 0;
+        locationOfTypeCursor = 0;
     }
 
     public boolean isSelected(Selectable s) {
@@ -396,10 +398,25 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
             // if you're selecting a node...
             if (selectionManager.getLastSelected() instanceof Node) {
                 Node editNode = (Node) selectionManager.getLastSelected();
-
+                // make sure locationOfTypeCursor is in the bounds of the text
+                if (locationOfTypeCursor < 0) {
+                    locationOfTypeCursor = 0;
+                } else if (locationOfTypeCursor > editNode.getInnerText().length() - 1) {
+                    locationOfTypeCursor = editNode.getInnerText().length() - 1;
+                }
+                /*
+                
+                
+                // make stuff happen using the locationOfTypeCursor variable
+                
+                */
+                
                 if (((int) e.getKeyChar()) == KeyEvent.VK_BACK_SPACE && editNode.getInnerText().length() > 0) {
                     // take off the last character in the string
-                    editNode.setInnerText(editNode.getInnerText().substring(0, editNode.getInnerText().length() - 1));
+                    editNode.setInnerText(
+                            editNode.getInnerText().substring(0, locationOfTypeCursor - 1) +
+                                    editNode.getInnerText().substring(locationOfTypeCursor, editNode.getInnerText().length()));
+                    locationOfTypeCursor--;
                 } else if (((int) e.getKeyChar()) == KeyEvent.VK_ENTER) {
                     // add a new line
                     editNode.setInnerText(editNode.getInnerText() + '\n');
@@ -503,6 +520,12 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     selectAll();
                 }
                 window.redrawView();
+                break;
+            case KeyEvent.VK_LEFT:
+                locationOfTypeCursor--;
+                break;
+            case KeyEvent.VK_RIGHT:
+                locationOfTypeCursor++;
                 break;
         }
     }
@@ -622,6 +645,26 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 window.getCamera().lock();
             }
         }
+        
+        // move the cursor that's editing to the end of the text
+        if (selectionManager.getLastSelected() != null) {
+            if (selectionManager.getLastSelected() instanceof Node) {
+                locationOfTypeCursor = ((Node)selectionManager.getLastSelected()).getInnerText().length();
+            } else if (selectionManager.getLastSelected() instanceof NodeLine) {
+                switch (linePartTyping) {
+                    case 0: 
+                        locationOfTypeCursor = ((NodeLine)selectionManager.getLastSelected()).getCenterText().length();
+                        break;
+                    case 1:
+                        locationOfTypeCursor = ((NodeLine)selectionManager.getLastSelected()).getTailText().length();
+                        break;
+                    case 2:
+                        locationOfTypeCursor = ((NodeLine)selectionManager.getLastSelected()).getHeadText().length();
+                        break;
+                }
+            }
+        }
+        
         window.redrawView();
     }
 

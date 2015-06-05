@@ -86,21 +86,25 @@ public enum LineType {
         g.setFont(n.getStyle().getFontType().deriveFont((float)(n.getStyle().getFontSize() / camera.getZoom())));
         g.setColor(n.getStyle().getFontColor());
         
+        int xOffset = g.getFontMetrics().getMaxAdvance();
         // draw the tail, center, and head texts
         
         if (n.getTailText().length() > 0) {
+            xOffset *= n.getTailText().length();
             g.drawString(n.getTailText(), 
                 (int)camera.convertWorldToCanvasX((float)pp.getX() + (tailDist * diffX * lineLength)), 
                 (int)camera.convertWorldToCanvasY((float)pp.getY() + (tailDist * diffY * lineLength)));
         }
         
         if (n.getCenterText().length() > 0) {
+            xOffset *= n.getCenterText().length();
             g.drawString(n.getCenterText(), 
                 (int)camera.convertWorldToCanvasX((float)pp.getX() + (centerDist * diffX * lineLength)), 
                 (int)camera.convertWorldToCanvasY((float)pp.getY() + (centerDist * diffY * lineLength)));
         }
         
         if (n.getHeadText().length() > 0) {
+            xOffset *= n.getCenterText().length();
             g.drawString(n.getHeadText(), 
                 (int)camera.convertWorldToCanvasX((float)pp.getX() + (headDist * diffX * lineLength)), 
                 (int)camera.convertWorldToCanvasY((float)pp.getY() + (headDist * diffY * lineLength)));
