@@ -20,7 +20,7 @@ public class NodeStyle extends FontStyle{
 
     public NodeStyle() {
         super();
-        shape = Shape.START_END;
+        shape = Shape.DOCUMENT;
         fillColor = Color.WHITE;
         borderColor = Color.BLACK;
         borderSize = 1;

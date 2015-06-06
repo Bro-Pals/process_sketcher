@@ -11,6 +11,7 @@ import bropals.flowy.data.Node;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -83,11 +84,23 @@ public enum Shape {
      * @param g The graphics that it will be drawn to
      * @param blinkCursor Whether or not the cursor will be showing for editing
      * text
-     * @param cursorLocation The lcoation of the cursor for editing text
+     * @param backgroundColor the background color of the view to draw this shape in.
+     * @param cursorLocation The location of the cursor for editing text
      */
     public void renderShape(Node node, Camera camera, Graphics g, boolean blinkCursor, int cursorLocation, Color backgroundColor) {
         Graphics2D g2 = (Graphics2D) g;
 
+        Font transformedFont = node.getStyle().getFontType().deriveFont(node.getStyle().getFontSize() / camera.getZoom());
+        g2.setFont(transformedFont);   
+        FontMetrics fm = g2.getFontMetrics();
+        
+        //Text wrapping values. Don't edit them to use these default values
+        int padding = 5;
+        int startEverythingX = camera.convertWorldToCanvasX(node.getX()) + padding; // canvas units
+        int startEverythingY = camera.convertWorldToCanvasX(node.getY()) + fm.getHeight() + padding; // canvas units
+        // the width each row can't get longer than (in canvas units)
+        int width = camera.convertWorldToCanvasX(node.getWidth()) - (padding * 2);
+        
         if (cursorLocation > node.getInnerText().length()) {
             cursorLocation = node.getInnerText().length();
         } else if (cursorLocation < 0) {
@@ -112,6 +125,7 @@ public enum Shape {
                 g.drawRect(ip1.x, ip1.y, ip3.x-ip1.x, ip3.y-ip1.y);
 
                 g2.setStroke(new BasicStroke(1));
+                
                 break;
             case DECISION:
                 p1 = new Point.Float(node.getX() + (node.getWidth()/2), node.getY());
@@ -120,6 +134,10 @@ public enum Shape {
                 p4 = new Point.Float(node.getX(), node.getY() + (node.getHeight()/2));
                 
                 drawPolygonFromPoints(g2, node, new Point.Float[] { p1, p2, p3, p4 }, camera);
+                
+                startEverythingX += camera.convertWorldToCanvasX(node.getWidth()/4);
+                startEverythingY += camera.convertWorldToCanvasY(node.getHeight()/4);
+                width -= camera.convertWorldToCanvasX(node.getWidth()/2);
                 break;
             case START_END:
                 p1 = new Point.Float(node.getX(), node.getY());
@@ -137,6 +155,11 @@ public enum Shape {
                 g.drawOval(ip1.x, ip1.y, ip3.x-ip1.x, ip3.y-ip1.y);
 
                 g2.setStroke(new BasicStroke(1));
+                
+                float constant = (float)(1-(Math.sqrt(2)/2))/2;
+                startEverythingX += camera.convertWorldToCanvasX(node.getWidth()*constant);
+                startEverythingY += camera.convertWorldToCanvasY(node.getHeight()*constant);
+                width -= camera.convertWorldToCanvasX(node.getWidth()*constant*2);
                 break;
             case MERGE:
                 p1 = new Point.Float(node.getX() + (node.getWidth()/2), node.getY() + node.getHeight() );
@@ -145,6 +168,8 @@ public enum Shape {
                                 
                 drawPolygonFromPoints(g2, node, new Point.Float[]{p1, p2, p3}, camera);
                 
+                startEverythingX += camera.convertWorldToCanvasX(node.getWidth()/4);
+                width -= camera.convertWorldToCanvasX(node.getWidth()/2);
                 break;
             case DELAY:
                 p1 = new Point.Float(node.getX(), node.getY());
@@ -172,6 +197,8 @@ public enum Shape {
                 g2.drawArc(ip2.x-third, ip2.y, third*2, ip5.y-ip2.y, 90, -180);
                 
                 g2.setStroke(new BasicStroke(1));
+                
+                width -= third;
                 break;
             case INPUT_OUTPUT:
                 p1 = new Point.Float(node.getX() + (int)((float)node.getWidth()/4), node.getY());
@@ -180,11 +207,14 @@ public enum Shape {
                 p4 = new Point.Float(node.getX(), node.getY() + node.getHeight());
                 
                 drawPolygonFromPoints(g2, node, new Point.Float[]{p1, p2, p3, p4}, camera);           
+                
+                startEverythingX += camera.convertWorldToCanvasX(node.getWidth()/4);
+                width -= camera.convertWorldToCanvasX(node.getWidth()/2);
                 break;
             case DOCUMENT:
                 p1 = new Point.Float(node.getX(), node.getY());
                 p2 = new Point.Float(node.getX() + node.getWidth(), node.getY());
-                p3 = new Point.Float(node.getX(), node.getY() + (int)( (float)node.getHeight()*3/4));
+                p3 = new Point.Float(node.getX(), node.getY() + (int)( (float)node.getHeight()*7/8));
                 p4 = new Point.Float(node.getX() + (node.getWidth()/2), node.getY() + node.getHeight());
                 
                 ip1 = camera.convertWorldToCanvas(p1);
@@ -194,34 +224,26 @@ public enum Shape {
                 
                 g.setColor(node.getStyle().getFillColor());
                 g.fillRect(ip1.x, ip1.y, ip2.x-ip1.x, ip3.y-ip1.y);
-                int fourthHeight = ip4.y-ip3.y;
+                int eighthHeight = ip4.y-ip3.y;
                 int halfWidth = ip4.x-ip1.x;
-                g.fillArc(ip3.x, ip3.y-fourthHeight, halfWidth, fourthHeight*2, 180, 180);
+                g.fillArc(ip3.x, ip3.y-eighthHeight, halfWidth, eighthHeight*2, 180, 180);
                 g.setColor(backgroundColor);
-                g.fillArc(ip4.x, ip1.y + (fourthHeight*2), halfWidth, fourthHeight*2, 0, 180);
+                g.fillArc(ip4.x, ip3.y - eighthHeight, halfWidth, eighthHeight*2, 0, 180);
                 
                 g.setColor(node.getStyle().getBorderColor());
                 g2.setStroke(new BasicStroke(node.getStyle().getBorderSize()));
                 g.drawLine(ip1.x, ip1.y, ip2.x, ip2.y);
                 g.drawLine(ip2.x, ip2.y, ip2.x, ip3.y);
                 g.drawLine(ip1.x, ip1.y, ip3.x, ip3.y);
-                g.drawArc(ip3.x, ip3.y-fourthHeight, halfWidth, fourthHeight*2, 180, 180);
-                g.drawArc(ip4.x, ip1.y + (fourthHeight*2), halfWidth, fourthHeight*2, 0, 180);
+                g.drawArc(ip3.x, ip3.y-eighthHeight, halfWidth, eighthHeight*2, 180, 180);
+                g.drawArc(ip4.x, ip3.y - eighthHeight, halfWidth, eighthHeight*2, 0, 180);
                 g2.setStroke(new BasicStroke(1));
                 break;
         }
 
         if (node.getInnerText().length() > 0) {
             g2.setColor(node.getStyle().getFontColor());
-            Font transformedFont = node.getStyle().getFontType().deriveFont(node.getStyle().getFontSize() / camera.getZoom());
-            g2.setFont(transformedFont);
- 
-            float padding = 5;
-            float startEverythingX = (float) camera.convertWorldToCanvasX(node.getX()) + padding; // canvas units
-            float startEverythingY = (float) camera.convertWorldToCanvasX(node.getY()) + g2.getFontMetrics().getHeight() + padding; // canvas units
-            // the width each row can't get longer than (in canvas units)
-            float width = node.getWidth() - (padding * 2);
-
+            
             // seperate the text into rows according to their lengths, not extending canvas units
             // the array for the text. Every element of the array represents one row of text
             ArrayList<String> text = new ArrayList<>();
