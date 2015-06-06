@@ -455,7 +455,9 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 if (((int) e.getKeyChar()) == KeyEvent.VK_BACK_SPACE && editNode.getInnerText().length() > 0) {
                     // take off the character at the location of the string
                     editNode.setInnerText(deleteCharacter(editNode.getInnerText(), locationOfTypeCursor));
-                    locationOfTypeCursor--;
+                    if (locationOfTypeCursor < editNode.getInnerText().length()) {
+                        locationOfTypeCursor--;
+                    }
                 } else if (((int) e.getKeyChar()) == KeyEvent.VK_ENTER) {
                     // add a new line
                     /*System.out.println("insert a new line");
@@ -467,7 +469,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     // add the typed character to the end
                     editNode.setInnerText(insertCharacter(editNode.getInnerText(), 
                             "" + e.getKeyChar(), locationOfTypeCursor));
-                    locationOfTypeCursor +=2;
+                    locationOfTypeCursor +=1;
                 }
                 
             // if you're selecting a node line...
