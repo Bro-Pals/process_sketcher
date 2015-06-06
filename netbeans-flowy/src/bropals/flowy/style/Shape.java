@@ -156,7 +156,31 @@ public enum Shape {
                 
                 break;
             case DELAY:
+                p1 = new Point.Float(node.getX(), node.getY());
+                p2 = new Point.Float(node.getX() + (int)((float)node.getWidth()*2/3), node.getY());
+                p3 = new Point.Float(node.getX(), node.getY() + node.getHeight());
+                p4 = new Point.Float(node.getX() + (int)((float)node.getWidth()*2/3), node.getY() + node.getHeight());
+                Point.Float p5 = new Point.Float(node.getX() + node.getWidth(), node.getY() + node.getHeight());
                 
+                ip1 = camera.convertWorldToCanvas(p1);
+                ip2 = camera.convertWorldToCanvas(p2);
+                ip3 = camera.convertWorldToCanvas(p3);
+                ip4 = camera.convertWorldToCanvas(p4);
+                Point ip5 = camera.convertWorldToCanvas(p5);
+                
+                g.setColor(node.getStyle().getFillColor());
+                g.fillRect(ip1.x, ip1.y, ip4.x-ip1.x, ip4.y-ip1.y);
+                int third = (ip5.x-ip2.x);
+                g2.fillArc(ip2.x-third, ip2.y, third*2, ip5.y-ip2.y, 90, -180);
+                
+                g.setColor(node.getStyle().getBorderColor());
+                g2.setStroke(new BasicStroke(node.getStyle().getBorderSize()));
+                g.drawLine(ip1.x, ip1.y, ip2.x, ip2.y);
+                g.drawLine(ip1.x, ip1.y, ip3.x, ip3.y);
+                g.drawLine(ip3.x, ip3.y, ip4.x, ip4.y);
+                g2.drawArc(ip2.x-third, ip2.y, third*2, ip5.y-ip2.y, 90, -180);
+                
+                g2.setStroke(new BasicStroke(1));
                 break;
         }
 
