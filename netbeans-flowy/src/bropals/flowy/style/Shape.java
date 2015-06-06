@@ -21,7 +21,15 @@ import java.awt.font.TextLayout;
 public enum Shape {
     SQUARE, TRIANGLE, OVAL, DIAMOND, THING;
     
-    public void renderShape(Node node, Camera camera, Graphics g, boolean blinkCursor) {
+    /**
+     * Render a node according to what the style is.
+     * @param node The node that is being rendered
+     * @param camera The camera used to transform it
+     * @param g The graphics that it will be drawn to
+     * @param blinkCursor Whether or not the cursor will be showing for editing text
+     * @param cursorLocation The lcoation of the cursor for editing text
+     */
+    public void renderShape(Node node, Camera camera, Graphics g, boolean blinkCursor, int cursorLocation) {
         Graphics2D g2 = (Graphics2D) g;
         switch(this) {
             case SQUARE:
