@@ -24,6 +24,7 @@ import java.util.ArrayList;
  */
 public class EventManager implements KeyListener, MouseListener, MouseMotionListener, BooleanBlinkListener {
 
+    public static String newLineSequence = "`";
     private SelectionManager selectionManager;
     private FlowchartWindow window;
     /**
@@ -396,7 +397,9 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         }
         
         if (cursorLocation < 0) {
-            cursorLocation = 0;
+            return original; // don't delete if the cursor is at the start
+        } else if (original.length() == 1 && cursorLocation == 0) {
+            return "";
         } else if (cursorLocation > original.length()) {
             cursorLocation = original.length();
         }
@@ -420,7 +423,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         if (original.length() == 0) {
             return character;
         }
-        
+
         return (original.substring(0, cursorLocation + 1) + character + original.substring(cursorLocation + 1));
     }
     
@@ -446,26 +449,25 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 Node editNode = (Node) selectionManager.getLastSelected();
                 // make sure locationOfTypeCursor is in the bounds of the text
                 
-                if (locationOfTypeCursor < 0) {
-                    locationOfTypeCursor = 0;
-                } else if (locationOfTypeCursor > editNode.getInnerText().length() - 1) {
+                if (locationOfTypeCursor > editNode.getInnerText().length() - 1 || locationOfTypeCursor < 0)
                     locationOfTypeCursor = editNode.getInnerText().length() - 1;
-                }
 
                 if (((int) e.getKeyChar()) == KeyEvent.VK_BACK_SPACE && editNode.getInnerText().length() > 0) {
                     // take off the character at the location of the string
                     editNode.setInnerText(deleteCharacter(editNode.getInnerText(), locationOfTypeCursor));
+                    locationOfTypeCursor--;
                 } else if (((int) e.getKeyChar()) == KeyEvent.VK_ENTER) {
                     // add a new line
-                    System.out.println("insert a new line");
+                    /*System.out.println("insert a new line");
                     editNode.setInnerText(insertCharacter(editNode.getInnerText(), 
-                            " \n ", locationOfTypeCursor));
-                    locationOfTypeCursor++;
+                            " " + newLineSequence + " ", locationOfTypeCursor));
+                    locationOfTypeCursor +=2;
+                    */
                 } else if (((int) e.getKeyChar()) != KeyEvent.VK_BACK_SPACE) {
                     // add the typed character to the end
                     editNode.setInnerText(insertCharacter(editNode.getInnerText(), 
                             "" + e.getKeyChar(), locationOfTypeCursor));
-                    locationOfTypeCursor++;
+                    locationOfTypeCursor +=2;
                 }
                 
             // if you're selecting a node line...

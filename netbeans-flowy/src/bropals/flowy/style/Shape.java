@@ -6,6 +6,7 @@
 package bropals.flowy.style;
 
 import bropals.flowy.Camera;
+import bropals.flowy.EventManager;
 import bropals.flowy.data.Node;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -35,6 +36,8 @@ public enum Shape {
         
         if (cursorLocation > node.getInnerText().length()) {
             cursorLocation = node.getInnerText().length();
+        } else if (cursorLocation < 0) {
+            cursorLocation = 0;
         }
         
         switch(this) {
@@ -81,7 +84,7 @@ public enum Shape {
             for (int i=1; i<words.length; i++) {
                 String testResultRow = text.get(rowOn) + " " + words[i]; // add a space after each word
                 // if the word is NOT a new line character and the new word will fit
-                if (!words[i].equals("\n") && 
+                if (!words[i].equals(EventManager.newLineSequence) && 
                         g.getFontMetrics().getStringBounds(testResultRow, g).getWidth() < width) {
                     // remove the old row
                     text.remove(rowOn); 
@@ -90,7 +93,11 @@ public enum Shape {
                 // otherwise if there isn't enough space on this new row
                 } else {
                     // add the word to the next row
-                    text.add(words[i]);
+                    if (!words[i].equals(EventManager.newLineSequence)) {
+                        text.add(words[i]);
+                    } else {
+                        text.add("-"); // add a bullet point
+                    }
                     rowOn++;
                 }
             }
@@ -103,28 +110,29 @@ public enum Shape {
             int lineHeight = g.getFontMetrics().getHeight() ;
             
             int sumOfCharsPrevRows = 0;
-            int rowCursorInside = 0;
+            boolean drawnCursorYet = false;
             
             // draw according to how the row was organized
             for (int r=0; r<text.size(); r++) {
                 g.drawString(text.get(r), (int)startEverythingX, 
                         (int)startEverythingY + (r * lineHeight));
                 if (sumOfCharsPrevRows + text.get(r).length() >= cursorLocation) {
-                    rowCursorInside = r;
+                   if (!drawnCursorYet && blinkCursor) {
+                        // get the offset for where to draw the cursor
+                        int thisRowOffset = (int)g.getFontMetrics().getStringBounds(
+                                (text.get(r).substring(0, cursorLocation - sumOfCharsPrevRows)), g).getWidth();
+                        //draw the cursor
+                        g2.fillRect((int)startEverythingX + thisRowOffset, 
+                            (int)startEverythingY + (lineHeight * (r - 1)) - 2, 
+                            3, lineHeight + 4);
+                        drawnCursorYet = true;
+                    }
                 } else {
                     sumOfCharsPrevRows += text.get(r).length();
                 }
             }
             
-            if (blinkCursor) {
-                // get the offset for where to draw the cursor
-                int thisRowOffset = (int)g.getFontMetrics().getStringBounds(
-                        (entireString.substring(sumOfCharsPrevRows, cursorLocation)), g).getWidth();
-                //draw the cursor
-                g2.fillRect((int)startEverythingX + thisRowOffset, 
-                    (int)startEverythingY + (lineHeight * (rowCursorInside - 1)) - 2, 
-                    3, lineHeight + 4);
-            }
+            
         }
     }
 }
