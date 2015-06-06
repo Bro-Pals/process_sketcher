@@ -159,6 +159,7 @@ public class FlowchartWindow extends JFrame {
         setSize(800, 600);
         view.setFocusable(true);
         view.setFocusTraversalKeysEnabled(false);
+        view.setBackground(Color.WHITE);
         
         BooleanBlinker blinker = new BooleanBlinker(400); // for the blinking in the cursor
         blinker.addListener(eventManager);
@@ -174,14 +175,14 @@ public class FlowchartWindow extends JFrame {
     
     public void paintView(Graphics g) {
         // draw the background
-        g.setColor(Color.WHITE);
+        g.setColor(view.getBackground());
         g.fillRect(0, 0, view.getWidth(), view.getHeight());
         // the color used for showing that something is selected
         Color selectionColor = Color.RED;
         for (Node n : flowchart.getNodes()) {
             n.getStyle().getShape().renderShape(n, camera, g, 
                 n == eventManager.getSelectionManager().getLastSelected() && eventManager.isCursorShowing(),
-                eventManager.getCursorLocation());
+                eventManager.getCursorLocation(), view.getBackground());
             if (eventManager.isSelected(n)) {
                 // draw the box around the node if it's being selected
                 g.setColor(selectionColor);

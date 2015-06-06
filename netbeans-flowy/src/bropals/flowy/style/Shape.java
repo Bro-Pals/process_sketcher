@@ -9,13 +9,12 @@ import bropals.flowy.Camera;
 import bropals.flowy.EventManager;
 import bropals.flowy.data.Node;
 import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Polygon;
-import java.awt.font.FontRenderContext;
-import java.awt.font.TextLayout;
 import java.util.ArrayList;
 
 /**
@@ -24,20 +23,6 @@ import java.util.ArrayList;
  */
 public enum Shape {
     /**
-     * Represents a step of a larger process.
-     *//**
-     * Represents a step of a larger process.
-     *//**
-     * Represents a step of a larger process.
-     *//**
-     * Represents a step of a larger process.
-     *//**
-     * Represents a step of a larger process.
-     *//**
-     * Represents a step of a larger process.
-     *//**
-     * Represents a step of a larger process.
-     *//**
      * Represents a step of a larger process.
      */
     ACTION, 
@@ -55,9 +40,18 @@ public enum Shape {
      */
     DECISION, 
     /**
-     * Indicates a delay in a process
+     * Indicates a delay in a process.
      */
-    DELAY;
+    DELAY,
+    /**
+     * Represents material or information entering or leaving a system.
+     */
+    INPUT_OUTPUT,
+    /**
+     * A printed document or report.
+     */
+    DOCUMENT;
+    
 
     private Polygon canvasPolyFromWorldCoordinates(Point.Float[] points, Camera c) {
         int x[] = new int[points.length];
@@ -67,6 +61,18 @@ public enum Shape {
             y[i] = c.convertWorldToCanvasY(points[i].y);
         }
         return new Polygon(x, y, points.length);
+    }
+    
+    private void drawPolygonFromPoints(Graphics2D g, Node node, Point.Float[] points, Camera c) {
+        Polygon shape = canvasPolyFromWorldCoordinates(points, c);
+
+        g.setColor(node.getStyle().getFillColor());
+        g.fillPolygon(shape);
+
+        g.setStroke(new BasicStroke(node.getStyle().getBorderSize()));
+        g.setColor(node.getStyle().getBorderColor());
+        g.drawPolygon(shape);
+        g.setStroke(new BasicStroke(1));
     }
     
     /**
@@ -79,7 +85,7 @@ public enum Shape {
      * text
      * @param cursorLocation The lcoation of the cursor for editing text
      */
-    public void renderShape(Node node, Camera camera, Graphics g, boolean blinkCursor, int cursorLocation) {
+    public void renderShape(Node node, Camera camera, Graphics g, boolean blinkCursor, int cursorLocation, Color backgroundColor) {
         Graphics2D g2 = (Graphics2D) g;
 
         if (cursorLocation > node.getInnerText().length()) {
@@ -113,14 +119,7 @@ public enum Shape {
                 p3 = new Point.Float(node.getX() + (node.getWidth()/2), node.getY() + node.getHeight());
                 p4 = new Point.Float(node.getX(), node.getY() + (node.getHeight()/2));
                 
-                Polygon diamond = canvasPolyFromWorldCoordinates(new Point.Float[]{p1, p2, p3, p4}, camera);
-                g.setColor(node.getStyle().getFillColor());
-                g.fillPolygon(diamond);
-                
-                g2.setStroke(new BasicStroke(node.getStyle().getBorderSize()));
-                g.setColor(node.getStyle().getBorderColor());
-                g.drawPolygon(diamond);
-                g2.setStroke(new BasicStroke(1));
+                drawPolygonFromPoints(g2, node, new Point.Float[] { p1, p2, p3, p4 }, camera);
                 break;
             case START_END:
                 p1 = new Point.Float(node.getX(), node.getY());
@@ -144,15 +143,7 @@ public enum Shape {
                 p2 = new Point.Float(node.getX(), node.getY() );
                 p3 = new Point.Float(node.getX() + node.getWidth(), node.getY());
                                 
-                Polygon triangle = canvasPolyFromWorldCoordinates(new Point.Float[]{p1, p2, p3}, camera);
-                
-                g.setColor(node.getStyle().getFillColor());
-                g.fillPolygon(triangle);
-                
-                g2.setStroke(new BasicStroke(node.getStyle().getBorderSize()));
-                g.setColor(node.getStyle().getBorderColor());
-                g.drawPolygon(triangle);
-                g2.setStroke(new BasicStroke(1));
+                drawPolygonFromPoints(g2, node, new Point.Float[]{p1, p2, p3}, camera);
                 
                 break;
             case DELAY:
@@ -182,13 +173,49 @@ public enum Shape {
                 
                 g2.setStroke(new BasicStroke(1));
                 break;
+            case INPUT_OUTPUT:
+                p1 = new Point.Float(node.getX() + (int)((float)node.getWidth()/4), node.getY());
+                p2 = new Point.Float(node.getX() + node.getWidth(), node.getY());
+                p3 = new Point.Float(node.getX() + (int)((float)node.getWidth()*3/4), node.getY() + node.getHeight());
+                p4 = new Point.Float(node.getX(), node.getY() + node.getHeight());
+                
+                drawPolygonFromPoints(g2, node, new Point.Float[]{p1, p2, p3, p4}, camera);           
+                break;
+            case DOCUMENT:
+                p1 = new Point.Float(node.getX(), node.getY());
+                p2 = new Point.Float(node.getX() + node.getWidth(), node.getY());
+                p3 = new Point.Float(node.getX(), node.getY() + (int)( (float)node.getHeight()*3/4));
+                p4 = new Point.Float(node.getX() + (node.getWidth()/2), node.getY() + node.getHeight());
+                
+                ip1 = camera.convertWorldToCanvas(p1);
+                ip2 = camera.convertWorldToCanvas(p2);
+                ip3 = camera.convertWorldToCanvas(p3);
+                ip4 = camera.convertWorldToCanvas(p4);
+                
+                g.setColor(node.getStyle().getFillColor());
+                g.fillRect(ip1.x, ip1.y, ip2.x-ip1.x, ip3.y-ip1.y);
+                int fourthHeight = ip4.y-ip3.y;
+                int halfWidth = ip4.x-ip1.x;
+                g.fillArc(ip3.x, ip3.y-fourthHeight, halfWidth, fourthHeight*2, 180, 180);
+                g.setColor(backgroundColor);
+                g.fillArc(ip4.x, ip1.y + (fourthHeight*2), halfWidth, fourthHeight*2, 0, 180);
+                
+                g.setColor(node.getStyle().getBorderColor());
+                g2.setStroke(new BasicStroke(node.getStyle().getBorderSize()));
+                g.drawLine(ip1.x, ip1.y, ip2.x, ip2.y);
+                g.drawLine(ip2.x, ip2.y, ip2.x, ip3.y);
+                g.drawLine(ip1.x, ip1.y, ip3.x, ip3.y);
+                g.drawArc(ip3.x, ip3.y-fourthHeight, halfWidth, fourthHeight*2, 180, 180);
+                g.drawArc(ip4.x, ip1.y + (fourthHeight*2), halfWidth, fourthHeight*2, 0, 180);
+                g2.setStroke(new BasicStroke(1));
+                break;
         }
 
         if (node.getInnerText().length() > 0) {
             g2.setColor(node.getStyle().getFontColor());
             Font transformedFont = node.getStyle().getFontType().deriveFont(node.getStyle().getFontSize() / camera.getZoom());
             g2.setFont(transformedFont);
-
+ 
             float padding = 5;
             float startEverythingX = (float) camera.convertWorldToCanvasX(node.getX()) + padding; // canvas units
             float startEverythingY = (float) camera.convertWorldToCanvasX(node.getY()) + g2.getFontMetrics().getHeight() + padding; // canvas units

@@ -20,8 +20,8 @@ public class NodeStyle extends FontStyle{
 
     public NodeStyle() {
         super();
-        shape = Shape.DELAY;
-        fillColor = Color.BLUE;
+        shape = Shape.START_END;
+        fillColor = Color.WHITE;
         borderColor = Color.BLACK;
         borderSize = 1;
     }
