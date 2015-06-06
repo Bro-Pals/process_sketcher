@@ -413,10 +413,15 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
     private String insertCharacter(String original, String character, int cursorLocation) {
         if (cursorLocation < 0) {
             cursorLocation = 0;
-        } else if (cursorLocation > original.length()) {
-            cursorLocation = original.length();
+        } else if (cursorLocation > original.length() - 1) {
+            cursorLocation = original.length() - 1;
         }
-        return (original.substring(0, cursorLocation) + character + original.substring(cursorLocation));
+        
+        if (original.length() == 0) {
+            return character;
+        }
+        
+        return (original.substring(0, cursorLocation + 1) + character + original.substring(cursorLocation + 1));
     }
     
     @Override
@@ -446,23 +451,15 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 } else if (locationOfTypeCursor > editNode.getInnerText().length() - 1) {
                     locationOfTypeCursor = editNode.getInnerText().length() - 1;
                 }
-                /*
-                
-                
-                // make stuff happen using the locationOfTypeCursor variable
-                
-                */
-                System.out.println("Cursor location: " + locationOfTypeCursor);
-                System.out.println(insertCharacter(editNode.getInnerText(), "|", locationOfTypeCursor));
-                
+
                 if (((int) e.getKeyChar()) == KeyEvent.VK_BACK_SPACE && editNode.getInnerText().length() > 0) {
                     // take off the character at the location of the string
                     editNode.setInnerText(deleteCharacter(editNode.getInnerText(), locationOfTypeCursor));
-                   //ocationOfTypeCursor--;
                 } else if (((int) e.getKeyChar()) == KeyEvent.VK_ENTER) {
                     // add a new line
+                    System.out.println("insert a new line");
                     editNode.setInnerText(insertCharacter(editNode.getInnerText(), 
-                            "\n", locationOfTypeCursor));
+                            " \n ", locationOfTypeCursor));
                     locationOfTypeCursor++;
                 } else if (((int) e.getKeyChar()) != KeyEvent.VK_BACK_SPACE) {
                     // add the typed character to the end
@@ -471,7 +468,6 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     locationOfTypeCursor++;
                 }
                 
-                System.out.println("Result: "  + insertCharacter(editNode.getInnerText(), "|", locationOfTypeCursor));
             // if you're selecting a node line...
             } else if (selectionManager.getLastSelected() != null
                     && selectionManager.getLastSelected() instanceof NodeLine) {

@@ -13,6 +13,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
+import java.util.ArrayList;
 
 /**
  *
@@ -31,6 +32,11 @@ public enum Shape {
      */
     public void renderShape(Node node, Camera camera, Graphics g, boolean blinkCursor, int cursorLocation) {
         Graphics2D g2 = (Graphics2D) g;
+        
+        if (cursorLocation > node.getInnerText().length()) {
+            cursorLocation = node.getInnerText().length();
+        }
+        
         switch(this) {
             case SQUARE:
                 g.setColor(node.getStyle().getBorderColor());
@@ -56,21 +62,68 @@ public enum Shape {
             g2.setColor(node.getStyle().getFontColor());
             Font transformedFont = node.getStyle().getFontType().deriveFont(node.getStyle().getFontSize() / camera.getZoom());
             g2.setFont(transformedFont);
-            /*
-            g.drawString(node.getInnerText(), 
-                    (int)(camera.convertWorldToCanvasX(node.getX()) + 5), 
-                    (int)(camera.convertWorldToCanvasY(node.getY()) + 5));
-                    */
+            
+            float padding = 5;
+            float startEverythingX = (float)camera.convertWorldToCanvasX(node.getX()) + padding; // canvas units
+            float startEverythingY =(float)camera.convertWorldToCanvasX(node.getY()) + g2.getFontMetrics().getHeight() + padding; // canvas units
+            // the width each row can't get longer than (in canvas units)
+            float width = node.getWidth() - (padding * 2);
+            
+            // seperate the text into rows according to their lengths, not extending canvas units
+            
+            // the array for the text. Every element of the array represents one row of text
+            ArrayList<String> text = new ArrayList<>();
+            String[] words = node.getInnerText().split(" ");
+            text.add(words[0]); // first word goes into the first row
+            
+            // what row is currently being filled
+            int rowOn = 0;
+            for (int i=1; i<words.length; i++) {
+                String testResultRow = text.get(rowOn) + " " + words[i]; // add a space after each word
+                // if the word is NOT a new line character and the new word will fit
+                if (!words[i].equals("\n") && 
+                        g.getFontMetrics().getStringBounds(testResultRow, g).getWidth() < width) {
+                    // remove the old row
+                    text.remove(rowOn); 
+                    // make this the new row
+                    text.add(rowOn, testResultRow);
+                // otherwise if there isn't enough space on this new row
+                } else {
+                    // add the word to the next row
+                    text.add(words[i]);
+                    rowOn++;
+                }
+            }
+            
+            String entireString = "";
+            for (String str : text) {
+                entireString += str;
+            }
 
-            FontRenderContext frc = g2.getFontRenderContext();
-            TextLayout textLayout = new TextLayout(node.getInnerText(), transformedFont, frc);
-            textLayout.draw(g2, (int)(camera.convertWorldToCanvasX(node.getX()) + 5), 
-                    (int)(camera.convertWorldToCanvasY(node.getY()) + 12));
-              
+            int lineHeight = g.getFontMetrics().getHeight() ;
+            
+            int sumOfCharsPrevRows = 0;
+            int rowCursorInside = 0;
+            
+            // draw according to how the row was organized
+            for (int r=0; r<text.size(); r++) {
+                g.drawString(text.get(r), (int)startEverythingX, 
+                        (int)startEverythingY + (r * lineHeight));
+                if (sumOfCharsPrevRows + text.get(r).length() >= cursorLocation) {
+                    rowCursorInside = r;
+                } else {
+                    sumOfCharsPrevRows += text.get(r).length();
+                }
+            }
+            
             if (blinkCursor) {
-                g2.drawRect((int)(camera.convertWorldToCanvasX(node.getX()) + 5), 
-                    (int)(camera.convertWorldToCanvasY(node.getY()) + 12), 
-                    5, 5);
+                // get the offset for where to draw the cursor
+                int thisRowOffset = (int)g.getFontMetrics().getStringBounds(
+                        (entireString.substring(sumOfCharsPrevRows, cursorLocation)), g).getWidth();
+                //draw the cursor
+                g2.fillRect((int)startEverythingX + thisRowOffset, 
+                    (int)startEverythingY + (lineHeight * (rowCursorInside - 1)) - 2, 
+                    3, lineHeight + 4);
             }
         }
     }
