@@ -19,6 +19,31 @@ import java.awt.Point;
 public enum LineType {
     SOLID, DASHED, DOTTED;
     
+    @Override
+    public String toString() {
+        switch(this) {
+            case SOLID:
+                return "Solid";
+            case DASHED:
+                return "Dashed";
+            case DOTTED:
+                return "Dotted";
+        }
+        return null;
+    }
+    
+    public static LineType fromString(String str) {
+        switch(str) {
+            case "Solid":
+                return SOLID;
+            case "Dashed":
+                return DASHED;
+            case "Dotted":
+                return DOTTED;
+        }
+        return null;
+    }
+    
     /**
      * Renders this line tpe, changing the color of the graphics to match the style.
      * @param n The node line to render

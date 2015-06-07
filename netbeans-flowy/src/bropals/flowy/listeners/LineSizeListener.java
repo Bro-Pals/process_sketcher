@@ -6,6 +6,7 @@
 package bropals.flowy.listeners;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.NodeLine;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -21,6 +22,9 @@ public class LineSizeListener extends AbstractFlowyListener implements ChangeLis
 
     @Override
     public void stateChanged(ChangeEvent e) {
+        NodeLine n = (NodeLine)getLastSelected();
+        n.getStyle().setLineSize((Integer)getFlowchartWindow().getLineSizeSpinner().getValue());
+        getFlowchartWindow().redrawView();
     }
     
 }

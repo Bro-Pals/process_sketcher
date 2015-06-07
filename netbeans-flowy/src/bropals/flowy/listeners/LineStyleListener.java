@@ -6,6 +6,8 @@
 package bropals.flowy.listeners;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.NodeLine;
+import bropals.flowy.style.LineType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -21,6 +23,9 @@ public class LineStyleListener extends AbstractFlowyListener implements ActionLi
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        NodeLine n = (NodeLine)getLastSelected();
+        n.getStyle().setType(LineType.fromString((String)getFlowchartWindow().getLineTypeComboBox().getSelectedItem()));
+        getFlowchartWindow().redrawView();
     }
     
 }

@@ -40,25 +40,35 @@ import bropals.flowy.listeners.ShapeListener;
 import bropals.flowy.listeners.UndoListener;
 import bropals.flowy.listeners.ZoomInListener;
 import bropals.flowy.listeners.ZoomOutListener;
+import bropals.flowy.style.LineType;
+import bropals.flowy.style.Shape;
 import bropals.flowy.util.BooleanBlinker;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
+import javax.swing.ListCellRenderer;
+import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
 /**
  * Used for editing a Flowchart.
@@ -81,21 +91,23 @@ public class FlowchartWindow extends JFrame {
     private JButton selectNextNode;
     private JButton selectPreviousNode;
     
+    private JPanel stylesTab;
+    
     //Font style buttons
     private JPanel fontStylePanel;
     private JSpinner fontSize;
     private JButton fontColor;
-    private JComboBox font;
+    private JComboBox<Font> font;
     
     //Line style buttons
     private JPanel lineStylePanel;
-    private JComboBox lineStyle;
+    private JComboBox<String> lineType;
     private JButton lineColor;
     private JSpinner lineSize;
     
     //Node style buttons
     private JPanel nodeStylePanel;
-    private JComboBox shape;
+    private JComboBox<String> shape;
     private JButton borderColor;
     private JButton fillColor;
     private JSpinner borderSize;
@@ -132,6 +144,7 @@ public class FlowchartWindow extends JFrame {
         flowchartWindowManager = manager;
         eventManager = new EventManager(this);
         buttonPanel = new JTabbedPane();
+        buttonPanel.setPreferredSize(new Dimension(400, 105));
         camera = new Camera();
         view = new JComponent() {
             @Override
@@ -372,14 +385,15 @@ public class FlowchartWindow extends JFrame {
         
         buttonPanel.addTab("View", viewTab);
         
-        JPanel stylesTab = new JPanel();
+        stylesTab = new JPanel();
         stylesTab.setLayout(new BoxLayout(stylesTab, BoxLayout.X_AXIS));
         
         //Need to make different panels to separate the buttons
         fontStylePanel = new JPanel();
         fontStylePanel.setLayout(new GridLayout(2, 2));
         
-        font = new JComboBox();//Need to get list of fonts here
+        font = new JComboBox<>(initFontList());//Need to get list of fonts here
+        font.setRenderer(new FontListCellRenderer());
         fontSize = new JSpinner();
         fontColor = new JButton(getIcon("fontColorIcon.png"));
         
@@ -400,19 +414,19 @@ public class FlowchartWindow extends JFrame {
         lineStylePanel = new JPanel();
         lineStylePanel.setLayout(new GridLayout(2, 2));
         
-        lineStyle = new JComboBox(); //Need to get list of lines here
+        lineType = new JComboBox(initLineTypeList()); //Need to get list of lines here
         lineSize = new JSpinner();
         lineColor = new JButton(getIcon("lineColorIcon.png"));
         
-        lineStylePanel.add(lineStyle);
+        lineStylePanel.add(lineType);
         lineStylePanel.add(lineSize);
         lineStylePanel.add(lineColor);
         
-        lineStyle.addActionListener(new LineStyleListener(this));
+        lineType.addActionListener(new LineStyleListener(this));
         lineSize.addChangeListener(new LineSizeListener(this));
         lineColor.addActionListener(new LineColorListener(this));
         
-        lineStyle.setToolTipText("Sets the line style of the selected lines(s)");
+        lineType.setToolTipText("Sets the line style of the selected lines(s)");
         lineSize.setToolTipText("Sets the line size of the selected lines(s)");
         lineColor.setToolTipText("Sets the line color of the selected lines(s)");
         
@@ -421,7 +435,7 @@ public class FlowchartWindow extends JFrame {
         nodeStylePanel = new JPanel();
         nodeStylePanel.setLayout(new GridLayout(2, 2));
         
-        shape = new JComboBox(); //Need to get a list of shapes
+        shape = new JComboBox(initShapeList()); //Need to get a list of shapes
         borderColor = new JButton(getIcon("borderColorIcon.png"));
         fillColor = new JButton(getIcon("fillColorIcon.png"));
         borderSize = new JSpinner();
@@ -464,5 +478,121 @@ public class FlowchartWindow extends JFrame {
     
     public void defaultCursor() {
         view.setCursor(Cursor.getDefaultCursor());
+    }
+
+    public JPanel getFontStylePanel() {
+        return fontStylePanel;
+    }
+
+    public JPanel getLineStylePanel() {
+        return lineStylePanel;
+    }
+
+    public JPanel getNodeStylePanel() {
+        return nodeStylePanel;
+    }
+    
+    
+    public void revalidateStyles() {
+        stylesTab.revalidate();
+    }
+    
+    private String[] initShapeList() {
+        return new String[] { 
+            Shape.ACTION.toString(),
+            Shape.DECISION.toString(),
+            Shape.DELAY.toString(),
+            Shape.DOCUMENT.toString(),
+            Shape.INPUT_OUTPUT.toString(),
+            Shape.MERGE.toString(),
+            Shape.START_END.toString()
+        };
+    }
+    
+    private String[] initLineTypeList() {
+        return new String[] { 
+            LineType.SOLID.toString(),
+            LineType.DASHED.toString(),
+            LineType.DOTTED.toString()
+        };
+    }   
+    
+    private Font[] initFontList() {
+        return Flowy.allFonts;
+    }
+    
+    public void setFontPanelStyles(Font font, Color fontColor, int fontSize) {
+        this.font.setSelectedItem(font);
+        this.fontColor.setBackground(fontColor);
+        this.fontSize.setValue(fontSize);
+    }
+    
+    public void setNodePanelStyles(Shape shape, Color borderColor, Color fillColor, int borderSize) {
+        this.shape.setSelectedItem(shape.toString());
+        this.borderColor.setBackground(borderColor);
+        this.fillColor.setBackground(fillColor);
+        this.borderSize.setValue(borderSize);
+    }
+    
+    public void setLinePanelStyles(LineType lineType, Color lineColor, int lineSize) {
+        this.lineType.setSelectedItem(lineType.toString());
+        this.lineColor.setBackground(lineColor);
+        this.lineSize.setValue(lineSize);
+    }
+    
+    /**
+     * For drawing fonts in the font drop down box.
+     */
+    class FontListCellRenderer implements ListCellRenderer<Font> {
+
+        private DefaultListCellRenderer dlcr = new DefaultListCellRenderer();
+        
+        @Override
+        public Component getListCellRendererComponent(JList<? extends Font> list, Font value, int index, boolean isSelected, boolean cellHasFocus) {
+            JLabel label = (JLabel)dlcr.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            label.setText(value.getFontName());
+            label.setFont(value.deriveFont((float)14));
+            return label;
+        }
+    }
+    
+    public JComboBox<Font> getFontComboBox() {
+        return this.font;
+    }
+    
+    public JSpinner getFontSizeSpinner() {
+        return this.fontSize;
+    }
+    
+    public JButton getFontColorButton() {
+        return this.fontColor;
+    }
+    
+    public JButton getBorderColorButton() {
+        return this.borderColor;
+    }
+    
+    public JButton getFillColorButton() {
+        return this.fillColor;
+    }
+    
+    public JSpinner getBorderSizeSpinner() {
+        return this.borderSize;
+    }
+    
+    public JComboBox<String> getShapeComboBox() {
+        return shape;
+    }
+    
+    public JComboBox<String> getLineTypeComboBox() {
+        return lineType;
+    }
+    
+    public JSpinner getLineSizeSpinner() {
+        return lineSize;
+    }
+    
+    public JButton getLineColorButton() {
+        return lineColor;
     }
 }

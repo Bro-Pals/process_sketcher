@@ -6,6 +6,8 @@
 package bropals.flowy.listeners;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.Node;
+import bropals.flowy.style.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -21,6 +23,9 @@ public class ShapeListener extends AbstractFlowyListener implements ActionListen
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        Node n = (Node)getLastSelected();
+        n.getStyle().setShape(Shape.fromString((String)getFlowchartWindow().getShapeComboBox().getSelectedItem()));
+        getFlowchartWindow().redrawView();
     }
     
 }

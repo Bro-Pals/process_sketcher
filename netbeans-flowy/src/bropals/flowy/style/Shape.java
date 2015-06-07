@@ -53,7 +53,47 @@ public enum Shape {
      */
     DOCUMENT;
     
-
+    @Override
+    public String toString() {
+        switch(this) {
+            case ACTION:
+                return "Action";
+            case DECISION:
+                return "Decision";
+            case DELAY:
+                return "Delay";
+            case DOCUMENT:
+                return "Document";
+            case INPUT_OUTPUT:
+                return "Input/Output";
+            case MERGE:
+                return "Merge";
+            case START_END:
+                return "Start/End";
+        }
+        return null;
+    }
+    
+    public static Shape fromString(String str) {
+        switch(str) {
+            case "Action":
+                return ACTION;
+            case "Decision":
+                return DECISION;
+            case "Delay":
+                return DELAY;
+            case "Document":
+                return DOCUMENT;
+            case "Input/Output":
+                return INPUT_OUTPUT;
+            case "Merge":
+                return MERGE;
+            case "Start/End":
+                return START_END;
+        }
+        return null;
+    }
+    
     private Polygon canvasPolyFromWorldCoordinates(Point.Float[] points, Camera c) {
         int x[] = new int[points.length];
         int y[] = new int[points.length];

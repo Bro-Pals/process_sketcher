@@ -56,7 +56,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
 
     public EventManager(FlowchartWindow instance) {
         window = instance;
-        selectionManager = new SelectionManager();
+        selectionManager = new SelectionManager(instance);
         dragManager = new DragManager(selectionManager);
         showCursor = false;
         linePartTyping = 0;
@@ -201,7 +201,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      */
     public void deleteSelected() {
         removeSelectables(selectionManager.getSelected());
-        selectionManager.getSelected().clear();
+        selectionManager.clearSelection();
         window.redrawView();
     }
 
@@ -230,7 +230,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         if (!selectionManager.getSelected().isEmpty()) {
             dragManager.setStuffInClipboard(selectionManager.getSelected());
             removeSelectables(selectionManager.getSelected());
-            selectionManager.getSelected().clear();
+            selectionManager.clearSelection();
         }
         window.redrawView();
     }
@@ -282,7 +282,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 }
             }
             
-            selectionManager.getSelected().clear();
+            selectionManager.clearSelection();
             
             // add everything to the flowchart, translating slightly, and selecting them
             for (int i=0; i<pastedNodes.size(); i++) {
@@ -291,9 +291,9 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 pastedNodes.get(i).setY(pastedNodes.get(i).getY() + 30);
                 
                 // select the newly added nodes and their connected lines
-                selectionManager.getSelected().add(pastedNodes.get(i));
+                selectionManager.select(pastedNodes.get(i));
                 for (NodeLine nl : pastedNodes.get(i).getLinesConnected())
-                    selectionManager.getSelected().add(nl);
+                    selectionManager.select(nl);
             }
             
             System.out.println("Pasted " + pastedNodes.size() + " nodes");
@@ -304,14 +304,14 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      * Select everything in the flowchart
      */
     public void selectAll() {
-        selectionManager.getSelected().clear();
+        selectionManager.clearSelection();
         for (int i = 0; i < window.getFlowchart().getNodes().size(); i++) {
             if (!selectionManager.getSelected().contains(window.getFlowchart().getNodes().get(i))) {
-                selectionManager.getSelected().add(window.getFlowchart().getNodes().get(i));
+                selectionManager.select(window.getFlowchart().getNodes().get(i));
             }
         }
         for (int i = 0; i < window.getFlowchart().getNodeLines().size(); i++) {
-            selectionManager.getSelected().add(window.getFlowchart().getNodeLines().get(i));
+            selectionManager.select(window.getFlowchart().getNodeLines().get(i));
         }
     }
 
@@ -353,8 +353,8 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 // if you found the next node, select it
                 if (nextNode != null) {
                     nextNodeIsThere = true;
-                    selectionManager.getSelected().clear();
-                    selectionManager.getSelected().add(nextNode);
+                    selectionManager.clearSelection();
+                    selectionManager.select(nextNode);
                     //System.out.println("selecting next node");
                 }
             }
@@ -373,8 +373,8 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 selectedNode.getLinesConnected().add(line);
                 dragManager.setNewlyMadeNode(createdNode);
                 // select your newly created node
-                selectionManager.getSelected().clear();
-                selectionManager.getSelected().add(createdNode);
+                selectionManager.clearSelection();
+                selectionManager.select(createdNode);
                 //System.out.println("New node " + createdNode + " from the node " + selectedNode);
             }
         }
@@ -435,8 +435,8 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         if (selectionManager.getLastSelected() != null && !e.isAltDown() && !e.isControlDown()) {
             if (selectionManager.getSelected().size() > 1) {
                 Selectable lastSelected = selectionManager.getLastSelected();
-                selectionManager.getSelected().clear();
-                selectionManager.getSelected().add(lastSelected);
+                selectionManager.clearSelection();
+                selectionManager.select(lastSelected);
             }
 
             // if a TAB key was typed
@@ -677,11 +677,11 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
 
             if (e.getButton() == MouseEvent.BUTTON1) {
                 if (!e.isShiftDown()) {
-                    selectionManager.getSelected().clear();
+                    selectionManager.clearSelection();
                 }
 
                 if (!selectionManager.getSelected().contains(clickedOnThing)) {
-                    selectionManager.getSelected().add(clickedOnThing);
+                    selectionManager.select(clickedOnThing);
                 }
                 if (selectionManager.getSelectedNodes().contains(node)) {
                     dragManager.startDragMove(mousePosition.x, mousePosition.y);
@@ -692,17 +692,17 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
             }
         } else if (nodeLine != null) { // actions only for node lines
             if (!e.isShiftDown()) {
-                selectionManager.getSelected().clear();
+                selectionManager.clearSelection();
             }
             if (!selectionManager.getSelected().contains(clickedOnThing)) {
-                selectionManager.getSelected().add(clickedOnThing);
+                selectionManager.select(clickedOnThing);
             }
         }
 
         if (node == null && nodeLine == null && e.getButton() == MouseEvent.BUTTON1) {
             // clear selection if you don't click anything
             if (!e.isShiftDown()) {
-                selectionManager.getSelected().clear();
+                selectionManager.clearSelection();
             }
 
             // you only start dragging a box when the spacebar is not held down
@@ -875,11 +875,11 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     dragManager.getOffsetX(), dragManager.getOffsetY());
             // clear selection
             if (!e.isShiftDown()) {
-                selectionManager.getSelected().clear();
+                selectionManager.clearSelection();
             }
             for (int i = 0; i < selectedItems.size(); i++) {
                 if (!selectionManager.getSelected().contains(selectedItems.get(i))) {
-                    selectionManager.getSelected().add(selectedItems.get(i));
+                    selectionManager.select(selectedItems.get(i));
                 }
             }
             dragManager.setBoxSelecting(false);

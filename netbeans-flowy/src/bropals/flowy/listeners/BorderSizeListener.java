@@ -6,6 +6,7 @@
 package bropals.flowy.listeners;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.Node;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -21,7 +22,9 @@ public class BorderSizeListener extends AbstractFlowyListener implements ChangeL
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Node n = (Node)getLastSelected();
+        n.getStyle().setBorderSize((Integer)getFlowchartWindow().getBorderSizeSpinner().getValue());
+        getFlowchartWindow().redrawView();
     }
     
 }

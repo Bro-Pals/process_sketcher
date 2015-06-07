@@ -8,6 +8,7 @@ package bropals.flowy.data;
 import bropals.flowy.style.LineStyle;
 import java.awt.Graphics;
 import bropals.flowy.Camera;
+import bropals.flowy.style.FontStyle;
 
 /**
  *
@@ -94,4 +95,8 @@ public class NodeLine implements Selectable {
         return other;
     }
    
+    @Override
+    public FontStyle getFontStyle() {
+        return style;
+    }
 }

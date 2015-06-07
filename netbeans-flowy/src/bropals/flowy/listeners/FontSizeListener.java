@@ -6,6 +6,8 @@
 package bropals.flowy.listeners;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.Selectable;
+import java.awt.Font;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -21,6 +23,9 @@ public class FontSizeListener extends AbstractFlowyListener implements ChangeLis
 
     @Override
     public void stateChanged(ChangeEvent e) {
+        Selectable s = getLastSelected();
+        s.getFontStyle().setFontSize((Integer)getFlowchartWindow().getFontSizeSpinner().getValue());
+        getFlowchartWindow().redrawView();
     }
     
 }

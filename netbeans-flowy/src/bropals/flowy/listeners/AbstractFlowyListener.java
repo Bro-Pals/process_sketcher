@@ -6,6 +6,7 @@
 package bropals.flowy.listeners;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.Selectable;
 
 /**
  *
@@ -23,5 +24,7 @@ public abstract class AbstractFlowyListener {
         return flowchartWindow;
     }
     
-    
+    public Selectable getLastSelected() {
+        return getFlowchartWindow().getEventManager().getSelectionManager().getLastSelected();
+    }
 }

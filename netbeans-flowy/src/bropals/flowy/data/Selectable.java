@@ -7,6 +7,7 @@ package bropals.flowy.data;
 
 import java.awt.Graphics;
 import bropals.flowy.Camera;
+import bropals.flowy.style.FontStyle;
 
 /**
  *
@@ -14,4 +15,5 @@ import bropals.flowy.Camera;
  */
 public interface Selectable {
     void render(Camera camera, Graphics g);
+    public FontStyle getFontStyle();
 }

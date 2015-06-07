@@ -6,8 +6,11 @@
 package bropals.flowy.listeners;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.NodeLine;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.JButton;
+import javax.swing.JColorChooser;
 
 /**
  *
@@ -21,6 +24,11 @@ public class LineColorListener extends AbstractFlowyListener implements ActionLi
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        NodeLine n = (NodeLine)getLastSelected();
+        JButton lineColor = getFlowchartWindow().getLineColorButton();
+        lineColor.setBackground(JColorChooser.showDialog(getFlowchartWindow(), "Pick the line color", n.getStyle().getLineColor()));
+        n.getStyle().setLineColor(lineColor.getBackground());
+        getFlowchartWindow().redrawView();
     }
     
 }

@@ -5,12 +5,17 @@
  */
 package bropals.flowy;
 
+import java.awt.Font;
+import java.awt.GraphicsEnvironment;
+
 /**
  * The main class.
  * @author Jonathon
  */
 public class Flowy {
 
+    public static Font[] allFonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
+    
     /**
      * @param args the command line arguments
      */

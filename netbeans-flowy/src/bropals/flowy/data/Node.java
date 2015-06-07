@@ -7,6 +7,7 @@ package bropals.flowy.data;
 
 import bropals.flowy.Camera;
 import bropals.flowy.EventManager;
+import bropals.flowy.style.FontStyle;
 import bropals.flowy.style.NodeStyle;
 import java.awt.Graphics;
 import java.util.ArrayList;
@@ -111,5 +112,8 @@ public class Node implements Selectable {
         return other;
     }
 
-
+    @Override
+    public FontStyle getFontStyle() {
+        return style;
+    }
 }

@@ -6,8 +6,11 @@
 package bropals.flowy.listeners;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.Node;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.JButton;
+import javax.swing.JColorChooser;
 
 /**
  *
@@ -21,6 +24,11 @@ public class BorderColorListener extends AbstractFlowyListener implements Action
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        Node n = (Node)getLastSelected();
+        JButton borderColor = getFlowchartWindow().getBorderColorButton();
+        borderColor.setBackground(JColorChooser.showDialog(getFlowchartWindow(), "Pick the border color", n.getStyle().getBorderColor()));
+        n.getStyle().setBorderColor(borderColor.getBackground());
+        getFlowchartWindow().redrawView();
     }
     
 }

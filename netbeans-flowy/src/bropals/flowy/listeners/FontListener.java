@@ -6,6 +6,8 @@
 package bropals.flowy.listeners;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.Selectable;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -21,6 +23,9 @@ public class FontListener extends AbstractFlowyListener implements ActionListene
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        Selectable s = getLastSelected();
+        s.getFontStyle().setFontType(((Font)getFlowchartWindow().getFontComboBox().getSelectedItem()));
+        getFlowchartWindow().redrawView();
     }
     
 }

@@ -43,8 +43,6 @@ public class FontStyle {
     }
 
     public void setFontType(Font fontType) {
-        this.fontType = fontType;
+        this.fontType = fontType.deriveFont((float)getFontSize());
     }
-
-    
 }
