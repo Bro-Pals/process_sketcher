@@ -8,8 +8,10 @@ package bropals.flowy.style;
 import bropals.flowy.Camera;
 import bropals.flowy.data.Node;
 import bropals.flowy.data.NodeLine;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 
 /**
@@ -128,13 +130,17 @@ public enum LineType {
         Point int_p1 = camera.convertWorldToCanvas(pp);
         Point int_p2 = camera.convertWorldToCanvas(cp);
         
+        g.setColor(n.getStyle().getLineColor());
+        ((Graphics2D)g).setStroke(new BasicStroke(n.getStyle().getLineSize()));
+        
         switch(this) {
             case SOLID:
-                g.setColor(n.getStyle().getLineColor());
+                
                 g.drawLine((int)int_p1.getX(),(int)int_p1.getY(), 
                         (int)int_p2.getX(), (int)int_p2.getY());
                 break;
         }
+        
         
         //Render the arrow head
         float pdiffX = -diffY;
@@ -152,6 +158,7 @@ public enum LineType {
         g.drawLine(iarrow1.x, iarrow1.y, int_p2.x, int_p2.y);
         g.drawLine(iarrow2.x, iarrow2.y, int_p2.x, int_p2.y);
         
+        ((Graphics2D)g).setStroke(new BasicStroke(1));
         // Render the Text
         
         // set the font for drawing the font
