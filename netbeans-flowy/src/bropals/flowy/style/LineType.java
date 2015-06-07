@@ -139,9 +139,29 @@ public enum LineType {
         
         switch(this) {
             case SOLID:
-                
                 g.drawLine((int)int_p1.getX(),(int)int_p1.getY(), 
                         (int)int_p2.getX(), (int)int_p2.getY());
+                break;
+            case DASHED:
+                int spacingBetweenDashes = 10;
+                float offset1X = 0;
+                float offset1Y = 0;
+                float offset2X = diffX * spacingBetweenDashes;
+                float offset2Y = diffY * spacingBetweenDashes;
+                int totalDistanceDrawn = 0;
+                
+                while (totalDistanceDrawn < lineLength - (spacingBetweenDashes * 2)) {
+                    g.drawLine((int)(int_p1.getX() + (offset1X / camera.getZoom())),
+                            (int)(int_p1.getY() + (offset1Y / camera.getZoom())), 
+                        (int)(int_p2.getX() + (offset2X / camera.getZoom())),
+                        (int)(int_p2.getY() + (offset2Y / camera.getZoom())));
+                    
+                    offset1X += diffX * spacingBetweenDashes * 2;
+                    offset2X += diffX * spacingBetweenDashes * 2;
+                    offset1Y += diffY * spacingBetweenDashes * 2;
+                    offset2Y += diffY * spacingBetweenDashes * 2;
+                    totalDistanceDrawn += spacingBetweenDashes * 2;
+                }
                 break;
         }
         

@@ -18,7 +18,7 @@ public class LineStyle extends FontStyle {
     private int lineSize;
 
     public LineStyle() {
-        type = LineType.SOLID;
+        type = LineType.DASHED;
         lineColor = Color.BLACK;
         lineSize = 1;
     }
