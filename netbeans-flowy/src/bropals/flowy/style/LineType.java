@@ -19,11 +19,12 @@ import java.awt.Point;
  * @author Kevin
  */
 public enum LineType {
+
     SOLID, DASHED, DOTTED;
-    
+
     @Override
     public String toString() {
-        switch(this) {
+        switch (this) {
             case SOLID:
                 return "Solid";
             case DASHED:
@@ -33,9 +34,9 @@ public enum LineType {
         }
         return null;
     }
-    
+
     public static LineType fromString(String str) {
-        switch(str) {
+        switch (str) {
             case "Solid":
                 return SOLID;
             case "Dashed":
@@ -45,10 +46,10 @@ public enum LineType {
         }
         return null;
     }
-    
+
     private void scootPointToEdge(Point.Float point, Node node) {
         //Vector going from the center to the point in question
-        Point.Float diffVec = new Point.Float(node.getX() + node.getWidth()/2 - point.x, node.getY() + node.getHeight()/2 - point.y);
+        Point.Float diffVec = new Point.Float(node.getX() + node.getWidth() / 2 - point.x, node.getY() + node.getHeight() / 2 - point.y);
         if (Math.abs(diffVec.x) > Math.abs(diffVec.y)) {
             if (diffVec.x < 0) {
                 point.x = node.getX() + node.getWidth();
@@ -63,193 +64,201 @@ public enum LineType {
             }
         }
     }
-    
+
     /**
-     * Renders this line tpe, changing the color of the graphics to match the style.
+     * Renders this line tpe, changing the color of the graphics to match the
+     * style.
+     *
      * @param n The node line to render
      * @param camera The camera in the flowchart
      * @param g The graphics to draw it to
-     * @param blinkCursor Whether or not the text cursor is showing for this render
+     * @param blinkCursor Whether or not the text cursor is showing for this
+     * render
      * @param cursorLocation The location of the cursor for text editing
-     * @param partCursorDrawing What part of the line the cursor is being drawn on 
-     * @return An array of two points of integers, representing the start and end point of
-     *      the line in canvas units. 
+     * @param partCursorDrawing What part of the line the cursor is being drawn
+     * on
+     * @return An array of two points of integers, representing the start and
+     * end point of the line in canvas units.
      */
-    public Point[] renderLine(NodeLine n, Camera camera, Graphics g, 
+    public Point[] renderLine(NodeLine n, Camera camera, Graphics g,
             boolean blinkCursor, int cursorLocation, int partCursorDrawing) {
         Node par = n.getParent();
         Node chi = n.getChild();
-        
+
         // fix the cursor location if it's less than 0
         if (cursorLocation < 0) {
             cursorLocation = 0;
         }
 
-
         // Render the Line
-        
         Point.Float cp = new Point.Float(
-            chi.getX() + chi.getWidth()/2,
-            chi.getY() + chi.getHeight()/2
+                chi.getX() + chi.getWidth() / 2,
+                chi.getY() + chi.getHeight() / 2
         );
-        
+
         Point.Float pp = new Point.Float(
-            par.getX() + par.getWidth()/2,
-            par.getY() + par.getHeight()/2
-        );        
-        
+                par.getX() + par.getWidth() / 2,
+                par.getY() + par.getHeight() / 2
+        );
+
         // create a vector for the direction of the line
-        float diffX = (float)(cp.getX() - pp.getX());
-        float diffY = (float)(cp.getY() - pp.getY());
-        float lineLength = (float)Math.sqrt((diffX * diffX) + (diffY * diffY));
+        float diffX = (float) (cp.getX() - pp.getX());
+        float diffY = (float) (cp.getY() - pp.getY());
+        float lineLength = (float) Math.sqrt((diffX * diffX) + (diffY * diffY));
         diffX = diffX / lineLength;
         diffY = diffY / lineLength; //Now they are normalized
-                
-        pp.x += (diffX*par.getWidth()/2);
-        pp.y += (diffY*par.getHeight()/2);
-        
+
+        pp.x += (diffX * par.getWidth() / 2);
+        pp.y += (diffY * par.getHeight() / 2);
+
         scootPointToEdge(pp, par);
-        
-        cp.x -= (diffX*chi.getWidth()/2);
-        cp.y -= (diffY*chi.getHeight()/2);
-        
+
+        cp.x -= (diffX * chi.getWidth() / 2);
+        cp.y -= (diffY * chi.getHeight() / 2);
+
         scootPointToEdge(cp, chi);
-                
+
         float tailDist = 0.20f; // 20% of the length
         float centerDist = 0.5f; // 50% of the length
         float headDist = 0.8f; // 80% of the length
-        
+
         //Redo the vector thing
         // create a vector for the direction of the line
-        diffX = (float)(cp.getX() - pp.getX());
-        diffY = (float)(cp.getY() - pp.getY());
-        lineLength = (float)Math.sqrt((diffX * diffX) + (diffY * diffY));
+        diffX = (float) (cp.getX() - pp.getX());
+        diffY = (float) (cp.getY() - pp.getY());
+        lineLength = (float) Math.sqrt((diffX * diffX) + (diffY * diffY));
         diffX = diffX / lineLength;
         diffY = diffY / lineLength; //Now they are normalized
-        
+
+        // Force a no shape figure to smash down to its local orgin
+        if (chi.getStyle().getShape() == Shape.NONE) {
+            cp.setLocation(chi.getX(), chi.getY());
+        }
+
         Point int_p1 = camera.convertWorldToCanvas(pp);
         Point int_p2 = camera.convertWorldToCanvas(cp);
-        
+
         g.setColor(n.getStyle().getLineColor());
-        ((Graphics2D)g).setStroke(new BasicStroke(n.getStyle().getLineSize()));
-        
-        switch(this) {
+        ((Graphics2D) g).setStroke(new BasicStroke(n.getStyle().getLineSize()));
+
+        switch (this) {
             case SOLID:
-                g.drawLine(int_p1.x,int_p1.y, 
+                g.drawLine(int_p1.x, int_p1.y,
                         int_p2.x, int_p2.y);
                 break;
             case DASHED:
-                ((Graphics2D)g).setStroke(new BasicStroke(
+                ((Graphics2D) g).setStroke(new BasicStroke(
                         n.getStyle().getLineSize(),
                         BasicStroke.CAP_BUTT,
                         BasicStroke.JOIN_BEVEL,
                         1f,
-                        new float[] { 10 },
+                        new float[]{10},
                         0f
                 ));
-                g.drawLine(int_p1.x,int_p1.y, 
+                g.drawLine(int_p1.x, int_p1.y,
                         int_p2.x, int_p2.y);
-                ((Graphics2D)g).setStroke(new BasicStroke(n.getStyle().getLineSize()));
+                ((Graphics2D) g).setStroke(new BasicStroke(n.getStyle().getLineSize()));
                 break;
             case DOTTED:
-                float canvasLineLength = (float)Math.sqrt(
-                    (((int_p2.x-int_p1.x)*(int_p2.x-int_p1.x))) +
-                    (((int_p2.y-int_p1.y)*(int_p2.y-int_p1.y)))
+                float canvasLineLength = (float) Math.sqrt(
+                        (((int_p2.x - int_p1.x) * (int_p2.x - int_p1.x)))
+                        + (((int_p2.y - int_p1.y) * (int_p2.y - int_p1.y)))
                 );
                 float prog = 0;
                 while (prog < canvasLineLength) {
-                    g.fillOval(int_p1.x + (int)(diffX*prog) - 2,int_p1.y + (int)(diffY*prog) - 2, 
+                    g.fillOval(int_p1.x + (int) (diffX * prog) - 2, int_p1.y + (int) (diffY * prog) - 2,
                             4, 4);
                     prog += 12;
                 }
                 break;
         }
         
-        //Render the arrow head
-        float pdiffX = -diffY;
-        float pdiffY = diffX;
-        
-        float fromX = diffX*(lineLength-15);
-        float fromY = diffY*(lineLength-15);
-        
-        Point.Float arrowHead1 = new Point.Float(pp.x + fromX + pdiffX*15, pp.y + fromY + pdiffY*10);
-        Point.Float arrowHead2 = new Point.Float(pp.x + fromX - pdiffX*15, pp.y + fromY - pdiffY*10);
-        
-        Point iarrow1 = camera.convertWorldToCanvas(arrowHead1);
-        Point iarrow2 = camera.convertWorldToCanvas(arrowHead2);       
-        
-        g.drawLine(iarrow1.x, iarrow1.y, int_p2.x, int_p2.y);
-        g.drawLine(iarrow2.x, iarrow2.y, int_p2.x, int_p2.y);
-        
-        ((Graphics2D)g).setStroke(new BasicStroke(1));
+        if (chi.getStyle().getShape() != Shape.NONE) {
+            //Render the arrow head
+            float pdiffX = -diffY;
+            float pdiffY = diffX;
+
+            float fromX = diffX * (lineLength - 15);
+            float fromY = diffY * (lineLength - 15);
+
+            Point.Float arrowHead1 = new Point.Float(pp.x + fromX + pdiffX * 15, pp.y + fromY + pdiffY * 10);
+            Point.Float arrowHead2 = new Point.Float(pp.x + fromX - pdiffX * 15, pp.y + fromY - pdiffY * 10);
+
+            Point iarrow1 = camera.convertWorldToCanvas(arrowHead1);
+            Point iarrow2 = camera.convertWorldToCanvas(arrowHead2);
+
+            g.drawLine(iarrow1.x, iarrow1.y, int_p2.x, int_p2.y);
+            g.drawLine(iarrow2.x, iarrow2.y, int_p2.x, int_p2.y);
+        }
+
+        ((Graphics2D) g).setStroke(new BasicStroke(1));
         // Render the Text
-        
+
         // set the font for drawing the font
-        g.setFont(n.getStyle().getFontType().deriveFont((float)(n.getStyle().getFontSize() / camera.getZoom())));
+        g.setFont(n.getStyle().getFontType().deriveFont((float) (n.getStyle().getFontSize() / camera.getZoom())));
         g.setColor(n.getStyle().getFontColor());
-        
+
         // Variables to track the location of the cursor
         float xPositionOffset = 0;
-        float originalParentPointX = (float)pp.getX();
-        float originalParentPointY = (float)pp.getY();
+        float originalParentPointX = (float) pp.getX();
+        float originalParentPointY = (float) pp.getY();
         int cursorRenderX = 0;
         int cursorRenderY = 0;
-        
+
         // draw the tail, center, and head texts
         /// draw the Tail text
-        xPositionOffset = (int)g.getFontMetrics().getStringBounds(n.getTailText(), g).getWidth()/2;
-        pp.setLocation(originalParentPointX + (tailDist * diffX * lineLength) - xPositionOffset, 
+        xPositionOffset = (int) g.getFontMetrics().getStringBounds(n.getTailText(), g).getWidth() / 2;
+        pp.setLocation(originalParentPointX + (tailDist * diffX * lineLength) - xPositionOffset,
                 originalParentPointY + (tailDist * diffY * lineLength));
         if (blinkCursor && partCursorDrawing == 1) {
             if (n.getTailText().length() > 0 && cursorLocation > n.getTailText().length() - 1) {
                 cursorLocation = n.getTailText().length() - 1;
             }
-            cursorRenderX = camera.convertWorldToCanvasX((float)pp.getX()) + 
-                    (int)(g.getFontMetrics().getStringBounds(n.getTailText().substring(0, cursorLocation), g).getWidth());
-            cursorRenderY = (int)(camera.convertWorldToCanvasY((int)pp.getY()) - g.getFontMetrics().getHeight() - 2);
+            cursorRenderX = camera.convertWorldToCanvasX((float) pp.getX())
+                    + (int) (g.getFontMetrics().getStringBounds(n.getTailText().substring(0, cursorLocation), g).getWidth());
+            cursorRenderY = (int) (camera.convertWorldToCanvasY((int) pp.getY()) - g.getFontMetrics().getHeight() - 2);
         }
-        g.drawString(n.getTailText(), 
-            (int)camera.convertWorldToCanvasX((float)pp.getX()), 
-            (int)camera.convertWorldToCanvasY((float)pp.getY()));
+        g.drawString(n.getTailText(),
+                (int) camera.convertWorldToCanvasX((float) pp.getX()),
+                (int) camera.convertWorldToCanvasY((float) pp.getY()));
 
         // Draw the Center text
-        xPositionOffset = (int)g.getFontMetrics().getStringBounds(n.getCenterText(), g).getWidth()/2;
+        xPositionOffset = (int) g.getFontMetrics().getStringBounds(n.getCenterText(), g).getWidth() / 2;
         pp.setLocation(originalParentPointX + (centerDist * diffX * lineLength) - xPositionOffset,
                 originalParentPointY + (centerDist * diffY * lineLength));
         if (blinkCursor && partCursorDrawing == 0) {
             if (n.getCenterText().length() > 0 && cursorLocation > n.getCenterText().length() - 1) {
                 cursorLocation = n.getCenterText().length() - 1;
             }
-            cursorRenderX = camera.convertWorldToCanvasX((float)pp.getX()) + 
-                    (int)(g.getFontMetrics().getStringBounds(n.getCenterText().substring(0, cursorLocation), g).getWidth());
-            cursorRenderY = (int)(camera.convertWorldToCanvasY((int)pp.getY()) - g.getFontMetrics().getHeight() - 2);
+            cursorRenderX = camera.convertWorldToCanvasX((float) pp.getX())
+                    + (int) (g.getFontMetrics().getStringBounds(n.getCenterText().substring(0, cursorLocation), g).getWidth());
+            cursorRenderY = (int) (camera.convertWorldToCanvasY((int) pp.getY()) - g.getFontMetrics().getHeight() - 2);
         }
-        g.drawString(n.getCenterText(), 
-            (int)camera.convertWorldToCanvasX((float)pp.getX()), 
-            (int)camera.convertWorldToCanvasY((float)pp.getY()));
-
+        g.drawString(n.getCenterText(),
+                (int) camera.convertWorldToCanvasX((float) pp.getX()),
+                (int) camera.convertWorldToCanvasY((float) pp.getY()));
 
         /// draw the Head text
-        xPositionOffset = (int)g.getFontMetrics().getStringBounds(n.getHeadText(), g).getWidth()/2;
+        xPositionOffset = (int) g.getFontMetrics().getStringBounds(n.getHeadText(), g).getWidth() / 2;
         pp.setLocation(originalParentPointX + (headDist * diffX * lineLength) - xPositionOffset,
                 originalParentPointY + (headDist * diffY * lineLength));
         if (blinkCursor && partCursorDrawing == 2) {
             if (n.getHeadText().length() > 0 && cursorLocation > n.getHeadText().length() - 1) {
                 cursorLocation = n.getHeadText().length() - 1;
             }
-            cursorRenderX = camera.convertWorldToCanvasX((float)pp.getX()) + 
-                    (int)(g.getFontMetrics().getStringBounds(n.getHeadText().substring(0, cursorLocation), g).getWidth());
-            cursorRenderY = (int)(camera.convertWorldToCanvasY((int)pp.getY()) - g.getFontMetrics().getHeight() - 2);
+            cursorRenderX = camera.convertWorldToCanvasX((float) pp.getX())
+                    + (int) (g.getFontMetrics().getStringBounds(n.getHeadText().substring(0, cursorLocation), g).getWidth());
+            cursorRenderY = (int) (camera.convertWorldToCanvasY((int) pp.getY()) - g.getFontMetrics().getHeight() - 2);
         }
-        g.drawString(n.getHeadText(), 
-            (int)camera.convertWorldToCanvasX((float)pp.getX()), 
-            (int)camera.convertWorldToCanvasY((float)pp.getY()));
-                
+        g.drawString(n.getHeadText(),
+                (int) camera.convertWorldToCanvasX((float) pp.getX()),
+                (int) camera.convertWorldToCanvasY((float) pp.getY()));
+
         // draw the blinking cursor
         if (blinkCursor) {
             g.setColor(Color.BLACK);
-            g.fillRect(cursorRenderX, cursorRenderY, 
-                3, g.getFontMetrics().getHeight() + 4);        
+            g.fillRect(cursorRenderX, cursorRenderY,
+                    3, g.getFontMetrics().getHeight() + 4);
 
         }
         return new Point[]{int_p1, int_p2};
