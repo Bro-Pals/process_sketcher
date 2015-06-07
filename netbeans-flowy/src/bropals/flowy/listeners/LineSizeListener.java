@@ -22,9 +22,14 @@ public class LineSizeListener extends AbstractFlowyListener implements ChangeLis
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        NodeLine n = (NodeLine)getLastSelected();
-        n.getStyle().setLineSize((Integer)getFlowchartWindow().getLineSizeSpinner().getValue());
-        getFlowchartWindow().redrawView();
+        int value = (Integer)getFlowchartWindow().getLineSizeSpinner().getValue();
+        if (value > 0) {
+            NodeLine n = (NodeLine)getLastSelected();
+            n.getStyle().setLineSize(value);
+            getFlowchartWindow().redrawView();
+        } else {
+            getFlowchartWindow().getLineSizeSpinner().setValue(1);
+        }
     }
     
 }

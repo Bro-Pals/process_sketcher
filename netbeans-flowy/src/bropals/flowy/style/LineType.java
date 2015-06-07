@@ -104,7 +104,7 @@ public enum LineType {
         float lineLength = (float)Math.sqrt((diffX * diffX) + (diffY * diffY));
         diffX = diffX / lineLength;
         diffY = diffY / lineLength; //Now they are normalized
-        
+                
         pp.x += (diffX*par.getWidth()/2);
         pp.y += (diffY*par.getHeight()/2);
         
@@ -114,7 +114,7 @@ public enum LineType {
         cp.y -= (diffY*chi.getHeight()/2);
         
         scootPointToEdge(cp, chi);
-        
+                
         float tailDist = 0.20f; // 20% of the length
         float centerDist = 0.5f; // 50% of the length
         float headDist = 0.8f; // 80% of the length
@@ -135,12 +135,35 @@ public enum LineType {
         
         switch(this) {
             case SOLID:
-                
-                g.drawLine((int)int_p1.getX(),(int)int_p1.getY(), 
-                        (int)int_p2.getX(), (int)int_p2.getY());
+                g.drawLine(int_p1.x,int_p1.y, 
+                        int_p2.x, int_p2.y);
+                break;
+            case DASHED:
+                ((Graphics2D)g).setStroke(new BasicStroke(
+                        n.getStyle().getLineSize(),
+                        BasicStroke.CAP_BUTT,
+                        BasicStroke.JOIN_BEVEL,
+                        1f,
+                        new float[] { 10 },
+                        0f
+                ));
+                g.drawLine(int_p1.x,int_p1.y, 
+                        int_p2.x, int_p2.y);
+                ((Graphics2D)g).setStroke(new BasicStroke(n.getStyle().getLineSize()));
+                break;
+            case DOTTED:
+                float canvasLineLength = (float)Math.sqrt(
+                    (((int_p2.x-int_p1.x)*(int_p2.x-int_p1.x))) +
+                    (((int_p2.y-int_p1.y)*(int_p2.y-int_p1.y)))
+                );
+                float prog = 0;
+                while (prog < canvasLineLength) {
+                    g.fillOval(int_p1.x + (int)(diffX*prog) - 2,int_p1.y + (int)(diffY*prog) - 2, 
+                            4, 4);
+                    prog += 12;
+                }
                 break;
         }
-        
         
         //Render the arrow head
         float pdiffX = -diffY;

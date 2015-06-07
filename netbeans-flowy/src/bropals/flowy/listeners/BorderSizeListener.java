@@ -22,9 +22,14 @@ public class BorderSizeListener extends AbstractFlowyListener implements ChangeL
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        Node n = (Node)getLastSelected();
-        n.getStyle().setBorderSize((Integer)getFlowchartWindow().getBorderSizeSpinner().getValue());
-        getFlowchartWindow().redrawView();
+        int value = (Integer)getFlowchartWindow().getBorderSizeSpinner().getValue();
+        if (value > 0) {
+            Node n = (Node)getLastSelected();
+            n.getStyle().setBorderSize(value);
+            getFlowchartWindow().redrawView();
+        } else {
+            getFlowchartWindow().getBorderSizeSpinner().setValue(1);
+        }
     }
     
 }
