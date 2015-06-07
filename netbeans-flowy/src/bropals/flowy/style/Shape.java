@@ -51,8 +51,12 @@ public enum Shape {
     /**
      * A printed document or report.
      */
-    DOCUMENT;
-    
+    DOCUMENT,
+    /**
+     * A Shape that doesn't render anything
+     */
+    NONE;
+
     @Override
     public String toString() {
         switch(this) {
@@ -128,6 +132,11 @@ public enum Shape {
      * @param cursorLocation The location of the cursor for editing text
      */
     public void renderShape(Node node, Camera camera, Graphics g, boolean blinkCursor, int cursorLocation, Color backgroundColor) {
+        // don't draw anything if the shape is nothing
+        if (node.getStyle().getShape() == Shape.NONE) {
+            return;
+        }
+        
         Graphics2D g2 = (Graphics2D) g;
 
         Font transformedFont = node.getStyle().getFontType().deriveFont(node.getStyle().getFontSize() / camera.getZoom());
@@ -137,7 +146,7 @@ public enum Shape {
         //Text wrapping values. Don't edit them to use these default values
         int padding = 5;
         int startEverythingX = camera.convertWorldToCanvasX(node.getX()) + padding; // canvas units
-        int startEverythingY = camera.convertWorldToCanvasX(node.getY()) + fm.getHeight() + padding; // canvas units
+        int startEverythingY = camera.convertWorldToCanvasY(node.getY()) + fm.getHeight() + padding; // canvas units
         // the width each row can't get longer than (in canvas units)
         int width = camera.convertWorldToCanvasX(node.getWidth()) - (padding * 2);
         
@@ -332,8 +341,9 @@ public enum Shape {
                 if (sumOfCharsPrevRows + text.get(r).length() >= cursorLocation) {
                    if (!drawnCursorYet && blinkCursor) {
                         // get the offset for where to draw the cursor
-                        int thisRowOffset = (int)g.getFontMetrics().getStringBounds(
-                                (text.get(r).substring(0, cursorLocation - sumOfCharsPrevRows)), g).getWidth();
+                        int thisRowOffset = (int)(g.getFontMetrics().getStringBounds(
+                                (text.get(r).substring(0, cursorLocation - sumOfCharsPrevRows)), g).getWidth() 
+                                / camera.getZoom());
                         //draw the cursor
                         g2.fillRect((int)startEverythingX + thisRowOffset, 
                             (int)startEverythingY + (lineHeight * (r - 1)) - 2, 

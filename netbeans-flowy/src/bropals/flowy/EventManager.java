@@ -8,6 +8,8 @@ package bropals.flowy;
 import bropals.flowy.data.Node;
 import bropals.flowy.data.NodeLine;
 import bropals.flowy.data.Selectable;
+import bropals.flowy.style.NodeStyle;
+import bropals.flowy.style.Shape;
 import bropals.flowy.util.BooleanBlinkListener;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
@@ -660,6 +662,13 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 dragManager.setOffsetY(0);
                 if (e.getButton() == MouseEvent.BUTTON3) {
                     Node createdNode = (Node) node.clone();
+                    if (!e.isControlDown()) {
+                        NodeStyle noStyle = new NodeStyle();
+                        createdNode.setWidth(1);
+                        createdNode.setHeight(1);
+                        noStyle.setShape(Shape.NONE);
+                        createdNode.setStyle(noStyle);
+                    }
                     createdNode.setX(dragManager.getInitialX());
                     createdNode.setY(dragManager.getInitialY());
                     createdNode.getLinesConnected().clear();
@@ -857,6 +866,18 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         if (dragManager.isDragging()) {
             if (e.getButton() == MouseEvent.BUTTON3 && dragManager.getNewlyMadeNode() != null) {
                 dragManager.setRightMouseDown(false);
+                if (dragManager.getNewlyMadeNode().getStyle().getShape() == Shape.NONE)  {
+                    Node guideNode = dragManager.getNewlyMadeNode();
+                    NodeLine connection = guideNode.getLinesConnected().get(0);
+                    window.getFlowchart().getNodes().remove(guideNode);
+                    Selectable select = getSelectableUnderPoint(mousePosition);
+                    if (select != null && select != connection.getParent() && select instanceof Node) {
+                        connection.setChild((Node)select);
+                        ((Node)select).getLinesConnected().add(connection);
+                    } else {
+                        connection.getParent().getLinesConnected().remove(connection);
+                    }
+                }
                 dragManager.setNewlyMadeNode(null);
                 dragManager.setDragging(false); // done dragging the newly created node
             }

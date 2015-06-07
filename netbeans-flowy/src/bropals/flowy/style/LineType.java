@@ -75,7 +75,7 @@ public enum LineType {
         
         // if the child is down and to the right
         if (par.getX() >= chi.getX() && par.getY() >= chi.getY()) {
-            cp.setLocation(chi.getX() + chi.getWidth(), chi.getY() + chi.getHeight());
+            pp.setLocation(chi.getX() + chi.getWidth(), chi.getY() + chi.getHeight());
             pp.setLocation(par.getX(), par.getY());
         // if the child is up and to the right
         } else if (par.getX() >= chi.getX() && par.getY() < chi.getY()) {
@@ -89,6 +89,11 @@ public enum LineType {
         } else {
             cp.setLocation(chi.getX(), chi.getY() + chi.getHeight());
             pp.setLocation(par.getX() + par.getWidth(), par.getY());
+        }
+        
+        // Force a no shape figure to smash down to its local orgin
+        if (chi.getStyle().getShape() == Shape.NONE) {
+            cp.setLocation(chi.getX(), chi.getY());
         }
         
         Point int_p1 = camera.convertWorldToCanvas(pp);
