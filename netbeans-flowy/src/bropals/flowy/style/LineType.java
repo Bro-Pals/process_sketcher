@@ -44,6 +44,24 @@ public enum LineType {
         return null;
     }
     
+    private void scootPointToEdge(Point.Float point, Node node) {
+        //Vector going from the center to the point in question
+        Point.Float diffVec = new Point.Float(node.getX() + node.getWidth()/2 - point.x, node.getY() + node.getHeight()/2 - point.y);
+        if (Math.abs(diffVec.x) > Math.abs(diffVec.y)) {
+            if (diffVec.x < 0) {
+                point.x = node.getX() + node.getWidth();
+            } else {
+                point.x = node.getX();
+            }
+        } else {
+            if (diffVec.y < 0) {
+                point.y = node.getY() + node.getHeight();
+            } else {
+                point.y = node.getY();
+            }
+        }
+    }
+    
     /**
      * Renders this line tpe, changing the color of the graphics to match the style.
      * @param n The node line to render
@@ -68,42 +86,47 @@ public enum LineType {
 
         // Render the Line
         
-        // child's point
-        Point.Float cp = new Point.Float();
-        // parent's point
-        Point.Float pp = new Point.Float();
+        Point.Float cp = new Point.Float(
+            chi.getX() + chi.getWidth()/2,
+            chi.getY() + chi.getHeight()/2
+        );
         
-        // if the child is down and to the right
-        if (par.getX() >= chi.getX() && par.getY() >= chi.getY()) {
-            cp.setLocation(chi.getX() + chi.getWidth(), chi.getY() + chi.getHeight());
-            pp.setLocation(par.getX(), par.getY());
-        // if the child is up and to the right
-        } else if (par.getX() >= chi.getX() && par.getY() < chi.getY()) {
-            cp.setLocation(chi.getX() + chi.getWidth(), chi.getY());
-            pp.setLocation(par.getX(), par.getY() + par.getHeight());
-        // if the child is up and to the left
-        } else if (par.getX() < chi.getX() && par.getY() < chi.getY()) {
-            cp.setLocation(chi.getX(), chi.getY());
-            pp.setLocation(par.getX() + par.getWidth(), par.getY() + par.getHeight());
-        // if the child is down and to the left (no conditional needed)
-        } else {
-            cp.setLocation(chi.getX(), chi.getY() + chi.getHeight());
-            pp.setLocation(par.getX() + par.getWidth(), par.getY());
-        }
-        
-        Point int_p1 = camera.convertWorldToCanvas(pp);
-        Point int_p2 = camera.convertWorldToCanvas(cp);
+        Point.Float pp = new Point.Float(
+            par.getX() + par.getWidth()/2,
+            par.getY() + par.getHeight()/2
+        );        
         
         // create a vector for the direction of the line
         float diffX = (float)(cp.getX() - pp.getX());
         float diffY = (float)(cp.getY() - pp.getY());
         float lineLength = (float)Math.sqrt((diffX * diffX) + (diffY * diffY));
         diffX = diffX / lineLength;
-        diffY = diffY / lineLength;
+        diffY = diffY / lineLength; //Now they are normalized
+        
+        pp.x += (diffX*par.getWidth()/2);
+        pp.y += (diffY*par.getHeight()/2);
+        
+        scootPointToEdge(pp, par);
+        
+        cp.x -= (diffX*chi.getWidth()/2);
+        cp.y -= (diffY*chi.getHeight()/2);
+        
+        scootPointToEdge(cp, chi);
         
         float tailDist = 0.20f; // 20% of the length
         float centerDist = 0.5f; // 50% of the length
         float headDist = 0.8f; // 80% of the length
+        
+        //Redo the vector thing
+        // create a vector for the direction of the line
+        diffX = (float)(cp.getX() - pp.getX());
+        diffY = (float)(cp.getY() - pp.getY());
+        lineLength = (float)Math.sqrt((diffX * diffX) + (diffY * diffY));
+        diffX = diffX / lineLength;
+        diffY = diffY / lineLength; //Now they are normalized
+        
+        Point int_p1 = camera.convertWorldToCanvas(pp);
+        Point int_p2 = camera.convertWorldToCanvas(cp);
         
         switch(this) {
             case SOLID:
@@ -113,7 +136,21 @@ public enum LineType {
                 break;
         }
         
+        //Render the arrow head
+        float pdiffX = -diffY;
+        float pdiffY = diffX;
         
+        float fromX = diffX*(lineLength-15);
+        float fromY = diffY*(lineLength-15);
+        
+        Point.Float arrowHead1 = new Point.Float(pp.x + fromX + pdiffX*15, pp.y + fromY + pdiffY*10);
+        Point.Float arrowHead2 = new Point.Float(pp.x + fromX - pdiffX*15, pp.y + fromY - pdiffY*10);
+        
+        Point iarrow1 = camera.convertWorldToCanvas(arrowHead1);
+        Point iarrow2 = camera.convertWorldToCanvas(arrowHead2);       
+        
+        g.drawLine(iarrow1.x, iarrow1.y, int_p2.x, int_p2.y);
+        g.drawLine(iarrow2.x, iarrow2.y, int_p2.x, int_p2.y);
         
         // Render the Text
         
