@@ -6,6 +6,7 @@
 package bropals.flowy.style;
 
 import bropals.flowy.Camera;
+import bropals.flowy.TextTypeManager;
 import bropals.flowy.data.Node;
 import bropals.flowy.data.NodeLine;
 import java.awt.BasicStroke;
@@ -201,7 +202,6 @@ public enum LineType {
         g.setColor(n.getStyle().getFontColor());
 
         // Variables to track the location of the cursor
-        float xPositionOffset = 0;
         float originalParentPointX = (float) pp.getX();
         float originalParentPointY = (float) pp.getY();
         int cursorRenderX = 0;
@@ -209,28 +209,28 @@ public enum LineType {
 
         // draw the tail, center, and head texts
         /// draw the Tail text
-        int[] info = renderText(n.getTailText(), headDist, originalParentPointX, originalParentPointY,
-                1, partCursorDrawing, lineLength, diffY, diffX, g, cursorLocation, 
-                camera, blinkCursor, NOT_ASSIGNED);
-        if (info[0] != NOT_ASSIGNED && info[1] != NOT_ASSIGNED) {
+        int[] info = renderText(n.getTailText(), tailDist, originalParentPointX, originalParentPointY,
+                TextTypeManager.TAIL, partCursorDrawing, lineLength, diffY, diffX, g, cursorLocation, 
+                camera, blinkCursor);
+        if (partCursorDrawing == TextTypeManager.TAIL) {
             cursorRenderX = info[0];
             cursorRenderY = info[1];
         }
 
         // Draw the Center text
         info = renderText(n.getCenterText(), centerDist, originalParentPointX, originalParentPointY,
-                0, partCursorDrawing, lineLength, diffY, diffX, g, cursorLocation, 
-                camera, blinkCursor, NOT_ASSIGNED);
-        if (info[0] != NOT_ASSIGNED && info[1] != NOT_ASSIGNED) {
+                TextTypeManager.CENTER, partCursorDrawing, lineLength, diffY, diffX, g, cursorLocation, 
+                camera, blinkCursor);
+        if (partCursorDrawing == TextTypeManager.CENTER) {
             cursorRenderX = info[0];
             cursorRenderY = info[1];
         }
 
         /// draw the Head text
         info = renderText(n.getHeadText(), headDist, originalParentPointX, originalParentPointY,
-                2, partCursorDrawing, lineLength, diffY, diffX, g, cursorLocation, 
-                camera, blinkCursor, NOT_ASSIGNED);
-        if (info[0] != NOT_ASSIGNED && info[1] != NOT_ASSIGNED) {
+                TextTypeManager.HEAD, partCursorDrawing, lineLength, diffY, diffX, g, cursorLocation, 
+                camera, blinkCursor);
+        if (partCursorDrawing == TextTypeManager.HEAD) {
             cursorRenderX = info[0];
             cursorRenderY = info[1];
         }
@@ -248,13 +248,13 @@ public enum LineType {
     /// a method to reduce the amount of copy pasting
     public int[] renderText(String text, float distanceRatio, float originalParentPointX, 
             float originalParentPointY, int cursorConditional, int partCursorDrawing, float lineLength, 
-            float diffY, float diffX, Graphics g, int cursorLocation, Camera camera, boolean blinkCursor, int NOT_ASSIGNED) {
-        int cursorRenderX = NOT_ASSIGNED;
-        int cursorRenderY = NOT_ASSIGNED;
+            float diffY, float diffX, Graphics g, int cursorLocation, Camera camera, boolean blinkCursor) {
+        int cursorRenderX = 0;
+        int cursorRenderY = 0;
         float xPositionOffset = (int) g.getFontMetrics().getStringBounds(text, g).getWidth() / 2;
         Point.Float pp = new Point.Float(originalParentPointX + (distanceRatio * diffX * lineLength) - xPositionOffset,
                 originalParentPointY + (distanceRatio * diffY * lineLength));
-        if (blinkCursor && partCursorDrawing == 2) {
+        if (blinkCursor && partCursorDrawing == cursorConditional) {
             if (text.length() > 0 && cursorLocation > text.length()) {
                 cursorLocation = text.length();
             }

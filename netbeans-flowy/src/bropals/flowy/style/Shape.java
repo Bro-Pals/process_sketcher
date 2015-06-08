@@ -318,11 +318,6 @@ public enum Shape {
                 }
             }
 
-            String entireString = "";
-            for (String str : text) {
-                entireString += str;
-            }
-
             int lineHeight = g.getFontMetrics().getHeight();
 
             int sumOfCharsPrevRows = 0;
@@ -348,6 +343,17 @@ public enum Shape {
                 } else {
                     sumOfCharsPrevRows += text.get(r).length();
                 }
+            }
+
+        // only draw the cursor is there is no text to go through
+        } else {
+            int lineHeight = g.getFontMetrics().getHeight();
+            // if the cursor is still not drawn yet and there is no text
+            if (blinkCursor && node.getInnerText().length() == 0) {
+                //draw the cursor at the start
+                g2.fillRect((int)startEverythingX, 
+                    (int)startEverythingY - lineHeight - 2, 
+                    3, lineHeight + 4);
             }
         }
     }
