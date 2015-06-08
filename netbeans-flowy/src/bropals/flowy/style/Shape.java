@@ -379,6 +379,13 @@ public enum Shape {
                     // otherwise if there isn't enough space on this new row
                 } else {
                     // add the word to the next row
+                    
+                    // add a space to the end of the current row
+                    String endOfRowString = text.get(rowOn) + " ";
+                    text.remove(rowOn);
+                    text.add(rowOn, endOfRowString);
+                    
+                    // create a new row
                     text.add(words[i]);
                     rowOn++;
                 }
@@ -394,7 +401,7 @@ public enum Shape {
             for (int r = 0; r < text.size(); r++) {
                 g.drawString(text.get(r), (int) startEverythingX,
                         (int) startEverythingY + (r * lineHeight));
-                if (sumOfCharsPrevRows + text.get(r).length() >= cursorLocation) {
+                if (sumOfCharsPrevRows + text.get(r).length() > cursorLocation) {
                    if (!drawnCursorYet && blinkCursor) {
                         // get the offset for where to draw the cursor
                         int thisRowOffset = camera.convertWorldToCanvasLength((float)g.getFontMetrics().getStringBounds(
@@ -409,7 +416,16 @@ public enum Shape {
                     sumOfCharsPrevRows += text.get(r).length();
                 }
             }
-
+            
+            // draw it at the end if not yet drawn
+            if (blinkCursor && !drawnCursorYet) {
+                int lastRow = text.size() - 1;
+                //draw the cursor
+                g2.fillRect((int)startEverythingX + camera.convertWorldToCanvasLength((float)g.getFontMetrics().getStringBounds(
+                       text.get(lastRow), g).getWidth()), 
+                    (int)startEverythingY + (lineHeight * (lastRow - 1)) - 2, 
+                    3, lineHeight + 4);
+            }
         // only draw the cursor is there is no text to go through
         } else {
             int lineHeight = g.getFontMetrics().getHeight();
