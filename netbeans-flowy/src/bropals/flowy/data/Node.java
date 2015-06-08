@@ -27,7 +27,22 @@ public class Node implements Selectable {
      * If the style is null, revert to a default style.
      */
     private NodeStyle style;
-    private float x, y, width, height;
+    /**
+     * The x position of the Node in world units.
+     */
+    private float x;
+    /**
+     * The y position of the Node in world units.
+     */
+    private float y;
+    /**
+     * The width of the Node in world units
+     */
+    private float width;
+    /**
+     * The height of the Node in world units.
+     */
+    private float height;
     /**
      * A list of all the lines connected to this node.
      */

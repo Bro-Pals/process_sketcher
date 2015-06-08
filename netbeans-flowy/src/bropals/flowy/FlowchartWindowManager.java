@@ -20,10 +20,23 @@ import javax.swing.JFrame;
  */
 public class FlowchartWindowManager implements WindowListener {
     
+    /**
+     * A list of all the windows that are visible and can be edited
+     */
     private ArrayList<FlowchartWindow> windows;
+    /**
+     * The welcome window that intially pops up.
+     */
     private JFrame welcomeWindow;
+    /**
+     * How many flowcharts that have been opened this session. 
+     * The actual number will be one less than this value.
+     */
     private int chartCounter = 1;
     
+    /**
+     * Creates a new window manager and opens a welcome window.
+     */
     public FlowchartWindowManager() {
         windows = new ArrayList<>();
         welcomeWindow = new JFrame("Welcome to Flowy");
@@ -102,6 +115,9 @@ public class FlowchartWindowManager implements WindowListener {
         window.setVisible(true);
     }
     
+    /**
+     * The action listener for the welcome window's button.
+     */
     class NewFlowchartListener implements ActionListener {
 
         @Override
