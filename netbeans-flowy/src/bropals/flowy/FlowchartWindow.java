@@ -194,8 +194,8 @@ public class FlowchartWindow extends JFrame {
         Color selectionColor = Color.RED;
         for (Node n : flowchart.getNodes()) {
             n.getStyle().getShape().renderShape(n, camera, g, 
-                n == eventManager.getSelectionManager().getLastSelected() && eventManager.isCursorShowing(),
-                eventManager.getCursorLocation(), view.getBackground());
+                n == eventManager.getSelectionManager().getLastSelected() && eventManager.getTextTypeManager().isCursorShowing(),
+                eventManager.getTextTypeManager().getLocationOfTypeCursor(), view.getBackground());
             if (eventManager.isSelected(n)) {
                 // draw the box around the node if it's being selected
                 g.setColor(selectionColor);
@@ -208,8 +208,8 @@ public class FlowchartWindow extends JFrame {
             }
             for (NodeLine nl : n.getLinesConnected()) {
                 Point[] linePoints = nl.getStyle().getType().renderLine(nl, camera, g, 
-                        nl == eventManager.getSelectionManager().getLastSelected() && eventManager.isCursorShowing(),
-                        eventManager.getCursorLocation(), eventManager.getLinePartTyping());
+                        nl == eventManager.getSelectionManager().getLastSelected() && eventManager.getTextTypeManager().isCursorShowing(),
+                        eventManager.getTextTypeManager().getLocationOfTypeCursor(), eventManager.getTextTypeManager().getLinePartTyping());
                 if (eventManager.isSelected(nl)) {
                     g.setColor(selectionColor);
                     float offset = 3 / camera.getZoom();

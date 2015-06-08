@@ -305,8 +305,7 @@ public enum Shape {
                 String testResultRow = text.get(rowOn) + " " + words[i]; // add a space after each word
                 // if the word is NOT a new line character and the new word will fit
 
-                if (!words[i].equals(EventManager.newLineSequence) && 
-                        g.getFontMetrics().getStringBounds(testResultRow, g).getWidth() < width) {
+                if (g.getFontMetrics().getStringBounds(testResultRow, g).getWidth() < width) {
                     // remove the old row
                     text.remove(rowOn);
                     // make this the new row
@@ -314,11 +313,7 @@ public enum Shape {
                     // otherwise if there isn't enough space on this new row
                 } else {
                     // add the word to the next row
-                    if (!words[i].equals(EventManager.newLineSequence)) {
-                        text.add(words[i]);
-                    } else {
-                        text.add("-"); // add a bullet point
-                    }
+                    text.add(words[i]);
                     rowOn++;
                 }
             }

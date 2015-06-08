@@ -26,7 +26,6 @@ import java.util.ArrayList;
  */
 public class EventManager implements KeyListener, MouseListener, MouseMotionListener, BooleanBlinkListener {
 
-    public static String newLineSequence = "`";
     private SelectionManager selectionManager;
     private FlowchartWindow window;
     /**
@@ -36,28 +35,11 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      *
      */
     private DragManager dragManager;
+    private TextTypeManager textTypeManager;
     /**
      * The variable to track if the spacebar is held down or not
      */
     private boolean spacebar;
-
-    /**
-     * Keep track of where on the line you're adding text (tail, head, or
-     * center) 0 = center, 1 = tail, and 2 = head, It will rotate between these three
-     * in the order 0 -> 1 -> 2 -> 0 ...
-     */
-    private int linePartTyping;
-    /**
-     * The location of the cursor on the string. The cursor is located behind the 
-     * character whose index is this number. This number is 0 for the start of 
-     * the string, and is equal to str.length() for a String str when it's at
-     * the end of the word.
-     * 
-     * For a string "word" and the location of "1" the cursor is positioned as
-     * "w|ord"
-     */
-    private int locationOfTypeCursor;
-    private boolean showCursor;
 
     /**
      * How close the mouse has to be to an edge of a node to be able to resize
@@ -69,9 +51,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         window = instance;
         selectionManager = new SelectionManager(instance);
         dragManager = new DragManager(selectionManager);
-        showCursor = false;
-        linePartTyping = 0;
-        locationOfTypeCursor = 0;
+        textTypeManager = new TextTypeManager();
     }
 
     public boolean isSelected(Selectable s) {
@@ -105,8 +85,8 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
             // drag so we can get the points of the line
             Point[] linePoints = nl.getStyle().getType().renderLine(nl, window.getCamera(), 
                     window.getView().getGraphics(), 
-                    isCursorShowing() && nl == selectionManager.getLastSelected(), 
-                    locationOfTypeCursor, linePartTyping);
+                    textTypeManager.isCursorShowing()&& nl == selectionManager.getLastSelected(), 
+                    textTypeManager.getLocationOfTypeCursor(), textTypeManager.getLinePartTyping());
             Point.Float p1 = window.getCamera().convertCanvasToWorld(linePoints[0]);
             Point.Float p2 = window.getCamera().convertCanvasToWorld(linePoints[1]);
 
@@ -452,29 +432,29 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
             // if you're selecting a node...
             if (selectionManager.getLastSelected() instanceof Node) {
                 Node editNode = (Node) selectionManager.getLastSelected();
-                // make sure locationOfTypeCursor is in the bounds of the text
+                // make sure textTypeManager.getLocationOfTypeCursor() is in the bounds of the text
                 
-                if (locationOfTypeCursor > editNode.getInnerText().length() || locationOfTypeCursor < 0)
-                    locationOfTypeCursor = editNode.getInnerText().length();
+                if (textTypeManager.getLocationOfTypeCursor() > editNode.getInnerText().length() || textTypeManager.getLocationOfTypeCursor() < 0)
+                    textTypeManager.setLocationOfTypeCursor(editNode.getInnerText().length());
 
                 if (((int) e.getKeyChar()) == KeyEvent.VK_BACK_SPACE && editNode.getInnerText().length() > 0) {
                     // take off the character at the location of the string
-                    editNode.setInnerText(deleteCharacter(editNode.getInnerText(), locationOfTypeCursor));
-                    if (locationOfTypeCursor > 0) {
-                        locationOfTypeCursor--;
+                    editNode.setInnerText(deleteCharacter(editNode.getInnerText(), textTypeManager.getLocationOfTypeCursor()));
+                    if (textTypeManager.getLocationOfTypeCursor() > 0) {
+                        textTypeManager.decrementLocationOfTypeCursor();
                     }
                 } else if (((int) e.getKeyChar()) == KeyEvent.VK_ENTER) {
                     // add a new line
                     /*System.out.println("insert a new line");
                     editNode.setInnerText(insertCharacter(editNode.getInnerText(), 
-                            " " + newLineSequence + " ", locationOfTypeCursor));
-                    locationOfTypeCursor +=2;
+                            " " + newLineSequence + " ", textTypeManager.getLocationOfTypeCursor()));
+                    textTypeManager.getLocationOfTypeCursor() +=2;
                     */
                 } else if (((int) e.getKeyChar()) != KeyEvent.VK_BACK_SPACE) {
                     // add the typed character to the end
                     editNode.setInnerText(insertCharacter(editNode.getInnerText(), 
-                            "" + e.getKeyChar(), locationOfTypeCursor));
-                    locationOfTypeCursor++;
+                            "" + e.getKeyChar(), textTypeManager.getLocationOfTypeCursor()));
+                    textTypeManager.incrementLocationOfTypeCursor();
                 }
                 
             // if you're selecting a node line...
@@ -483,7 +463,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 NodeLine editLine = (NodeLine) selectionManager.getLastSelected();
 
                 int lengthOfEditingLine = 0;
-                switch (linePartTyping) {
+                switch (textTypeManager.getLinePartTyping()) {
                     case 0:
                         lengthOfEditingLine = editLine.getCenterText().length();
                         break;
@@ -496,62 +476,62 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 }
 
                 // move the cursor to the end of the newly selected line
-                if (locationOfTypeCursor > lengthOfEditingLine || locationOfTypeCursor < 0)
-                    locationOfTypeCursor = lengthOfEditingLine;
+                if (textTypeManager.getLocationOfTypeCursor() > lengthOfEditingLine || textTypeManager.getLocationOfTypeCursor() < 0)
+                    textTypeManager.setLocationOfTypeCursor(lengthOfEditingLine);
                 
                 if (((int) e.getKeyChar()) == KeyEvent.VK_BACK_SPACE && lengthOfEditingLine > 0) {
                     // take off the last character in the string
-                    switch (linePartTyping) {
+                    switch (textTypeManager.getLinePartTyping()) {
                         case 0:
-                            editLine.setCenterText(deleteCharacter(editLine.getCenterText(), locationOfTypeCursor));
+                            editLine.setCenterText(deleteCharacter(editLine.getCenterText(), textTypeManager.getLocationOfTypeCursor()));
                             break;
                         case 1:
-                            editLine.setTailText(deleteCharacter(editLine.getTailText(), locationOfTypeCursor));
+                            editLine.setTailText(deleteCharacter(editLine.getTailText(), textTypeManager.getLocationOfTypeCursor()));
                             break;
                         case 2:
-                            editLine.setHeadText(deleteCharacter(editLine.getHeadText(), locationOfTypeCursor));
+                            editLine.setHeadText(deleteCharacter(editLine.getHeadText(), textTypeManager.getLocationOfTypeCursor()));
                             break;
                     }
-                    locationOfTypeCursor--;
+                    textTypeManager.decrementLocationOfTypeCursor();
 
                 } else if (((int) e.getKeyChar()) == KeyEvent.VK_ENTER) {
                     // cycle what part of the line that is being edited
-                    if (linePartTyping < 2) {
-                        linePartTyping++;
+                    if (textTypeManager.getLinePartTyping() < 2) {
+                        textTypeManager.setLinePartTyping(textTypeManager.getLinePartTyping() + 1);
                     } else {
-                        linePartTyping = 0;
+                        textTypeManager.setLinePartTyping(0);
                     }
-                    switch (linePartTyping) {
+                    switch (textTypeManager.getLinePartTyping()) {
                         case 0:
-                            locationOfTypeCursor = editLine.getCenterText().length();
+                            textTypeManager.setLocationOfTypeCursor(editLine.getCenterText().length());
                             break;
                         case 1:
-                            locationOfTypeCursor = editLine.getTailText().length();
+                            textTypeManager.setLocationOfTypeCursor(editLine.getTailText().length());
                             break;
                         case 2:
-                            locationOfTypeCursor = editLine.getHeadText().length();
+                            textTypeManager.setLocationOfTypeCursor(editLine.getHeadText().length());
                             break;
                     }
                 } else if (((int) e.getKeyChar()) != KeyEvent.VK_BACK_SPACE) {
                     // add the typed character to the end
-                    switch (linePartTyping) {
+                    switch (textTypeManager.getLinePartTyping()) {
                         case 0:
                             editLine.setCenterText(
                                     insertCharacter(editLine.getCenterText(), 
-                                        "" + e.getKeyChar(), locationOfTypeCursor));
+                                        "" + e.getKeyChar(), textTypeManager.getLocationOfTypeCursor()));
                             break;
                         case 1:
                             editLine.setTailText(
                                     insertCharacter(editLine.getTailText(), 
-                                        "" + e.getKeyChar(), locationOfTypeCursor));
+                                        "" + e.getKeyChar(), textTypeManager.getLocationOfTypeCursor()));
                             break;
                         case 2:
                             editLine.setHeadText(
                                     insertCharacter(editLine.getHeadText(), 
-                                        "" + e.getKeyChar(), locationOfTypeCursor));
+                                        "" + e.getKeyChar(), textTypeManager.getLocationOfTypeCursor()));
                             break;
                     }
-                    locationOfTypeCursor++;
+                    textTypeManager.incrementLocationOfTypeCursor();
                 }
             }
         }
@@ -598,11 +578,11 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 window.redrawView();
                 break;
             case KeyEvent.VK_LEFT:
-                locationOfTypeCursor--;
+                textTypeManager.decrementLocationOfTypeCursor();
                 window.redrawView();
                 break;
             case KeyEvent.VK_RIGHT:
-                locationOfTypeCursor++;
+                textTypeManager.incrementLocationOfTypeCursor();
                 window.redrawView();
                 break;
         }
@@ -734,17 +714,17 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         // move the cursor that's editing to the end of the text
         if (selectionManager.getLastSelected() != null) {
             if (selectionManager.getLastSelected() instanceof Node) {
-                locationOfTypeCursor = ((Node)selectionManager.getLastSelected()).getInnerText().length();
+                textTypeManager.setLocationOfTypeCursor(((Node)selectionManager.getLastSelected()).getInnerText().length());
             } else if (selectionManager.getLastSelected() instanceof NodeLine) {
-                switch (linePartTyping) {
+                switch (textTypeManager.getLinePartTyping()) {
                     case 0: 
-                        locationOfTypeCursor = ((NodeLine)selectionManager.getLastSelected()).getCenterText().length();
+                        textTypeManager.setLocationOfTypeCursor(((NodeLine)selectionManager.getLastSelected()).getCenterText().length());
                         break;
                     case 1:
-                        locationOfTypeCursor = ((NodeLine)selectionManager.getLastSelected()).getTailText().length();
+                        textTypeManager.setLocationOfTypeCursor(((NodeLine)selectionManager.getLastSelected()).getTailText().length());
                         break;
                     case 2:
-                        locationOfTypeCursor = ((NodeLine)selectionManager.getLastSelected()).getHeadText().length();
+                        textTypeManager.setLocationOfTypeCursor(((NodeLine)selectionManager.getLastSelected()).getHeadText().length());
                         break;
                 }
             }
@@ -956,20 +936,12 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
 
     @Override
     public void booleanSwitch(boolean value) {
-        showCursor = value;
+        textTypeManager.setCursorShowing(value);
         window.redrawView();
     }
     
-    public boolean isCursorShowing() {
-        return showCursor;
-    }
-    
-    public int getCursorLocation() {
-        return locationOfTypeCursor;
-    }
-
-    public int getLinePartTyping() {
-        return linePartTyping;
+    public TextTypeManager getTextTypeManager() {
+        return textTypeManager;
     }
 
 }
