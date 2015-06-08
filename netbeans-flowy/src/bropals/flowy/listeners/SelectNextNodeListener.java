@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- *
+ * The listener for the select next node button.
  * @author Jonathon
  */
 public class SelectNextNodeListener extends AbstractFlowyListener implements ActionListener {

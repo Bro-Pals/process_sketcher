@@ -13,7 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JColorChooser;
 
 /**
- *
+ * The listener for the line color button.
  * @author Jonathon
  */
 public class LineColorListener extends AbstractFlowyListener implements ActionListener {

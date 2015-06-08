@@ -13,7 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JColorChooser;
 
 /**
- *
+ * The listener for the fill color button.
  * @author Jonathon
  */
 public class FillColorListener extends AbstractFlowyListener implements ActionListener {

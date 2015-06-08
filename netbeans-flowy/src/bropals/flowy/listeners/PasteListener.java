@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- *
+ * The listener for the paste clipboard button.
  * @author Jonathon
  */
 public class PasteListener extends AbstractFlowyListener implements ActionListener {

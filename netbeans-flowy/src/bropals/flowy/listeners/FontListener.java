@@ -12,7 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- *
+ * The listener for the font chooser.
  * @author Jonathon
  */
 public class FontListener extends AbstractFlowyListener implements ActionListener {

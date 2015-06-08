@@ -9,8 +9,8 @@ import bropals.flowy.FlowchartWindow;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-/**
- *
+/** 
+ * The listener for the new flowchart button.
  * @author Jonathon
  */
 public class NewFlowchartListener extends AbstractFlowyListener implements ActionListener {

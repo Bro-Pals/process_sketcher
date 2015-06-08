@@ -12,7 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- *
+ * The listener for the line style chooser.
  * @author Jonathon
  */
 public class LineStyleListener extends AbstractFlowyListener implements ActionListener {

@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- *
+ * The listener for the reset view button.
  * @author Jonathon
  */
 public class ResetViewListener extends AbstractFlowyListener implements ActionListener {

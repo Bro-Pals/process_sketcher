@@ -12,7 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- *
+ * The listener for the shape chooser in the styles tab.
  * @author Jonathon
  */
 public class ShapeListener extends AbstractFlowyListener implements ActionListener {

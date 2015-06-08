@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- *
+ * The listener for the open flowchart button.
  * @author Jonathon
  */
 public class OpenFlowchartListener extends AbstractFlowyListener implements ActionListener {

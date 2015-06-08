@@ -12,7 +12,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 /**
- *
+ * The listener for the fit to view button.
  * @author Jonathon
  */
 public class FitToViewListener extends AbstractFlowyListener implements ActionListener {

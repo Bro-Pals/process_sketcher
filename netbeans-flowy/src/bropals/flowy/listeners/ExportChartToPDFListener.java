@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- *
+ * The listener for the export chart to PDF button.
  * @author Jonathon
  */
 public class ExportChartToPDFListener extends AbstractFlowyListener implements ActionListener {

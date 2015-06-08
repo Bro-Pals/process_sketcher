@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- *
+ * The listener for the print flowchart button.
  * @author Jonathon
  */
 public class PrintFlowchartListener extends AbstractFlowyListener implements ActionListener {

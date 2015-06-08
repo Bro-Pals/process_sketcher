@@ -16,21 +16,48 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
 /**
- *
+ * Manages the camera controls.
  * @author Jonathon
  */
 public class CameraControls implements MouseMotionListener, KeyListener, MouseListener, MouseWheelListener {
-
+    /**
+     * The camera that is being controlled.
+     */
     private Camera camera;
+    /**
+     * The flowchart window.
+     */
     private FlowchartWindow window;
-    
-    private float panStartX; //In world coords
-    private float panStartY; //In world coords
+    /**
+     * The X mouse position in world coordinates when a pan has begun.
+     */
+    private float panStartX;
+     /**
+     * The Y mouse position in world coordinates when a pan has begun.
+     */
+    private float panStartY;
+    /**
+     * The camera X position in world coordinates when a pan has begun.
+     */
     private float camStartX;
+    /**
+     * The camera Y position in world coordinates when a pan has begun.
+     */
     private float camStartY;
+    /**
+     * A flag to indicate if the user is holding space.
+     */
     private boolean holdingSpace = false;
+    /**
+     * A flag to indicate if the camera is being dragged.
+     */
     private boolean draggingCamera = false;
     
+    /**
+     * Creates a CameraControls object for controlling a camera.
+     * @param camera the camera to control.
+     * @param window the flowchart window.
+     */
     public CameraControls(Camera camera, FlowchartWindow window) {
         this.camera = camera;
         this.window = window;
@@ -103,14 +130,25 @@ public class CameraControls implements MouseMotionListener, KeyListener, MouseLi
     public void mouseExited(MouseEvent e) {
     }
     
+    /**
+     * Checks to see if the user is to begin a camera pan.
+     * @param mouseButton the mouse button.
+     * @return if the user is beginning a pan.
+     */
     private boolean dragging(int mouseButton) {
         return (holdingSpace && mouseButton == MouseEvent.BUTTON1) || mouseButton == MouseEvent.BUTTON2;
     }
 
+    /**
+     * Zooms the camera in.
+     */
     public void zoomIn() {
         camera.zoom(-1 / 4.0f);
     }
     
+    /**
+     * Zooms the camera out.
+     */
     public void zoomOut() {
         camera.zoom(1 / 4.0f);
     }

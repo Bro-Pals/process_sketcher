@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- *
+ *The listener for the save flowchart as button.
  * @author Jonathon
  */
 public class SaveAsFlowchartListener extends AbstractFlowyListener implements ActionListener {

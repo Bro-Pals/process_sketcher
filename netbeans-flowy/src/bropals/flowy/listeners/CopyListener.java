@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- *
+ * The listener for the copy button.
  * @author Jonathon
  */
 public class CopyListener extends AbstractFlowyListener implements ActionListener {

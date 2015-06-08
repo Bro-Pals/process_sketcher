@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- *
+ * The listener for the select previous node button.
  * @author Jonathon
  */
 public class SelectPreviousNodeListener extends AbstractFlowyListener implements ActionListener {

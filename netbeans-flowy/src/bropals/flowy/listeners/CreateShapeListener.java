@@ -11,7 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- *
+ * The listener for the create shape button.
  * @author Jonathon
  */
 public class CreateShapeListener extends AbstractFlowyListener implements ActionListener {

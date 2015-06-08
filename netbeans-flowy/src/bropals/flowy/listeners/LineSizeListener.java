@@ -11,7 +11,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 /**
- *
+ * The listener for the line size spinner.
  * @author Jonathon
  */
 public class LineSizeListener extends AbstractFlowyListener implements ChangeListener {

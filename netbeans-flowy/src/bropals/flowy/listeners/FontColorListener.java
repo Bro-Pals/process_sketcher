@@ -14,7 +14,7 @@ import javax.swing.JButton;
 import javax.swing.JColorChooser;
 
 /**
- *
+ * The listener for the font color button.
  * @author Jonathon
  */
 public class FontColorListener extends AbstractFlowyListener implements ActionListener {

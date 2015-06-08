@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- *
+ * The listener for the zoom in button.
  * @author Jonathon
  */
 public class ZoomInListener extends AbstractFlowyListener implements ActionListener {

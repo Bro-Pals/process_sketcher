@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- *
+ * The listener for the undo button.
  * @author Jonathon
  */
 public class UndoListener extends AbstractFlowyListener implements ActionListener {

@@ -7,12 +7,11 @@ package bropals.flowy.listeners;
 
 import bropals.flowy.FlowchartWindow;
 import bropals.flowy.data.Selectable;
-import java.awt.Font;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 /**
- *
+ * The listener for the font size spinner.
  * @author Jonathon
  */
 public class FontSizeListener extends AbstractFlowyListener implements ChangeListener {
