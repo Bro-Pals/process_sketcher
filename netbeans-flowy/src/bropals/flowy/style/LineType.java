@@ -85,6 +85,8 @@ public enum LineType {
         Node par = n.getParent();
         Node chi = n.getChild();
 
+        final int NOT_ASSIGNED = 1023901412;
+        
         // fix the cursor location if it's less than 0
         if (cursorLocation < 0) {
             cursorLocation = 0;
@@ -207,52 +209,31 @@ public enum LineType {
 
         // draw the tail, center, and head texts
         /// draw the Tail text
-        xPositionOffset = (int) g.getFontMetrics().getStringBounds(n.getTailText(), g).getWidth() / 2;
-        pp.setLocation(originalParentPointX + (tailDist * diffX * lineLength) - xPositionOffset,
-                originalParentPointY + (tailDist * diffY * lineLength));
-        if (blinkCursor && partCursorDrawing == 1) {
-            if (n.getTailText().length() > 0 && cursorLocation > n.getTailText().length() - 1) {
-                cursorLocation = n.getTailText().length() - 1;
-            }
-            cursorRenderX = camera.convertWorldToCanvasX((float) pp.getX())
-                    + (int) (g.getFontMetrics().getStringBounds(n.getTailText().substring(0, cursorLocation), g).getWidth());
-            cursorRenderY = (int) (camera.convertWorldToCanvasY((int) pp.getY()) - g.getFontMetrics().getHeight() - 2);
+        int[] info = renderText(n.getTailText(), headDist, originalParentPointX, originalParentPointY,
+                1, partCursorDrawing, lineLength, diffY, diffX, g, cursorLocation, 
+                camera, blinkCursor, NOT_ASSIGNED);
+        if (info[0] != NOT_ASSIGNED && info[1] != NOT_ASSIGNED) {
+            cursorRenderX = info[0];
+            cursorRenderY = info[1];
         }
-        g.drawString(n.getTailText(),
-                (int) camera.convertWorldToCanvasX((float) pp.getX()),
-                (int) camera.convertWorldToCanvasY((float) pp.getY()));
 
         // Draw the Center text
-        xPositionOffset = (int) g.getFontMetrics().getStringBounds(n.getCenterText(), g).getWidth() / 2;
-        pp.setLocation(originalParentPointX + (centerDist * diffX * lineLength) - xPositionOffset,
-                originalParentPointY + (centerDist * diffY * lineLength));
-        if (blinkCursor && partCursorDrawing == 0) {
-            if (n.getCenterText().length() > 0 && cursorLocation > n.getCenterText().length() - 1) {
-                cursorLocation = n.getCenterText().length() - 1;
-            }
-            cursorRenderX = camera.convertWorldToCanvasX((float) pp.getX())
-                    + (int) (g.getFontMetrics().getStringBounds(n.getCenterText().substring(0, cursorLocation), g).getWidth());
-            cursorRenderY = (int) (camera.convertWorldToCanvasY((int) pp.getY()) - g.getFontMetrics().getHeight() - 2);
+        info = renderText(n.getCenterText(), centerDist, originalParentPointX, originalParentPointY,
+                0, partCursorDrawing, lineLength, diffY, diffX, g, cursorLocation, 
+                camera, blinkCursor, NOT_ASSIGNED);
+        if (info[0] != NOT_ASSIGNED && info[1] != NOT_ASSIGNED) {
+            cursorRenderX = info[0];
+            cursorRenderY = info[1];
         }
-        g.drawString(n.getCenterText(),
-                (int) camera.convertWorldToCanvasX((float) pp.getX()),
-                (int) camera.convertWorldToCanvasY((float) pp.getY()));
 
         /// draw the Head text
-        xPositionOffset = (int) g.getFontMetrics().getStringBounds(n.getHeadText(), g).getWidth() / 2;
-        pp.setLocation(originalParentPointX + (headDist * diffX * lineLength) - xPositionOffset,
-                originalParentPointY + (headDist * diffY * lineLength));
-        if (blinkCursor && partCursorDrawing == 2) {
-            if (n.getHeadText().length() > 0 && cursorLocation > n.getHeadText().length() - 1) {
-                cursorLocation = n.getHeadText().length() - 1;
-            }
-            cursorRenderX = camera.convertWorldToCanvasX((float) pp.getX())
-                    + (int) (g.getFontMetrics().getStringBounds(n.getHeadText().substring(0, cursorLocation), g).getWidth());
-            cursorRenderY = (int) (camera.convertWorldToCanvasY((int) pp.getY()) - g.getFontMetrics().getHeight() - 2);
+        info = renderText(n.getHeadText(), headDist, originalParentPointX, originalParentPointY,
+                2, partCursorDrawing, lineLength, diffY, diffX, g, cursorLocation, 
+                camera, blinkCursor, NOT_ASSIGNED);
+        if (info[0] != NOT_ASSIGNED && info[1] != NOT_ASSIGNED) {
+            cursorRenderX = info[0];
+            cursorRenderY = info[1];
         }
-        g.drawString(n.getHeadText(),
-                (int) camera.convertWorldToCanvasX((float) pp.getX()),
-                (int) camera.convertWorldToCanvasY((float) pp.getY()));
 
         // draw the blinking cursor
         if (blinkCursor) {
@@ -262,5 +243,29 @@ public enum LineType {
 
         }
         return new Point[]{int_p1, int_p2};
+    }
+    
+    /// a method to reduce the amount of copy pasting
+    public int[] renderText(String text, float distanceRatio, float originalParentPointX, 
+            float originalParentPointY, int cursorConditional, int partCursorDrawing, float lineLength, 
+            float diffY, float diffX, Graphics g, int cursorLocation, Camera camera, boolean blinkCursor, int NOT_ASSIGNED) {
+        int cursorRenderX = NOT_ASSIGNED;
+        int cursorRenderY = NOT_ASSIGNED;
+        float xPositionOffset = (int) g.getFontMetrics().getStringBounds(text, g).getWidth() / 2;
+        Point.Float pp = new Point.Float(originalParentPointX + (distanceRatio * diffX * lineLength) - xPositionOffset,
+                originalParentPointY + (distanceRatio * diffY * lineLength));
+        if (blinkCursor && partCursorDrawing == 2) {
+            if (text.length() > 0 && cursorLocation > text.length()) {
+                cursorLocation = text.length();
+            }
+            cursorRenderX = camera.convertWorldToCanvasX((float) pp.getX())
+                    + (int) (g.getFontMetrics().getStringBounds(text.substring(0, cursorLocation), g).getWidth());
+            cursorRenderY = (int) (camera.convertWorldToCanvasY((int) pp.getY()) - g.getFontMetrics().getHeight() - 2);
+        }
+        g.drawString(text,
+                (int) camera.convertWorldToCanvasX((float) pp.getX()),
+                (int) camera.convertWorldToCanvasY((float) pp.getY()));
+        
+        return new int[]{cursorRenderX, cursorRenderY};
     }
 }

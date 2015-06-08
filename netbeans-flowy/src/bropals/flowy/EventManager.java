@@ -43,10 +43,19 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
 
     /**
      * Keep track of where on the line you're adding text (tail, head, or
-     * center) 0 = center 1 = tail 2 = head It will rotate between these three
+     * center) 0 = center, 1 = tail, and 2 = head, It will rotate between these three
      * in the order 0 -> 1 -> 2 -> 0 ...
      */
     private int linePartTyping;
+    /**
+     * The location of the cursor on the string. The cursor is located behind the 
+     * character whose index is this number. This number is 0 for the start of 
+     * the string, and is equal to str.length() for a String str when it's at
+     * the end of the word.
+     * 
+     * For a string "word" and the location of "1" the cursor is positioned as
+     * "w|ord"
+     */
     private int locationOfTypeCursor;
     private boolean showCursor;
 
@@ -387,46 +396,40 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      * Remove a character at the location of the cursor from the string.
      * @param original The original string
      * @param cursorLocation The location of the cursor. If the cursorLocation is
-     *          greater than the length of the string, it will delete the character
-     *          at the end of the string. If it's less than 0, it will delete the
-     *          character at the start of the string.
+     *          equal to the length of the string, it will delete the character
+     *          at the end of the string. If it's 0, it will not delete anything.
      * @return The resulting string
      */
     private String deleteCharacter(String original, int cursorLocation) {
-        // don't try to delete if the string is too small
-        if (original.length() < 1) {
+        // don't delete if it's at the start of the string
+        if (cursorLocation <= 0) {
             return original;
+        } else if (cursorLocation == 1) {
+            return original.substring(1);
+        } else if (cursorLocation == original.length()) {
+            return original.substring(0, original.length() - 1);
         }
-        
-        if (cursorLocation < 0) {
-            return original; // don't delete if the cursor is at the start
-        } else if (original.length() == 1 && cursorLocation == 0) {
-            return "";
-        } else if (cursorLocation > original.length()) {
-            cursorLocation = original.length();
-        }
-        return (original.substring(0, cursorLocation) + original.substring(cursorLocation + 1));
+        // wo|rd   ->   w|rd   (location 2)
+        return (original.substring(0, cursorLocation - 1) + original.substring(cursorLocation));
     }
     
     /**
      * Inserts a character at the location of the cursor into the string
      * @param original The original string
      * @param cursorLocation The location of the cursor. The character is inserted 
-     *              at the character in front of the 
+     *              at the character in front of the one whose index is cursorLocation - 1.
      * @return The resulting string
      */
     private String insertCharacter(String original, String character, int cursorLocation) {
-        if (cursorLocation < 0) {
-            cursorLocation = 0;
-        } else if (cursorLocation > original.length() - 1) {
-            cursorLocation = original.length() - 1;
+        // |word + A  ->  A|word
+        // word| + A -> wordA|
+        // wo|rd + A -> woArd  (location 2)
+        if (cursorLocation == 0) {
+            return character + original;
+        } else if (cursorLocation == original.length()) {
+            return original + character;
         }
-        
-        if (original.length() == 0) {
-            return character;
-        }
-
-        return (original.substring(0, cursorLocation + 1) + character + original.substring(cursorLocation + 1));
+        return (original.substring(0, cursorLocation) + character + original.substring(cursorLocation));
     }
     
     @Override
@@ -451,13 +454,13 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 Node editNode = (Node) selectionManager.getLastSelected();
                 // make sure locationOfTypeCursor is in the bounds of the text
                 
-                if (locationOfTypeCursor > editNode.getInnerText().length() - 1 || locationOfTypeCursor < 0)
-                    locationOfTypeCursor = editNode.getInnerText().length() - 1;
+                if (locationOfTypeCursor > editNode.getInnerText().length() || locationOfTypeCursor < 0)
+                    locationOfTypeCursor = editNode.getInnerText().length();
 
                 if (((int) e.getKeyChar()) == KeyEvent.VK_BACK_SPACE && editNode.getInnerText().length() > 0) {
                     // take off the character at the location of the string
                     editNode.setInnerText(deleteCharacter(editNode.getInnerText(), locationOfTypeCursor));
-                    if (locationOfTypeCursor < editNode.getInnerText().length()) {
+                    if (locationOfTypeCursor > 0) {
                         locationOfTypeCursor--;
                     }
                 } else if (((int) e.getKeyChar()) == KeyEvent.VK_ENTER) {
@@ -471,7 +474,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     // add the typed character to the end
                     editNode.setInnerText(insertCharacter(editNode.getInnerText(), 
                             "" + e.getKeyChar(), locationOfTypeCursor));
-                    locationOfTypeCursor +=1;
+                    locationOfTypeCursor++;
                 }
                 
             // if you're selecting a node line...
@@ -493,8 +496,8 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 }
 
                 // move the cursor to the end of the newly selected line
-                if (locationOfTypeCursor > lengthOfEditingLine - 1 || locationOfTypeCursor < 0)
-                    locationOfTypeCursor = lengthOfEditingLine - 1;
+                if (locationOfTypeCursor > lengthOfEditingLine || locationOfTypeCursor < 0)
+                    locationOfTypeCursor = lengthOfEditingLine;
                 
                 if (((int) e.getKeyChar()) == KeyEvent.VK_BACK_SPACE && lengthOfEditingLine > 0) {
                     // take off the last character in the string
@@ -509,7 +512,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                             editLine.setHeadText(deleteCharacter(editLine.getHeadText(), locationOfTypeCursor));
                             break;
                     }
-
+                    locationOfTypeCursor--;
 
                 } else if (((int) e.getKeyChar()) == KeyEvent.VK_ENTER) {
                     // cycle what part of the line that is being edited
@@ -548,6 +551,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                                         "" + e.getKeyChar(), locationOfTypeCursor));
                             break;
                     }
+                    locationOfTypeCursor++;
                 }
             }
         }
