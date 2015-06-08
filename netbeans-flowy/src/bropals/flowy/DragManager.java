@@ -15,18 +15,88 @@ import java.util.ArrayList;
  * @author Jonathon
  */
 public class DragManager {
-    
+    /**
+     * The selection manager for the current FlowchartWindow.
+     */
     private SelectionManager selectionManager;
+    /**
+     * The selectables that are currently on the clipboard.
+     */
     private ArrayList<Selectable> clipboard;
-    private boolean dragging, boxSelecting, leftMouseDown, rightMouseDown, resizingLeft, resizingRight, resizingTop, resizingBottom;
-    private float offsetX; //In world coords
-    private float offsetY; //In world coords
-    private float initialX; //In world coords
-    private float initialY; //In world coords
-    private Node newlyMadeNode, resizing;
-    private Node[] moveDragging; //List of stuff that is being dragged
-    private float[][] moveDragOffsets; //World coords
+    /**
+     * Indicates if the user is performing a drag operation.
+     */
+    private boolean dragging;
+    /**
+     * Indicates if the user is performing a box-select.
+     */
+    private boolean boxSelecting;
+    /**
+     * Indicates if the user's left mouse button is down.
+     */
+    private boolean leftMouseDown;
+    /**
+     * Indicates if the user's right mouse button is down.
+     */
+    private boolean rightMouseDown;
+    /**
+     * Indicates if the user is resizing the left edge of a node.
+     */
+    private boolean resizingLeft;
+    /**
+     * Indicates if the user is resizing the right edge of a node.
+     */
+    private boolean resizingRight;
+    /**
+     * Indicates if the user is resizing the top edge of a node.
+     */
+    private boolean resizingTop;
+    /**
+     * Indicates if the user is resizing the bottom edge of a node.
+     */
+    private boolean resizingBottom;
+    /**
+     * A stored X offset value in world coordinates.
+     */
+    private float offsetX;
+    /**
+     * A stored Y offset value in world coordinates.
+     */
+    private float offsetY;
+    /**
+     * The initial X position of the user's mouse when a drag
+     * operation started, in world coordinates.
+     */
+    private float initialX;
+    /**
+     * The initial Y position of the user's mouse when a drag
+     * operation started, in world coordinates.
+     */
+    private float initialY;
+    /**
+     * The node that was most recently created for a create-node-drag operation.
+     */
+    private Node newlyMadeNode;
+    /**
+     * The node that is currently being resized.
+     */
+    private Node resizing;
+    /**
+     * The array of nodes that are currently being drag-moved.
+     */
+    private Node[] moveDragging;
+    /**
+     * The array of stored offsets from the mouse position for
+     * each node currently being drag-moved, in world coordinates.
+     */
+    private float[][] moveDragOffsets;
     
+    /**
+     * Creates a drag manager for the purpose of keeping track of
+     * the drag logic.
+     * @param manager the selection manager, which DragManager needs
+     * a reference to.
+     */
     public DragManager(SelectionManager manager) {
         dragging = false;
         offsetX = 0;
@@ -42,67 +112,139 @@ public class DragManager {
         clipboard = new ArrayList<>();
     }
 
+    /**
+     * Sets the selectables in the clipboard.
+     * @param selectables the selectables to occupy the clipboard
+     */
     public void setStuffInClipboard(ArrayList<Selectable> selectables) {
         clipboard.clear();
         clipboard.addAll(selectables);
     }
     
+    /**
+     * Gets the selectables currently in the clipboard.
+     * @return the selectables currently in the clipboard.
+     */
     public ArrayList<Selectable> getClipboard() {
         return clipboard;
     }
     
+    /**
+     * Set the box-selecting flag in this drag manager.
+     * @param boxSelecting the new state of the box-select flag.
+     */
     public void setBoxSelecting(boolean boxSelecting) {
         this.boxSelecting = boxSelecting;
     }
 
+    /**
+     * Gets the value of the box-select flag.
+     * @return the value of the box-select flag.
+     */
     public boolean isBoxSelecting() {
         return boxSelecting;
     }
     
+    /**
+     * Gets the value of the drag flag.
+     * @return the value of the drag flag.
+     */
     public boolean isDragging() {
         return dragging;
     }
 
+    /**
+     * Sets the value of the drag flag.
+     * @param dragging the new value of the drag flag.
+     */
     public void setDragging(boolean dragging) {
         this.dragging = dragging;
     }
 
+    /**
+     * Gets the stored X offset, in world coordinates.
+     * @return the stored X offset, in world coordinates.
+     */
     public float getOffsetX() {
         return offsetX;
     }
 
+    /**
+     * Sets the stored X offset, in world coordinates.
+     * @param offsetX the new stored X offset.
+     */
     public void setOffsetX(float offsetX) {
         this.offsetX = offsetX;
     }
 
+    /**
+     * Gets the stored Y offset, in world coordinates.
+     * @return the stored Y offset, in world coordinates.
+     */
     public float getOffsetY() {
         return offsetY;
     }
 
+    /**
+     * Sets the stored Y offset, in world coordinates.
+     * @param offsetY the new stored Y offset.
+     */
     public void setOffsetY(float offsetY) {
         this.offsetY = offsetY;
     }
 
+    /**
+     * Gets the X position of the user's mouse when the current
+     * drag operation began.
+     * @return the X position of the user's mouse when the
+     * current drag operation began.
+     */
     public float getInitialX() {
         return initialX;
     }
 
+    /**
+     * Sets the X position of the user's mouse for the drag operation
+     * that is to begin.
+     * @param initialX the X position of the user's mouse for the drag operation
+     * that is to begin.
+     */
     public void setInitialX(float initialX) {
         this.initialX = initialX;
     }
 
+    /**
+     * Gets the Y position of the user's mouse when the current
+     * drag operation began.
+     * @return the Y position of the user's mouse when the
+     * current drag operation began.
+     */
     public float getInitialY() {
         return initialY;
     }
 
+    /**
+     * Sets the Y position of the user's mouse for the drag operation
+     * that is to begin.
+     * @param initialY the Y position of the user's mouse for the drag operation
+     * that is to begin.
+     */
     public void setInitialY(float initialY) {
         this.initialY = initialY;
     }
 
+    /**
+     * Get the left mouse down flag.
+     * @return the left mouse down flag.
+     */
     public boolean isLeftMouseDown() {
         return leftMouseDown;
     }
 
+    /**
+     * Set the left mouse down flag.
+     * @param leftMouseDown the left mouse down flag.
+     */
     public void setLeftMouseDown(boolean leftMouseDown) {
         this.leftMouseDown = leftMouseDown;
     }

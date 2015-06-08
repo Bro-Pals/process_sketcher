@@ -50,12 +50,11 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
+import java.io.InputStream;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
@@ -68,17 +67,27 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.ListCellRenderer;
-import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
 /**
  * Used for editing a Flowchart.
  * @author Jonathon
  */
 public class FlowchartWindow extends JFrame {
-    
+    /**
+     * The window manager for all windows.
+     */
     private FlowchartWindowManager flowchartWindowManager;
+    /**
+     * The flowchart that this FlowchartWindow is currently editing.
+     */
     private Flowchart flowchart;
+    /**
+     * Manages events related to the view.
+     */
     private EventManager eventManager;
+    /**
+     * Handles the camera controls.
+     */
     private CameraControls cameraControls;
     private JTabbedPane buttonPanel;
     private JComponent view;
@@ -131,12 +140,22 @@ public class FlowchartWindow extends JFrame {
     private JButton autoformatHorizontally;
     private JButton autoformatVertically;
     
+    /**
+     * Creates a new FlowchartWindow with an empty flowchart.
+     * @param manager the FlowchartWindowManager.
+     */
     public FlowchartWindow(FlowchartWindowManager manager) {
         this(manager, null);
     }
     
-    public FlowchartWindow(FlowchartWindowManager manager, File file) {
-        if (file != null) {
+    /**
+     * Creates a new FlowchartWindow, loading in flowchart data from
+     * an input stream to edit it.
+     * @param manager the FlowchartWindowManager.
+     * @param stream the stream to read the flowchart data from.
+     */
+    public FlowchartWindow(FlowchartWindowManager manager, InputStream stream) {
+        if (stream != null) {
             //Load the flowchart here
         } else {
             flowchart = new Flowchart(); // a new empty flowchart with one default node
@@ -182,10 +201,17 @@ public class FlowchartWindow extends JFrame {
         blinkThread.start();
     }
     
+    /**
+     * Redraw the flowchart editor view.
+     */
     public void redrawView() {
         view.repaint();
     }
     
+    /**
+     * The paint function for the flowchart editor view.
+     * @param g the graphics context to draw with.
+     */
     public void paintView(Graphics g) {
         // draw the background
         g.setColor(view.getBackground());
@@ -259,6 +285,10 @@ public class FlowchartWindow extends JFrame {
         return cameraControls;
     }
 
+    /**
+     * Gets the flowchart editor view.
+     * @return 
+     */
     public JComponent getView() {
         return view;
     }
@@ -266,8 +296,8 @@ public class FlowchartWindow extends JFrame {
     
     
     /**
-     * The flowchart currently being edited.
-     * @return 
+     * Gets the flowchart currently being edited.
+     * @return the flowchart currently being edited.
      */
     public Flowchart getFlowchart() {
         return flowchart;
@@ -277,7 +307,10 @@ public class FlowchartWindow extends JFrame {
         return flowchartWindowManager;
     }
     
-    private final void formatTabs() {
+    /**
+     * Format and creates all GUI elements for this FlowchartWindow.
+     */
+    private void formatTabs() {
         JPanel fileTab = new JPanel();
         fileTab.setLayout(new BoxLayout(fileTab, BoxLayout.X_AXIS));
         
@@ -460,22 +493,37 @@ public class FlowchartWindow extends JFrame {
         buttonPanel.addTab("Styles", stylesTab);
     }
     
+    /**
+     * Sets the view's cursor to the top edge resize cursor.
+     */
     public void resizeTopCursor() {
         view.setCursor(Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR));
     }
     
+    /**
+     * Sets the view's cursor to the bottom edge resize cursor.
+     */
     public void resizeBottomCursor() {
         view.setCursor(Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR));
     }
     
+    /**
+     * Sets the view's cursor to the left edge resize cursor.
+     */
     public void resizeLeftCursor() {
         view.setCursor(Cursor.getPredefinedCursor(Cursor.W_RESIZE_CURSOR));
     }
     
+    /**
+     * Sets the view's cursor to the right edge resize cursor.
+     */
     public void resizeRightCursor() {
         view.setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
     }
     
+    /**
+     * Sets the view's cursor to the system's default cursor.
+     */
     public void defaultCursor() {
         view.setCursor(Cursor.getDefaultCursor());
     }
@@ -492,11 +540,18 @@ public class FlowchartWindow extends JFrame {
         return nodeStylePanel;
     }
     
-    
+    /**
+     * Calls {@link #javax.swing.JComponent.revalidate revalidate} on
+     * the styles tab.
+     */
     public void revalidateStyles() {
         stylesTab.revalidate();
     }
     
+    /**
+     * Inits the list of possible Shapes for a node.
+     * @return the list of possible Shapes for a node.
+     */
     private String[] initShapeList() {
         return new String[] { 
             Shape.ACTION.toString(),
@@ -509,6 +564,10 @@ public class FlowchartWindow extends JFrame {
         };
     }
     
+    /**
+     * Inits the list of possible line types for a node line.
+     * @return the list of possible line types for a node line.
+     */
     private String[] initLineTypeList() {
         return new String[] { 
             LineType.SOLID.toString(),
@@ -517,16 +576,33 @@ public class FlowchartWindow extends JFrame {
         };
     }   
     
+    /**
+     * Gets the list of all fonts for this system.
+     * @return the list of all possible fonts.
+     */
     private Font[] initFontList() {
         return Flowy.allFonts;
     }
     
+    /**
+     * Sets the values for the font editing components in the styles panel.
+     * @param font the font to set the font editor to.
+     * @param fontColor the color to set the font color editor to.
+     * @param fontSize the font size to display in the font size editor.
+     */
     public void setFontPanelStyles(Font font, Color fontColor, int fontSize) {
         this.font.setSelectedItem(font);
         this.fontColor.setBackground(fontColor);
         this.fontSize.setValue(fontSize);
     }
     
+    /**
+     * Sets the values for the node editing components in the styles panel.
+     * @param shape the shape to set the shape editor to.
+     * @param borderColor the border color to set the border color editor to.
+     * @param fillColor the fill color to set the fill color editor to.
+     * @param borderSize the border size to display in the border size editor.
+     */
     public void setNodePanelStyles(Shape shape, Color borderColor, Color fillColor, int borderSize) {
         this.shape.setSelectedItem(shape.toString());
         this.borderColor.setBackground(borderColor);
@@ -534,6 +610,12 @@ public class FlowchartWindow extends JFrame {
         this.borderSize.setValue(borderSize);
     }
     
+    /**
+     * Sets the values for the line editing components in the styles panel.
+     * @param lineType the line type to set he line type editor to.
+     * @param lineColor the color to set the line color editor to.
+     * @param lineSize the line size to display in the line size editor.
+     */
     public void setLinePanelStyles(LineType lineType, Color lineColor, int lineSize) {
         this.lineType.setSelectedItem(lineType.toString());
         this.lineColor.setBackground(lineColor);
