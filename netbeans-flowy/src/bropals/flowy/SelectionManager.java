@@ -20,47 +20,83 @@ import java.util.ArrayList;
  */
 public class SelectionManager {
     
+    /**
+     * A list of everything being selected
+     */
     private ArrayList<Selectable> selected;
+    /**
+     * The FlowChart window that is using this SelectionManager
+     */
     private FlowchartWindow instance;
     
+    /**
+     * Create a new selection manager for a window.
+     * @param window The window that will be using this SelectionManager
+     */
     public SelectionManager(FlowchartWindow window) {
         selected = new ArrayList<>();
         this.instance = window;
     }
     
+    /**
+     * Get a list of everything that is selected. Adding selectables to this 
+     * list will add them to the selected, but it is advised to use the select()
+     * and deselect() methods
+     * @return 
+     */
     public ArrayList<Selectable> getSelected() {
         return selected;
     }
     
+    /**
+     * Select a single selectable
+     * @param selectable The selectable being selected
+     */
     public void select(Selectable selectable) {
         selected.add(selectable);
         refreshStylesTabVisiblity();
         refreshValuesOfStylesTabDueToNewSelection(selectable);
     }
     
+    /**
+     * Deselect a single selectable
+     * @param selectable The selectable being deselected
+     */
     public void deselect(Selectable selectable) {
         selected.remove(selectable);
         refreshStylesTabVisiblity();
     }
     
+    /**
+     * Deselect everything that is selected
+     */
     public void clearSelection() {
         selected.clear();
         makeAllStylesInvisible();
         instance.revalidateStyles();
     }
     
+    /**
+     * Make all the tables invisible for the window.
+     */
     private void makeAllStylesInvisible() {
         instance.getFontStylePanel().setVisible(false);
         instance.getLineStylePanel().setVisible(false);
         instance.getNodeStylePanel().setVisible(false);
     }
     
+    /**
+     * Make all of the tabs visible for the window.
+     */
     private void makeAllStylesVisible() {
         instance.getFontStylePanel().setVisible(true);
         instance.getLineStylePanel().setVisible(true);
         instance.getNodeStylePanel().setVisible(true);
     }
     
+    /**
+     * Refresh what tabs are visible according to what's selected.
+     */
     private void refreshStylesTabVisiblity() {
         if (selected.isEmpty()) {
             makeAllStylesInvisible();
@@ -89,6 +125,10 @@ public class SelectionManager {
         instance.revalidateStyles();
     }
     
+    /**
+     * Refreshes the styles tab GUI in the flowchart window using a Selectable
+     * @param s The selectable whose values will be used in updating the GUI.
+     */
     private void refreshValuesOfStylesTabDueToNewSelection(Selectable s) {
         Node n = null;
         NodeLine nl = null;
@@ -107,6 +147,11 @@ public class SelectionManager {
         }
     }
   
+    /**
+     * Get all the nodes being selected. Adding a Node to this flowchart WON'T 
+     * add it to the flowchart. This array might be empty if no Nodes are selected.
+     * @return A list of all the NodeLines in the selection.
+     */
     public ArrayList<Node> getSelectedNodes() {
         ArrayList<Node> nodes = new ArrayList<>();
         for (int i=0; i<selected.size(); i++) {
@@ -118,8 +163,9 @@ public class SelectionManager {
     }
     
     /**
-     * Get a list of all the NodeLines currently selected. Adding
-     * @return 
+     * Get a list of all the NodeLines currently selected. Adding a NodeLine
+     * to this array WON'T add it to the flowchart. This array might be empty.
+     * @return A list of all the NodeLines in the selection.
      */
     public ArrayList<NodeLine> getSelectedNodeLines() {
         ArrayList<NodeLine> nodelines = new ArrayList<>();
