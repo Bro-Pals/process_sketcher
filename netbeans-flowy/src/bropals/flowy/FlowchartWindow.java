@@ -120,7 +120,7 @@ public class FlowchartWindow extends JFrame {
     private JButton copy;
     private JButton cut;
     private JButton paste;
-    private JLabel nodesSelectedCounter;
+    //private JLabel nodesSelectedCounter;
     private JButton newFlowchart;
     private JButton saveFlowchart;
     private JButton saveAsFlowchart;
