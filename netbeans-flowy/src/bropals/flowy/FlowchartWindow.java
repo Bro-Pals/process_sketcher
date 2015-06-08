@@ -174,7 +174,7 @@ public class FlowchartWindow extends JFrame {
         view.setFocusTraversalKeysEnabled(false);
         view.setBackground(Color.WHITE);
         
-        BooleanBlinker blinker = new BooleanBlinker(400); // for the blinking in the cursor
+        BooleanBlinker blinker = new BooleanBlinker(280); // for the blinking in the cursor
         blinker.addListener(eventManager);
         blinkThread = new Thread(blinker);
         revalidate();
