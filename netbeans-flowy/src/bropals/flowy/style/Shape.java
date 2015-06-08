@@ -212,7 +212,7 @@ public enum Shape {
         int startEverythingX = camera.convertWorldToCanvasX(node.getX()) + padding; // canvas units
         int startEverythingY = camera.convertWorldToCanvasY(node.getY()) + fm.getHeight() + padding; // canvas units
         // the width each row can't get longer than (in canvas units)
-        int width = camera.convertWorldToCanvasX(node.getWidth()) - (padding * 2);
+        int width =  camera.convertWorldToCanvasLength(node.getWidth() - (padding * 2));
         
         if (cursorLocation > node.getInnerText().length()) {
             cursorLocation = node.getInnerText().length();
@@ -354,14 +354,15 @@ public enum Shape {
                 break;
         }
 
+        String[] words = node.getInnerText().split(" ");
+
         // only draw text if there is text
-        if (node.getInnerText().length() > 0) {
+        if (node.getInnerText().length() > 0 && words.length > 0) {
             g2.setColor(node.getStyle().getFontColor());
             
             // seperate the text into rows according to their lengths, not extending canvas units
             // the array for the text. Every element of the array represents one row of text
             ArrayList<String> text = new ArrayList<>();
-            String[] words = node.getInnerText().split(" ");
             text.add(words[0]); // first word goes into the first row
 
             // what row is currently being filled

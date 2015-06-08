@@ -123,6 +123,24 @@ public class Camera {
     }
     
     /**
+     * Converts a length in canvas units to world units.
+     * @param l The length in canvas units.
+     * @return THe same length in world units.
+     */
+    public float convertCanvasToWorldLength(float l) {
+        return l * zoom;
+    }
+    
+    /**
+     * Converts a length in world units to canvas units.
+     * @param l The length in world units.
+     * @return Tee same length in canvas units.
+     */
+    public int convertWorldToCanvasLength(float l) {
+        return (int)(l / zoom);
+    }
+    
+    /**
      * Sets the X location of the camera, given a X world coordinate.
      * @param x the new X location of the camera in world coordinates.
      */
