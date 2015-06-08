@@ -27,8 +27,17 @@ import java.awt.Color;
  */
 public class LineStyle extends FontStyle {
     
+    /**
+     * The type of the line.
+     */
     private LineType type;
+    /**
+     * The color of the line.
+     */
     private Color lineColor;
+    /**
+     * The thickness/stoke of the line.
+     */
     private int lineSize;
 
     /**

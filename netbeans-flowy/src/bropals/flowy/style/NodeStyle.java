@@ -27,9 +27,21 @@ import java.awt.Color;
  */
 public class NodeStyle extends FontStyle{
     
+    /**
+     * The shape of the Node.
+     */
     private Shape shape;
+    /**
+     * The fill color of the Node.
+     */
     private Color fillColor;
+    /**
+     * The color of the Node's border.
+     */
     private Color borderColor;
+    /**
+     * The thickness/stoke of the Node's border..
+     */
     private int borderSize;
 
     /**
@@ -110,7 +122,6 @@ public class NodeStyle extends FontStyle{
     }
     
     @Override
-
     public Object clone() {
         NodeStyle other = new NodeStyle();
         other.setBorderColor(borderColor);

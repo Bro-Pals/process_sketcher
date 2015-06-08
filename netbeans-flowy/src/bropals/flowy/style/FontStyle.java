@@ -28,7 +28,13 @@ import java.awt.Font;
  */
 public class FontStyle {
     
+    /**
+     * The color of the text when it's rendered.
+     */
     private Color fontColor;
+    /**
+     * The font that will be used when rendering the text.
+     */
     private Font fontType;
 
     /**
