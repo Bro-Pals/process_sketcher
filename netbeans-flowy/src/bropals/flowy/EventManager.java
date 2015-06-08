@@ -62,127 +62,6 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         return selectionManager;
     }
 
-    /**
-     * Find the selectable selected
-     *
-     * @param p A point that is in world units
-     * @return The thing that is closest under the mouse, or null if nothing was
-     * close.
-     */
-    private Selectable getSelectableUnderPoint(Point.Float p) {
-        Selectable thing = null; // initially nothing
-        for (Node n : window.getFlowchart().getNodes()) {
-            if (p.getX() > n.getX() && p.getX() < n.getX() + n.getWidth()
-                    && p.getY() > n.getY() && p.getY() < n.getY() + n.getHeight()) {
-                return n;
-            }
-        }
-
-        // it must be a minimum of 10 pixels away
-        double nearestDistance = 10 * (window.getCamera().getZoom());
-        // if no nodes were found, find the nearest line.
-        for (NodeLine nl : window.getFlowchart().getNodeLines()) {
-            // drag so we can get the points of the line
-            Point[] linePoints = nl.getStyle().getType().renderLine(nl, window.getCamera(), 
-                    window.getView().getGraphics(), 
-                    textTypeManager.isCursorShowing()&& nl == selectionManager.getLastSelected(), 
-                    textTypeManager.getLocationOfTypeCursor(), textTypeManager.getLinePartTyping());
-            Point.Float p1 = window.getCamera().convertCanvasToWorld(linePoints[0]);
-            Point.Float p2 = window.getCamera().convertCanvasToWorld(linePoints[1]);
-
-            // copied the formula from:
-            // http://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line
-            double distance = Math.abs(((p2.getY() - p1.getY()) * p.getX())
-                    - ((p2.getX() - p1.getX()) * p.getY()) + (p2.getX() * p1.getY())
-                    - (p2.getY() * p1.getX())) / Math.sqrt(Math.pow(p2.getY() - p1.getY(), 2)
-                            + Math.pow(p2.getX() - p1.getX(), 2));
-
-            if (distance < nearestDistance) {
-                nearestDistance = distance;
-                thing = nl;
-            }
-        }
-
-        return thing;
-    }
-
-    /**
-     * Get a list of all the selectables that are completely inside of the given
-     * box
-     *
-     * @param p The top left corner of the box in world units
-     * @param width The width of the box in world units
-     * @param height The height of the box in world units
-     * @return A list of all selectables (nodes and node-lines) that were
-     * completely inside of the box
-     */
-    private ArrayList<Selectable> getSelectablesUnderBox(Point p, float width, float height) {
-        // readjust the position of the box with negative width or heights
-        if (width < 0) {
-            p.setLocation(p.getX() + width, p.getY());
-            width = Math.abs(width);
-        }
-        if (height < 0) {
-            p.setLocation(p.getX(), p.getY() + height);
-            height = Math.abs(height);
-        }
-
-        ArrayList<Selectable> list = new ArrayList<>();
-        for (Node n : window.getFlowchart().getNodes()) {
-            if (p.getX() < n.getX() && p.getX() + width > n.getX() + n.getWidth()
-                    && p.getY() < n.getY() && p.getY() + height > n.getY() + n.getHeight()) {
-                list.add(n);
-            }
-        }
-        for (NodeLine nl : window.getFlowchart().getNodeLines()) {
-            if (list.contains(nl.getChild()) && list.contains(nl.getParent())
-                    && !list.contains(nl)) {
-                list.add(nl);
-            }
-        }
-
-        return list;
-    }
-
-    /**
-     * Remove everything in stuff from the flowchart.
-     *
-     * @param stuff What will be removed from flowchart.
-     */
-    private void removeSelectables(ArrayList<Selectable> stuff) {
-        for (Selectable s : stuff) {
-            if (s instanceof Node) {
-                for (int i=0; i<window.getFlowchart().getNodes().size(); i++) {
-
-                    if (window.getFlowchart().getNodes().get(i) == s) {
-                        Node removedNode = window.getFlowchart().getNodes().get(i);
-                        window.getFlowchart().getNodes().remove(i);
-                        // look through the other nodes...
-                        for (Node other : window.getFlowchart().getNodes()) {
-                            // to delete any node line that references the node we're removing
-                            for (NodeLine nl : other.getLinesConnected()) {
-                                // if the line references the removed node AT ALL
-                                if (other != removedNode && nl.getChild() == removedNode || nl.getParent() == removedNode) {
-                                    other.getLinesConnected().remove(nl);
-                                    break;
-                                }
-                            }
-                        }
-                         // break out of removing all the lines for that node
-                        break;
-                    }
-                }
-            } else if (s instanceof NodeLine) {
-                for (int i=0; i<window.getFlowchart().getNodes().size(); i++) {
-                    for (int l=0; l<window.getFlowchart().getNodes().get(i).getLinesConnected().size(); l++) {
-                        if (((NodeLine)s) == window.getFlowchart().getNodes().get(i).getLinesConnected().get(l)) {
-                            window.getFlowchart().getNodes().get(i).getLinesConnected().remove(l);
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     /**
      * ***** Methods for all the actions (as a level of indirection) ******
@@ -191,7 +70,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      * Delete all the selected nodes and deselect
      */
     public void deleteSelected() {
-        removeSelectables(selectionManager.getSelected());
+        selectionManager.removeSelectables(selectionManager.getSelected());
         selectionManager.clearSelection();
         window.redrawView();
     }
@@ -220,7 +99,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
     public void cutSelected() {
         if (!selectionManager.getSelected().isEmpty()) {
             dragManager.setStuffInClipboard(selectionManager.getSelected());
-            removeSelectables(selectionManager.getSelected());
+            selectionManager.removeSelectables(selectionManager.getSelected());
             selectionManager.clearSelection();
         }
         window.redrawView();
@@ -464,13 +343,13 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
 
                 int lengthOfEditingLine = 0;
                 switch (textTypeManager.getLinePartTyping()) {
-                    case 0:
+                    case TextTypeManager.CENTER:
                         lengthOfEditingLine = editLine.getCenterText().length();
                         break;
-                    case 1:
+                    case TextTypeManager.TAIL:
                         lengthOfEditingLine = editLine.getTailText().length();
                         break;
-                    case 2:
+                    case TextTypeManager.HEAD:
                         lengthOfEditingLine = editLine.getHeadText().length();
                         break;
                 }
@@ -482,13 +361,13 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 if (((int) e.getKeyChar()) == KeyEvent.VK_BACK_SPACE && lengthOfEditingLine > 0) {
                     // take off the last character in the string
                     switch (textTypeManager.getLinePartTyping()) {
-                        case 0:
+                        case TextTypeManager.CENTER:
                             editLine.setCenterText(deleteCharacter(editLine.getCenterText(), textTypeManager.getLocationOfTypeCursor()));
                             break;
-                        case 1:
+                        case TextTypeManager.TAIL:
                             editLine.setTailText(deleteCharacter(editLine.getTailText(), textTypeManager.getLocationOfTypeCursor()));
                             break;
-                        case 2:
+                        case TextTypeManager.HEAD:
                             editLine.setHeadText(deleteCharacter(editLine.getHeadText(), textTypeManager.getLocationOfTypeCursor()));
                             break;
                     }
@@ -502,30 +381,30 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                         textTypeManager.setLinePartTyping(0);
                     }
                     switch (textTypeManager.getLinePartTyping()) {
-                        case 0:
+                        case TextTypeManager.CENTER:
                             textTypeManager.setLocationOfTypeCursor(editLine.getCenterText().length());
                             break;
-                        case 1:
+                        case TextTypeManager.TAIL:
                             textTypeManager.setLocationOfTypeCursor(editLine.getTailText().length());
                             break;
-                        case 2:
+                        case TextTypeManager.HEAD:
                             textTypeManager.setLocationOfTypeCursor(editLine.getHeadText().length());
                             break;
                     }
                 } else if (((int) e.getKeyChar()) != KeyEvent.VK_BACK_SPACE) {
                     // add the typed character to the end
                     switch (textTypeManager.getLinePartTyping()) {
-                        case 0:
+                        case TextTypeManager.CENTER:
                             editLine.setCenterText(
                                     insertCharacter(editLine.getCenterText(), 
                                         "" + e.getKeyChar(), textTypeManager.getLocationOfTypeCursor()));
                             break;
-                        case 1:
+                        case TextTypeManager.TAIL:
                             editLine.setTailText(
                                     insertCharacter(editLine.getTailText(), 
                                         "" + e.getKeyChar(), textTypeManager.getLocationOfTypeCursor()));
                             break;
-                        case 2:
+                        case TextTypeManager.HEAD:
                             editLine.setHeadText(
                                     insertCharacter(editLine.getHeadText(), 
                                         "" + e.getKeyChar(), textTypeManager.getLocationOfTypeCursor()));
@@ -605,7 +484,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
     public void mousePressed(MouseEvent e) {
         Point.Float mousePosition = window.getCamera().convertCanvasToWorld(e.getPoint());
 
-        Selectable clickedOnThing = getSelectableUnderPoint(mousePosition);
+        Selectable clickedOnThing = selectionManager.getSelectableUnderPoint(mousePosition);
 
         Node node = null;
         NodeLine nodeLine = null;
@@ -854,7 +733,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     Node guideNode = dragManager.getNewlyMadeNode();
                     NodeLine connection = guideNode.getLinesConnected().get(0);
                     window.getFlowchart().getNodes().remove(guideNode);
-                    Selectable select = getSelectableUnderPoint(mousePosition);
+                    Selectable select = selectionManager.getSelectableUnderPoint(mousePosition);
                     if (select != null && select != connection.getParent() && select instanceof Node) {
                         connection.setChild((Node)select);
                         ((Node)select).getLinesConnected().add(connection);
@@ -875,7 +754,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         }
         if (e.getButton() == MouseEvent.BUTTON1 && dragManager.isBoxSelecting()) {
             // Find everything that was selected using the box select
-            ArrayList<Selectable> selectedItems = getSelectablesUnderBox(
+            ArrayList<Selectable> selectedItems = selectionManager.getSelectablesUnderBox(
                     new Point((int) dragManager.getInitialX(), (int) dragManager.getInitialY()),
                     dragManager.getOffsetX(), dragManager.getOffsetY());
             // clear selection
