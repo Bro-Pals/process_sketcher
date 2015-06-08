@@ -19,7 +19,8 @@ import java.awt.Polygon;
 import java.util.ArrayList;
 
 /**
- *
+ * Represents the shape of a node, which also indicates its meaning
+ * to the flowchart.
  * @author Jonathon
  */
 public enum Shape {
@@ -78,6 +79,12 @@ public enum Shape {
         return null;
     }
     
+    /**
+     * Interprets a string as a shape.
+     * @param str the string to interpret.
+     * @return the interpreted shape, or <code>null</code> if no shape
+     * was determined.
+     */
     public static Shape fromString(String str) {
         switch(str) {
             case "Action":
@@ -98,6 +105,15 @@ public enum Shape {
         return null;
     }
     
+    /**
+     * Creates a polygon in canvas coordinates from a set of points in world
+     * coordinates.
+     * @param points a set of points in world coordinates to construct
+     * the polygon out of.
+     * @param c the camera for the view.
+     * @return a polygon in canvas coordinates, constructed from the given 
+     * set of world coordinate points.
+     */
     private Polygon canvasPolyFromWorldCoordinates(Point.Float[] points, Camera c) {
         int x[] = new int[points.length];
         int y[] = new int[points.length];
@@ -108,6 +124,14 @@ public enum Shape {
         return new Polygon(x, y, points.length);
     }
     
+    /**
+     * Constructs and draws a canvas coordinate polygon from a set of
+     * world coordinate points.
+     * @param g the graphics context to draw the polygon.
+     * @param node the node that the polygon represents.
+     * @param points the set of points to construct the polygon from.
+     * @param c the camera for the view.
+     */
     private void drawPolygonFromPoints(Graphics2D g, Node node, Point.Float[] points, Camera c) {
         Polygon shape = canvasPolyFromWorldCoordinates(points, c);
 

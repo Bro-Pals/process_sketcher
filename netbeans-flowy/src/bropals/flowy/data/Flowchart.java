@@ -8,19 +8,28 @@ package bropals.flowy.data;
 import java.util.ArrayList;
 
 /**
- *
+ * An object to represent a flowchart.
  * @author Jonathon
  */
 public class Flowchart {
-    
+    /**
+     * The nodes that make up this Flowchart.
+     */
     private ArrayList<Node> nodes;
 
+    /**
+     * Create the default flowchart.
+     */
     public Flowchart() {
         nodes = new ArrayList<>();
         Node firstNode = new Node(100, 100);
         nodes.add(firstNode);
     }
     
+    /**
+     * Gets the nodes that make up this flowchart.
+     * @return the nodes that make up this flowchart.
+     */
     public ArrayList<Node> getNodes() {
         return nodes;
     }

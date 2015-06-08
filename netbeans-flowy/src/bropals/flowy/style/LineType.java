@@ -15,12 +15,22 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 
 /**
- *
+ * Represents the different types of lines.
  * @author Kevin
  */
 public enum LineType {
-
-    SOLID, DASHED, DOTTED;
+    /**
+     * A simple solid line.
+     */
+    SOLID, 
+    /**
+     * A dashed line.
+     */
+    DASHED, 
+    /**
+     * A dotted line.
+     */
+    DOTTED;
 
     @Override
     public String toString() {
@@ -35,6 +45,12 @@ public enum LineType {
         return null;
     }
 
+    /**
+     * Interprets a string as a line type.
+     * @param str the string to interpret.
+     * @return the interpreted line type, or <code>null</code> if
+     * none could be interpreted.
+     */
     public static LineType fromString(String str) {
         switch (str) {
             case "Solid":
@@ -47,6 +63,11 @@ public enum LineType {
         return null;
     }
 
+    /**
+     * Scoots a point to the nearest edge of a node. Used for line rendering.
+     * @param point the point to scoot.
+     * @param node the node to scoot the point to the edge of.
+     */
     private void scootPointToEdge(Point.Float point, Node node) {
         //Vector going from the center to the point in question
         Point.Float diffVec = new Point.Float(node.getX() + node.getWidth() / 2 - point.x, node.getY() + node.getHeight() / 2 - point.y);
@@ -168,9 +189,9 @@ public enum LineType {
                 );
                 float prog = 0;
                 while (prog < canvasLineLength) {
-                    g.fillOval(int_p1.x + (int) (diffX * prog) - 2, int_p1.y + (int) (diffY * prog) - 2,
-                            4, 4);
-                    prog += 12;
+                    g.fillOval(int_p1.x + (int) (diffX * prog) - (n.getStyle().getLineSize()), int_p1.y + (int) (diffY * prog) - (n.getStyle().getLineSize()),
+                            (n.getStyle().getLineSize()*2), (n.getStyle().getLineSize()*2));
+                    prog += (n.getStyle().getLineSize()*4);
                 }
                 break;
         }
