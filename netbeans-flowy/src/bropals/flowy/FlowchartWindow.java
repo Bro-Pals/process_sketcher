@@ -8,6 +8,7 @@ package bropals.flowy;
 import bropals.flowy.data.Flowchart;
 import bropals.flowy.data.Node;
 import bropals.flowy.data.NodeLine;
+import bropals.flowy.data.Selectable;
 import static bropals.flowy.icons.IconManager.getIcon;
 import bropals.flowy.listeners.AutoformatHorizontallyListener;
 import bropals.flowy.listeners.AutoformatVerticallyListener;
@@ -574,6 +575,78 @@ public class FlowchartWindow extends JFrame {
      */
     public void revalidateStyles() {
         stylesTab.revalidate();
+    }
+    
+    
+    /**
+     * Make all the tables invisible for the window.
+     */
+    public void makeAllStylesInvisible() {
+        getFontStylePanel().setVisible(false);
+        getLineStylePanel().setVisible(false);
+        getNodeStylePanel().setVisible(false);
+    }
+    
+    /**
+     * Make all of the tabs visible for the window.
+     */
+    public void makeAllStylesVisible() {
+        getFontStylePanel().setVisible(true);
+        getLineStylePanel().setVisible(true);
+        getNodeStylePanel().setVisible(true);
+    }
+    
+    /**
+     * Refresh what tabs are visible according to what's selected.
+     */
+    public void refreshStylesTabVisiblity() {
+        if (eventManager.getSelectionManager().getSelected().isEmpty()) {
+            makeAllStylesInvisible();
+        } else {
+            boolean hasNode = false;
+            boolean hasLine = false;
+            for (int i=0; i<eventManager.getSelectionManager().getSelected().size(); i++) {
+                if (eventManager.getSelectionManager().getSelected().get(i) instanceof Node) {
+                    hasNode = true;
+                } else if (eventManager.getSelectionManager().getSelected().get(i) instanceof NodeLine) {
+                    hasLine = true;
+                }
+                if (hasNode && hasLine) {
+                    makeAllStylesVisible();
+                    revalidateStyles();
+                    return;
+                }
+            }
+            getFontStylePanel().setVisible(true);
+            if (hasNode) {
+                getNodeStylePanel().setVisible(true);
+            } else if (hasLine) {
+                getLineStylePanel().setVisible(true);
+            }
+        }
+        revalidateStyles();
+    }
+    
+    /**
+     * Refreshes the styles tab GUI in the flowchart window using a Selectable
+     * @param s The selectable whose values will be used in updating the GUI.
+     */
+    public void refreshValuesOfStylesTabDueToNewSelection(Selectable s) {
+        Node n = null;
+        NodeLine nl = null;
+        if (s instanceof Node) {
+            n = (Node)s;
+        } else if (s instanceof NodeLine) {
+            nl = (NodeLine)s;
+        }
+        setFontPanelStyles(s.getFontStyle().getFontType(), s.getFontStyle().getFontColor(), s.getFontStyle().getFontSize());
+        if (n != null) {
+            //Node
+            setNodePanelStyles(n.getStyle().getShape(), n.getStyle().getBorderColor(), n.getStyle().getFillColor(), n.getStyle().getBorderSize());
+        } else if (nl != null) {
+            //NodeLine
+            setLinePanelStyles(nl.getStyle().getType(), nl.getStyle().getLineColor(), nl.getStyle().getLineSize());
+        }
     }
     
     /**

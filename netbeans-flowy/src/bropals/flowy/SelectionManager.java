@@ -54,8 +54,8 @@ public class SelectionManager {
      */
     public void select(Selectable selectable) {
         selected.add(selectable);
-        refreshStylesTabVisiblity();
-        refreshValuesOfStylesTabDueToNewSelection(selectable);
+        instance.refreshStylesTabVisiblity();
+        instance.refreshValuesOfStylesTabDueToNewSelection(selectable);
     }
     
     /**
@@ -64,7 +64,7 @@ public class SelectionManager {
      */
     public void deselect(Selectable selectable) {
         selected.remove(selectable);
-        refreshStylesTabVisiblity();
+        instance.refreshStylesTabVisiblity();
     }
     
     /**
@@ -72,79 +72,8 @@ public class SelectionManager {
      */
     public void clearSelection() {
         selected.clear();
-        makeAllStylesInvisible();
+        instance.makeAllStylesInvisible();
         instance.revalidateStyles();
-    }
-    
-    /**
-     * Make all the tables invisible for the window.
-     */
-    private void makeAllStylesInvisible() {
-        instance.getFontStylePanel().setVisible(false);
-        instance.getLineStylePanel().setVisible(false);
-        instance.getNodeStylePanel().setVisible(false);
-    }
-    
-    /**
-     * Make all of the tabs visible for the window.
-     */
-    private void makeAllStylesVisible() {
-        instance.getFontStylePanel().setVisible(true);
-        instance.getLineStylePanel().setVisible(true);
-        instance.getNodeStylePanel().setVisible(true);
-    }
-    
-    /**
-     * Refresh what tabs are visible according to what's selected.
-     */
-    private void refreshStylesTabVisiblity() {
-        if (selected.isEmpty()) {
-            makeAllStylesInvisible();
-        } else {
-            boolean hasNode = false;
-            boolean hasLine = false;
-            for (int i=0; i<selected.size(); i++) {
-                if (selected.get(i) instanceof Node) {
-                    hasNode = true;
-                } else if (selected.get(i) instanceof NodeLine) {
-                    hasLine = true;
-                }
-                if (hasNode && hasLine) {
-                    makeAllStylesVisible();
-                    instance.revalidateStyles();
-                    return;
-                }
-            }
-            instance.getFontStylePanel().setVisible(true);
-            if (hasNode) {
-                instance.getNodeStylePanel().setVisible(true);
-            } else if (hasLine) {
-                instance.getLineStylePanel().setVisible(true);
-            }
-        }
-        instance.revalidateStyles();
-    }
-    
-    /**
-     * Refreshes the styles tab GUI in the flowchart window using a Selectable
-     * @param s The selectable whose values will be used in updating the GUI.
-     */
-    private void refreshValuesOfStylesTabDueToNewSelection(Selectable s) {
-        Node n = null;
-        NodeLine nl = null;
-        if (s instanceof Node) {
-            n = (Node)s;
-        } else if (s instanceof NodeLine) {
-            nl = (NodeLine)s;
-        }
-        instance.setFontPanelStyles(s.getFontStyle().getFontType(), s.getFontStyle().getFontColor(), s.getFontStyle().getFontSize());
-        if (n != null) {
-            //Node
-            instance.setNodePanelStyles(n.getStyle().getShape(), n.getStyle().getBorderColor(), n.getStyle().getFillColor(), n.getStyle().getBorderSize());
-        } else if (nl != null) {
-            //NodeLine
-            instance.setLinePanelStyles(nl.getStyle().getType(), nl.getStyle().getLineColor(), nl.getStyle().getLineSize());
-        }
     }
   
     /**

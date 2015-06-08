@@ -26,18 +26,24 @@ import java.util.ArrayList;
  */
 public class EventManager implements KeyListener, MouseListener, MouseMotionListener, BooleanBlinkListener {
 
+    /**
+     * The SelectionManager used by this object and the window.
+     */
     private SelectionManager selectionManager;
+    /**
+     * The window that this event manager is a listener for.
+     */
     private FlowchartWindow window;
     /**
-     *
-     * NOTE: Make the camera not able to be transformed when dragging to the
-     * drag offsets work
-     *
+     * The DragManager for containing information about dragging things.
      */
     private DragManager dragManager;
+    /**
+     * Contains all the information and methods for typing text.
+     */
     private TextTypeManager textTypeManager;
     /**
-     * The variable to track if the spacebar is held down or not
+     * The variable to track if the spacebar is held down or not.
      */
     private boolean spacebar;
 
@@ -47,6 +53,10 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      */
     public final static float DRAG_RESIZE_DISTANCE = 6.0f;
 
+    /**
+     * Create a new EventManager 
+     * @param instance The window that this event manager is listening to.
+     */
     public EventManager(FlowchartWindow instance) {
         window = instance;
         selectionManager = new SelectionManager(instance);
@@ -54,10 +64,19 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         textTypeManager = new TextTypeManager();
     }
 
+    /**
+     * See if the given Selectable is selected
+     * @param s The selectable
+     * @return True if the selectable is selected; returns false if it's not selected.
+     */
     public boolean isSelected(Selectable s) {
         return selectionManager.getSelected().contains(s);
     }
     
+    /**
+     * Get the selection manager used by this event manager
+     * @return the selection manager used by this event manager
+     */
     public SelectionManager getSelectionManager() {
         return selectionManager;
     }
@@ -809,6 +828,10 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
 
     }
 
+    /**
+     * Get the drag manager used by this event manager
+     * @return the drag manager used by this event manager
+     */
     public DragManager getDragManager() {
         return dragManager;
     }
@@ -819,6 +842,10 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         window.redrawView();
     }
     
+    /**
+     * Get the text type manager used by this event manager
+     * @return the text type manager used by this event manager
+     */
     public TextTypeManager getTextTypeManager() {
         return textTypeManager;
     }

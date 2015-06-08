@@ -28,7 +28,13 @@ public class Node implements Selectable {
      */
     private NodeStyle style;
     private float x, y, width, height;
+    /**
+     * A list of all the lines connected to this node.
+     */
     private ArrayList<NodeLine> linesConnected;
+    /**
+     * The text that is inside of this Node.
+     */
     private String innerText;
     
     /**
