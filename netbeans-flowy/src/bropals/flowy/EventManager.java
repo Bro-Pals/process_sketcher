@@ -112,7 +112,6 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      * Make a new flowchart window
      */
     public void createNewFlowchart() {
-        System.out.println("Creating a flowchart");
         window.getFlowchartWindowManager().newFlowchart();
         window.redrawView();
     }
@@ -199,7 +198,6 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     selectionManager.select(nl);
             }
             
-            System.out.println("Pasted " + pastedNodes.size() + " nodes");
         }
     }
     
@@ -258,7 +256,6 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     nextNodeIsThere = true;
                     selectionManager.clearSelection();
                     selectionManager.select(nextNode);
-                    //System.out.println("selecting next node");
                 }
             }
 
@@ -278,7 +275,6 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 // select your newly created node
                 selectionManager.clearSelection();
                 selectionManager.select(createdNode);
-                //System.out.println("New node " + createdNode + " from the node " + selectedNode);
             }
         }
         window.redrawView();
@@ -326,7 +322,6 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
     
     @Override
     public void keyTyped(KeyEvent e) {
-        //System.out.println("Typed a character: " + e.getKeyChar());
 
         // if you're selecting soemthing that you aren't holding alt or control (for a different action)
         if (selectionManager.getLastSelected() != null && !e.isAltDown() && !e.isControlDown()) {
@@ -355,13 +350,6 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     if (textTypeManager.getLocationOfTypeCursor() > 0) {
                         textTypeManager.decrementLocationOfTypeCursor();
                     }
-                } else if (((int) e.getKeyChar()) == KeyEvent.VK_ENTER) {
-                    // add a new line
-                    /*System.out.println("insert a new line");
-                    editNode.setInnerText(insertCharacter(editNode.getInnerText(), 
-                            " " + newLineSequence + " ", textTypeManager.getLocationOfTypeCursor()));
-                    textTypeManager.getLocationOfTypeCursor() +=2;
-                    */
                 } else if (((int) e.getKeyChar()) != KeyEvent.VK_BACK_SPACE) {
                     // add the typed character to the end
                     editNode.setInnerText(insertCharacter(editNode.getInnerText(), 
@@ -547,7 +535,6 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
             }
             return;
         }
-        //System.out.println(node);
         // actions involving a node
         if (node != null) {
             if (!dragManager.isDragging()) { // not yet dragging anything...
@@ -575,7 +562,6 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     node.getLinesConnected().add(line);
                     dragManager.setNewlyMadeNode(createdNode);
                     dragManager.setRightMouseDown(true);
-                    //System.out.println("New node " + createdNode + " from the node " + node);
                     window.redrawView();
                 }
             }
