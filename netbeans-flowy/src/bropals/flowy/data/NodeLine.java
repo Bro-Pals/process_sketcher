@@ -17,11 +17,29 @@ import bropals.flowy.style.FontStyle;
  */
 public class NodeLine implements Selectable {
     
+    /**
+     * The parent node of this line.
+     */
     private Node parent;
+    /**
+     * The child node of this line.
+     */
     private Node child;
+    /**
+     * The style used by this line.
+     */
     private LineStyle style;
+    /**
+     * THe text that will render near the tail of this line.
+     */
     private String tailText;
+    /**
+     * The text that will render near the center of this line.
+     */
     private String centerText;
+    /**
+     * The text that will render near the head of this line.
+     */
     private String headText;
 
     /**
