@@ -57,6 +57,32 @@ public enum Shape {
      * A Shape that doesn't render anything
      */
     NONE;
+    
+    /**
+     * Gets the meaning of the shape.
+     * @return the meaning of the shape.
+     */
+    public String getMeaning() {
+        switch(this) {
+            case ACTION:
+                return "Represents a step of a larger process.";
+            case DECISION:
+                return "A decision or branching point.";
+            case DELAY:
+                return "Indicates a delay in a process.";
+            case DOCUMENT:
+                return "A printed document or report.";
+            case INPUT_OUTPUT:
+                return "Represents material or information entering or "
+                        + "leaving a system.";
+            case MERGE:
+                return "Indicates a step where two or more sub-lists or "
+                        + "sub-processes become one.";
+            case START_END:
+                return "Marks the start or end point of a system.";
+        }
+        return null;
+    }
 
     @Override
     public String toString() {
