@@ -14,7 +14,6 @@ import bropals.flowy.style.FontStyle;
  * @author Jonathon
  */
 public interface Selectable {
-    void render(Camera camera, Graphics g);
     /**
      * Gets the style that controls the font of the selectable.
      * @return 

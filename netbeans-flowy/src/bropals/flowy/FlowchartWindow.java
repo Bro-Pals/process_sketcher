@@ -273,14 +273,26 @@ public class FlowchartWindow extends JFrame {
         }
     }
     
+    /**
+     * Get the camera being used to render for this window
+     * @return the camera being used to render for this window
+     */
     public Camera getCamera() {
         return camera;
     }
 
+    /**
+     * Get the event manager handling events for this window
+     * @return the event manager handling events for this window
+     */
     public EventManager getEventManager() {
         return eventManager;
     }
     
+    /**
+     * Get the camera controls
+     * @return the camera controls
+     */
     public CameraControls getCameraControls() {
         return cameraControls;
     }
@@ -303,6 +315,10 @@ public class FlowchartWindow extends JFrame {
         return flowchart;
     }
 
+    /**
+     * Get the flowchart window manager
+     * @return The flowchart window manager
+     */
     public FlowchartWindowManager getFlowchartWindowManager() {
         return flowchartWindowManager;
     }
@@ -528,14 +544,26 @@ public class FlowchartWindow extends JFrame {
         view.setCursor(Cursor.getDefaultCursor());
     }
 
+    /**
+     * Get the font style panel
+     * @return The font style panel
+     */
     public JPanel getFontStylePanel() {
         return fontStylePanel;
     }
 
+    /**
+     * Get the line style panel
+     * @return The line style panel
+     */
     public JPanel getLineStylePanel() {
         return lineStylePanel;
     }
 
+    /**
+     * Get the node style panel
+     * @return The node style panel
+     */
     public JPanel getNodeStylePanel() {
         return nodeStylePanel;
     }
@@ -638,42 +666,82 @@ public class FlowchartWindow extends JFrame {
         }
     }
     
+    /**
+     * Get the font combo box component
+     * @return The font combo box component
+     */
     public JComboBox<Font> getFontComboBox() {
         return this.font;
     }
     
+    /**
+     * Get the font size spinner component
+     * @return The font size spinner component
+     */
     public JSpinner getFontSizeSpinner() {
         return this.fontSize;
     }
     
+    /**
+     * Get the font color button
+     * @return the font color button
+     */
     public JButton getFontColorButton() {
         return this.fontColor;
     }
     
+    /**
+     * Get the border color button
+     * @return the border color button
+     */
     public JButton getBorderColorButton() {
         return this.borderColor;
     }
     
+    /**
+     * Get the fill color button
+     * @return the fill color button
+     */
     public JButton getFillColorButton() {
         return this.fillColor;
     }
     
+    /**
+     * Get the border size spinner component
+     * @return the border size spinner component
+     */
     public JSpinner getBorderSizeSpinner() {
         return this.borderSize;
     }
     
+    /**
+     * Get the shape combo box component
+     * @return Get the shape combo box component
+     */
     public JComboBox<String> getShapeComboBox() {
         return shape;
     }
     
+    /**
+     * Get the line type combo box component
+     * @return the line type combo box component
+     */
     public JComboBox<String> getLineTypeComboBox() {
         return lineType;
     }
     
+    /**
+     * Get the line size spinner component
+     * @return the line size spinner component
+     */
     public JSpinner getLineSizeSpinner() {
         return lineSize;
     }
     
+    /**
+     * Get the line color button
+     * @return the line color button
+     */
     public JButton getLineColorButton() {
         return lineColor;
     }

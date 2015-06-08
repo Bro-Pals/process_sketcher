@@ -38,11 +38,6 @@ public class NodeLine implements Selectable {
         headText = "";
     }
     
-    @Override
-    public void render(Camera camera, Graphics g) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
     /**
      * Gets the parent node (the node on the tail side).
      * @return the parent node.

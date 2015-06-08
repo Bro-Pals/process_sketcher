@@ -266,8 +266,27 @@ public enum LineType {
         return new Point[]{int_p1, int_p2};
     }
     
-    /// a method to reduce the amount of copy pasting
-    public int[] renderText(String text, float distanceRatio, float originalParentPointX, 
+    /**
+     * A method that takes away the copy pasting of rendering the text
+     * @param text The text to draw
+     * @param distanceRatio The ratio of where on the line the text is drawn. 
+     *              It's a value from 0 to 1
+     * @param originalParentPointX The x position where the line originates
+     * @param originalParentPointY The y position where the line originates
+     * @param cursorConditional The value to test the partCursorDrawing value to 
+     *          to decide if the cursor will be drawn on this text
+     * @param partCursorDrawing The value indicating what part of the line the cursor
+     *              will be drawn on
+     * @param lineLength The length of the line
+     * @param diffY The s component of the normalized vector for the line
+     * @param diffX The y component of the normalized vector for the line
+     * @param g The graphics context
+     * @param cursorLocation The location of the cursor
+     * @param camera The camera context
+     * @param blinkCursor Whether or not the cursor will be showing
+     * @return 
+     */
+    private int[] renderText(String text, float distanceRatio, float originalParentPointX, 
             float originalParentPointY, int cursorConditional, int partCursorDrawing, float lineLength, 
             float diffY, float diffX, Graphics g, int cursorLocation, Camera camera, boolean blinkCursor) {
         int cursorRenderX = 0;

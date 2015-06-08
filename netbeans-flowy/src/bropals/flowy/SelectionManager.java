@@ -117,6 +117,10 @@ public class SelectionManager {
         return nodes;
     }
     
+    /**
+     * Get a list of all the NodeLines currently selected. Adding
+     * @return 
+     */
     public ArrayList<NodeLine> getSelectedNodeLines() {
         ArrayList<NodeLine> nodelines = new ArrayList<>();
         for (int i=0; i<selected.size(); i++) {
@@ -127,6 +131,12 @@ public class SelectionManager {
         return nodelines;
     }
     
+    /**
+     * Get the most recently selected Selectable. This can be a Node
+     * Or a NodeLine. If nothing is selected, this returns null.
+     * @return The most recently selected Selectable, or returns null 
+     *      if nothing is selected
+     */
     public Selectable getLastSelected() {
         if (!selected.isEmpty()) {
             return selected.get(selected.size() - 1);

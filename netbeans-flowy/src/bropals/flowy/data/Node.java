@@ -46,11 +46,6 @@ public class Node implements Selectable {
         innerText = "";
     }
     
-    @Override
-    public void render(Camera camera, Graphics g) {
-        
-    }
-    
     /**
      * Gets the node style that is controlling the look of this Node.
      * @return the style controlling the look of this Node.
