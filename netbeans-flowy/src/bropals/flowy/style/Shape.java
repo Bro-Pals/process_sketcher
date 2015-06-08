@@ -184,9 +184,9 @@ public enum Shape {
                 
                 drawPolygonFromPoints(g2, node, new Point.Float[] { p1, p2, p3, p4 }, camera);
                 
-                startEverythingX += camera.convertWorldToCanvasX(node.getWidth()/4);
-                startEverythingY += camera.convertWorldToCanvasY(node.getHeight()/4);
-                width -= camera.convertWorldToCanvasX(node.getWidth()/2);
+                startEverythingX += (node.getWidth()/4) / camera.getZoom();
+                startEverythingY += (node.getHeight()/4) / camera.getZoom();
+                width -= (node.getWidth()/2) / camera.getZoom();
                 break;
             case START_END:
                 p1 = new Point.Float(node.getX(), node.getY());
@@ -206,9 +206,9 @@ public enum Shape {
                 g2.setStroke(new BasicStroke(1));
                 
                 float constant = (float)(1-(Math.sqrt(2)/2))/2;
-                startEverythingX += camera.convertWorldToCanvasX(node.getWidth()*constant);
-                startEverythingY += camera.convertWorldToCanvasY(node.getHeight()*constant);
-                width -= camera.convertWorldToCanvasX(node.getWidth()*constant*2);
+                startEverythingX += (node.getWidth()*constant) / camera.getZoom();
+                startEverythingY += (node.getHeight()*constant) / camera.getZoom();
+                width -= (node.getWidth()*constant*2) / camera.getZoom();
                 break;
             case MERGE:
                 p1 = new Point.Float(node.getX() + (node.getWidth()/2), node.getY() + node.getHeight() );
@@ -217,8 +217,8 @@ public enum Shape {
                                 
                 drawPolygonFromPoints(g2, node, new Point.Float[]{p1, p2, p3}, camera);
                 
-                startEverythingX += camera.convertWorldToCanvasX(node.getWidth()/4);
-                width -= camera.convertWorldToCanvasX(node.getWidth()/2);
+                startEverythingX += (node.getWidth()/4) / camera.getZoom();
+                width -= (node.getWidth()/2) / camera.getZoom();
                 break;
             case DELAY:
                 p1 = new Point.Float(node.getX(), node.getY());
@@ -257,8 +257,8 @@ public enum Shape {
                 
                 drawPolygonFromPoints(g2, node, new Point.Float[]{p1, p2, p3, p4}, camera);           
                 
-                startEverythingX += camera.convertWorldToCanvasX(node.getWidth()/4);
-                width -= camera.convertWorldToCanvasX(node.getWidth()/2);
+                startEverythingX += (node.getWidth()/4) / camera.getZoom();
+                width -= (node.getWidth()/2) / camera.getZoom();
                 break;
             case DOCUMENT:
                 p1 = new Point.Float(node.getX(), node.getY());
@@ -290,6 +290,7 @@ public enum Shape {
                 break;
         }
 
+        // only draw text if there is text
         if (node.getInnerText().length() > 0) {
             g2.setColor(node.getStyle().getFontColor());
             
