@@ -19,10 +19,28 @@
  */
 package bropals.flowy.action;
 
+import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.NodeLine;
+
 /**
  * An action that occurs when you edit text in a node line.
  * @author Kevin
  */
-public class EditedNodeLineText {
+public class EditedNodeLineText extends Action {
+
+    private NodeLine line;
+    private String oldText;
+    private int partOfLine;
+    
+    public EditedNodeLineText(NodeLine lineEdited, String textOld, int partOfTheLine) {
+        line = lineEdited;
+        oldText = textOld;
+        partOfLine = partOfTheLine;
+    }
+    
+    @Override
+    public void undo(FlowchartWindow instance) {
+        System.out.println("Undo changing text on a NodeLine");
+    }
     
 }

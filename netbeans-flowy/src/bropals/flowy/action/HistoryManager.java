@@ -20,6 +20,7 @@
 package bropals.flowy.action;
 
 import bropals.flowy.FlowchartWindow;
+import java.awt.Dimension;
 import java.util.ArrayList;
 
 /**
@@ -40,6 +41,10 @@ public class HistoryManager {
      * The FlowchartWindow this HistoryManager is keeping track of the history of.
      */
     private FlowchartWindow instance;
+    /**
+     * Used for saving the size of something.
+     */
+    private Dimension savedSize;
     
     /**
      * Creates a new HistoryManager for the given FlowchartWindow.
@@ -47,6 +52,8 @@ public class HistoryManager {
      */
     public HistoryManager(FlowchartWindow window) {
         instance = window;
+        savedSize = null;
+        actions = new ArrayList<>();
     }
     
     /**
@@ -54,9 +61,11 @@ public class HistoryManager {
      * from the history.
      */
     public void undoLastAction() {
-        int last = actions.size() - 1;
-        actions.get(last).undo(instance);
-        actions.remove(last);
+        if (actions.size() > 0) {
+            int last = actions.size() - 1;
+            actions.get(last).undo(instance);
+            actions.remove(last);
+        }
     }
     
     /**
@@ -69,5 +78,21 @@ public class HistoryManager {
         if (actions.size() > HISTORY_LIMIT) {
             actions.remove(0);
         }
+    }
+    
+    /**
+     * Save the given dimension to the HistoryManager.
+     * @param d The dimension to save
+     */
+    public void saveDimension(Dimension d) {
+        savedSize = d;
+    }
+    
+    /**
+     * Get the saved dimension
+     * @return the saved dimension
+     */
+    public Dimension getSavedDimension() {
+        return savedSize;
     }
 }

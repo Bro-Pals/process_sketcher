@@ -20,6 +20,7 @@
 package bropals.flowy.action;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.Node;
 
 /**
  * An action that occurs when you edit text on a node
@@ -27,9 +28,17 @@ import bropals.flowy.FlowchartWindow;
  */
 public class EditedNodeText extends Action {
 
+    private Node node;
+    private String text;
+    
+    public EditedNodeText(Node editedNode, String oldText) {
+        node = editedNode;
+        text = oldText;
+    }
+    
     @Override
     public void undo(FlowchartWindow instance) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        System.out.println("undo edited node text");
     }
     
 }

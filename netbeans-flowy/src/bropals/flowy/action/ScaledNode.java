@@ -20,6 +20,8 @@
 package bropals.flowy.action;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.Node;
+import java.awt.Dimension;
 
 /**
  * An action that occurs when you scale a Node
@@ -27,9 +29,17 @@ import bropals.flowy.FlowchartWindow;
  */
 public class ScaledNode extends Action {
 
+    private Node node;
+    private Dimension dimension;
+    
+    public ScaledNode(Node editedNode, Dimension oldDimension) {
+        node = editedNode;
+        dimension = oldDimension;
+    }
+    
     @Override
     public void undo(FlowchartWindow instance) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        System.out.println("Undid scaling a node");
     }
     
 }

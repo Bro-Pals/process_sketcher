@@ -20,6 +20,7 @@
 package bropals.flowy.action;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.NodeLine;
 
 /**
  * An action that occurs when you connect two nodes together
@@ -27,9 +28,18 @@ import bropals.flowy.FlowchartWindow;
  */
 public class ConnectedNodes extends Action {
 
+    /**
+     * The line that was created from the action occuring.
+     */
+    private NodeLine line;
+    
+    public ConnectedNodes(NodeLine lineCreated) {
+        line = lineCreated;
+    }
+    
     @Override
     public void undo(FlowchartWindow instance) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        System.out.println("Undid connecting two lines together");
     }
     
 }

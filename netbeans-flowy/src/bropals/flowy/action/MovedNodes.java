@@ -20,6 +20,7 @@
 package bropals.flowy.action;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.Node;
 
 /**
  * An action that occurs when you move one or more nodes.
@@ -27,9 +28,24 @@ import bropals.flowy.FlowchartWindow;
  */
 public class MovedNodes extends Action {
 
+    private Node[] nodesMoved;
+    /**
+     * How much to offset each node from the initial x and y position
+     */
+    private float[][] offsetsOfNodes;
+    private float initialXPos;
+    private float initialYPos;
+    
+    public MovedNodes(Node[] nodesMoved, float[][] offsetsOfNodes, float initialX, float initialY) {
+        this.nodesMoved = nodesMoved;
+        this.offsetsOfNodes = offsetsOfNodes;
+        this.initialXPos = initialX;
+        this.initialYPos = initialY;
+    }
+    
     @Override
     public void undo(FlowchartWindow instance) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        System.out.println("Undo moving Nodes");
     }
     
 }

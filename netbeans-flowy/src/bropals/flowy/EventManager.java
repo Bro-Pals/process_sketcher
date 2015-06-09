@@ -26,6 +26,7 @@ import bropals.flowy.data.Selectable;
 import bropals.flowy.style.NodeStyle;
 import bropals.flowy.style.Shape;
 import bropals.flowy.util.BooleanBlinkListener;
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -237,7 +238,11 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 newlySelected.add(s);
             }
         }
-        historyManager.addToHistory(new Selected(newlySelected));
+        
+        // add the newly added things only if there are any
+        if (!newlySelected.isEmpty()) {
+            historyManager.addToHistory(new Selected(newlySelected));
+        }
     }
 
     /**
@@ -302,6 +307,8 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 // select your newly created node
                 selectionManager.clearSelection();
                 selectionManager.select(createdNode);
+                // add creating a node through tabbing to history
+                historyManager.addToHistory((new CreatedConnectedNodeTabbed(createdNode, line, initialSelected)));
             } else {
                 // if no node is created the action was a selection from tabbing
                 historyManager.addToHistory(new SelectedTabbed(initialSelected));
@@ -327,6 +334,8 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         } else if (cursorLocation == original.length()) {
             return original.substring(0, original.length() - 1);
         }
+        
+        
         // wo|rd   ->   w|rd   (location 2)
         return (original.substring(0, cursorLocation - 1) + original.substring(cursorLocation));
     }
@@ -374,6 +383,8 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 if (textTypeManager.getLocationOfTypeCursor() > editNode.getInnerText().length() || textTypeManager.getLocationOfTypeCursor() < 0)
                     textTypeManager.setLocationOfTypeCursor(editNode.getInnerText().length());
 
+                String oldText = editNode.getInnerText();
+                
                 if (((int) e.getKeyChar()) == KeyEvent.VK_BACK_SPACE && editNode.getInnerText().length() > 0) {
                     // take off the character at the location of the string
                     editNode.setInnerText(deleteCharacter(editNode.getInnerText(), textTypeManager.getLocationOfTypeCursor()));
@@ -387,28 +398,37 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     textTypeManager.incrementLocationOfTypeCursor();
                 }
                 
+                if (!oldText.equals(editNode.getInnerText())) {
+                    historyManager.addToHistory(new EditedNodeText(editNode, oldText));
+                }
+                
             // if you're selecting a node line...
             } else if (selectionManager.getLastSelected() != null
                     && selectionManager.getLastSelected() instanceof NodeLine) {
                 NodeLine editLine = (NodeLine) selectionManager.getLastSelected();
 
+                String oldText = "";
+                
                 int lengthOfEditingLine = 0;
                 switch (textTypeManager.getLinePartTyping()) {
                     case TextTypeManager.CENTER:
                         lengthOfEditingLine = editLine.getCenterText().length();
+                        oldText = editLine.getCenterText();
                         break;
                     case TextTypeManager.TAIL:
                         lengthOfEditingLine = editLine.getTailText().length();
+                        oldText = editLine.getTailText();
                         break;
                     case TextTypeManager.HEAD:
                         lengthOfEditingLine = editLine.getHeadText().length();
+                        oldText = editLine.getHeadText();
                         break;
                 }
 
                 // move the cursor to the end of the newly selected line
                 if (textTypeManager.getLocationOfTypeCursor() > lengthOfEditingLine || textTypeManager.getLocationOfTypeCursor() < 0)
                     textTypeManager.setLocationOfTypeCursor(lengthOfEditingLine);
-                
+                                
                 if (((int) e.getKeyChar()) == KeyEvent.VK_BACK_SPACE && lengthOfEditingLine > 0) {
                     // take off the last character in the string
                     switch (textTypeManager.getLinePartTyping()) {
@@ -423,7 +443,6 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                             break;
                     }
                     textTypeManager.decrementLocationOfTypeCursor();
-
                 } else if (((int) e.getKeyChar()) == KeyEvent.VK_ENTER) {
                     // cycle what part of the line that is being edited
                     if (textTypeManager.getLinePartTyping() < 2) {
@@ -463,6 +482,10 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     }
                     textTypeManager.incrementLocationOfTypeCursor();
                 }
+                
+                if (!oldText.equals("")) {
+                    historyManager.addToHistory(new EditedNodeLineText(editLine, oldText, textTypeManager.getLinePartTyping()));
+                }
             }
         }
 
@@ -477,6 +500,9 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 break;
             case KeyEvent.VK_DELETE:
                 deleteSelected();
+                break;
+            case KeyEvent.VK_Z:
+                historyManager.undoLastAction();
                 break;
             case KeyEvent.VK_N:
                 if (e.isControlDown()) {
@@ -563,6 +589,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 dragManager.startDragResizeRight(resizing);
                 window.resizeRightCursor();
             }
+            historyManager.saveDimension(new Dimension((int)resizing.getWidth(), (int)resizing.getHeight()));
             return;
         }
         // actions involving a node
@@ -597,14 +624,21 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
             }
 
             if (e.getButton() == MouseEvent.BUTTON1) {
-                if (!e.isShiftDown()) {
-                    selectionManager.clearSelection();
-                }
-
                 if (!selectionManager.getSelected().contains(clickedOnThing)) {
+                    if (!e.isShiftDown()) {
+                        selectionManager.clearSelection();
+                    }
                     selectionManager.select(clickedOnThing);
+                    //record that this was added to the selection
+                    historyManager.addToHistory(new Selected(clickedOnThing));
                 }
+                
                 if (selectionManager.getSelectedNodes().contains(node)) {
+                    // if shift was not held down, only select and transform the clicked on node
+                    if (!e.isShiftDown()) {
+                        selectionManager.clearSelection();
+                        selectionManager.getSelected().add(node);
+                    }
                     dragManager.startDragMove(mousePosition.x, mousePosition.y);
                     dragManager.setLeftMouseDown(true);
                 } else {
@@ -781,23 +815,43 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 if (dragManager.getNewlyMadeNode().getStyle().getShape() == Shape.NONE)  {
                     Node guideNode = dragManager.getNewlyMadeNode();
                     NodeLine connection = guideNode.getLinesConnected().get(0);
+                    // remove the guide node
                     window.getFlowchart().getNodes().remove(guideNode);
                     Selectable select = selectionManager.getSelectableUnderPoint(mousePosition);
                     if (select != null && select != connection.getParent() && select instanceof Node) {
                         connection.setChild((Node)select);
                         ((Node)select).getLinesConnected().add(connection);
+                        // record that a connection was mad
+                        historyManager.addToHistory(new ConnectedNodes(connection));
                     } else {
                         connection.getParent().getLinesConnected().remove(connection);
                     }
+                } else {
+                    historyManager.addToHistory(new CreatedConnectedNode(
+                            dragManager.getNewlyMadeNode(), 
+                            dragManager.getNewlyMadeNode().getLinesConnected().get(0)));
                 }
                 dragManager.setNewlyMadeNode(null);
                 dragManager.setDragging(false); // done dragging the newly created node
             }
             if (dragManager.isDragResizing()) {
+                // record the scale to history only if it changed
+                if ((int)dragManager.getResizingNode().getWidth() != (int)historyManager.getSavedDimension().getWidth() ||
+                        (int)dragManager.getResizingNode().getHeight() != (int)historyManager.getSavedDimension().getHeight()) {
+                    historyManager.addToHistory(new ScaledNode(dragManager.getResizingNode(), historyManager.getSavedDimension()));
+                }
                 dragManager.endDragResize();
                 window.defaultCursor();
             }
             if (dragManager.isDragMoving()) {
+                // record the moving of nodes to history if it did move
+                if (dragManager.getOffsetX() != 0 || dragManager.getOffsetY() != 0) {
+                    historyManager.addToHistory(new MovedNodes(
+                            dragManager.getMoveDraggingNodesArray(), 
+                            dragManager.getMoveDraggingOffsetsArray(), 
+                            dragManager.getInitialX(), 
+                            dragManager.getInitialY()));
+                }
                 dragManager.endDragMove();
             }
         }
@@ -810,11 +864,18 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
             if (!e.isShiftDown()) {
                 selectionManager.clearSelection();
             }
+            ArrayList<Selectable> addedToSelection = new ArrayList<>();
             for (int i = 0; i < selectedItems.size(); i++) {
                 if (!selectionManager.getSelected().contains(selectedItems.get(i))) {
                     selectionManager.select(selectedItems.get(i));
+                    addedToSelection.add(selectedItems.get(i));
                 }
             }
+            // record the newly selected items only if there was anything newly selected
+            if (!addedToSelection.isEmpty()) {
+                historyManager.addToHistory(new Selected(addedToSelection));
+            }
+            
             dragManager.setBoxSelecting(false);
             dragManager.setDragging(false);
             dragManager.setLeftMouseDown(false);

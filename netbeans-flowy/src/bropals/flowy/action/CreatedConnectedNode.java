@@ -20,6 +20,8 @@
 package bropals.flowy.action;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.Node;
+import bropals.flowy.data.NodeLine;
 
 /**
  * The action that occurs when you make a new node by dragging it from an 
@@ -28,9 +30,17 @@ import bropals.flowy.FlowchartWindow;
  */
 public class CreatedConnectedNode extends Action {
 
+    private Node node;
+    private NodeLine line;
+    
+    public CreatedConnectedNode(Node createdNode, NodeLine createdNodeLine) {
+        node = createdNode;
+        line = createdNodeLine;
+    }
+    
     @Override
     public void undo(FlowchartWindow instance) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        System.out.println("Undo created a node with a connection on it");
     }
     
 }

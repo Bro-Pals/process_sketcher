@@ -29,6 +29,9 @@ import java.util.ArrayList;
  */
 public class Selected extends Action {
 
+    /**
+     * The Selectables that will be removed from the selected when this is undone.
+     */
     private ArrayList<Selectable> selected;
     
     public Selected(Selectable addedToSelection) {
