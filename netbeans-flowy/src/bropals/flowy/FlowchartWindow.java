@@ -19,6 +19,7 @@
  */
 package bropals.flowy;
 
+import bropals.flowy.data.BinaryUtil;
 import bropals.flowy.data.Flowchart;
 import bropals.flowy.data.Node;
 import bropals.flowy.data.NodeLine;
@@ -69,12 +70,20 @@ import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -82,6 +91,7 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.ListCellRenderer;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * Used for editing a Flowchart.
@@ -97,9 +107,21 @@ public class FlowchartWindow extends JFrame {
      */
     private Flowchart flowchart;
     /**
+     * The current flowchart file location.
+     */
+    private File file;
+    /**
      * Manages events related to the view.
      */
     private EventManager eventManager;
+    /**
+     * Handles the saved styles.
+     */
+    private StyleManager styleManager;
+    /**
+     * The file chooser.
+     */
+    private JFileChooser fc;
     /**
      * Handles the camera controls.
      */
@@ -160,7 +182,7 @@ public class FlowchartWindow extends JFrame {
      * @param manager the FlowchartWindowManager.
      */
     public FlowchartWindow(FlowchartWindowManager manager) {
-        this(manager, null);
+        this(manager, null, null);
     }
     
     /**
@@ -168,14 +190,27 @@ public class FlowchartWindow extends JFrame {
      * an input stream to edit it.
      * @param manager the FlowchartWindowManager.
      * @param stream the stream to read the flowchart data from.
+     * @param location the file location the flowchart data comes from, if 
+     * it is a file.
      */
-    public FlowchartWindow(FlowchartWindowManager manager, InputStream stream) {
+    public FlowchartWindow(FlowchartWindowManager manager, InputStream stream, File location) {
+        styleManager = new StyleManager();
         if (stream != null) {
-            //Load the flowchart here
+            flowchart = readFlowchartData(stream);
         } else {
-            flowchart = new Flowchart(); // a new empty flowchart with one default node
+            flowchart = new Flowchart(true); // a new empty flowchart with one default node
+            flowchart.passStyleManager(styleManager);
         }
         flowchartWindowManager = manager;
+        fc = new JFileChooser();
+        if (location != null) {
+            file = location;
+            fc.setCurrentDirectory(location.getParentFile());
+        }
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fc.setMultiSelectionEnabled(false);
+        //Configure the file chooser so it can only act on .fwy files.
+        fc.setFileFilter(new FileNameExtensionFilter("Flowy flowchart files (*.fwy)", "fwy"));
         eventManager = new EventManager(this);
         buttonPanel = new JTabbedPane();
         buttonPanel.setPreferredSize(new Dimension(400, 105));
@@ -831,5 +866,87 @@ public class FlowchartWindow extends JFrame {
      */
     public JButton getLineColorButton() {
         return lineColor;
+    }
+    
+    /**
+     * Creates a flowchart from data obtained from an InputStream.
+     * This function closes the InputStream.
+     * @param stream the stream with the flowchart data, opened.
+     * @return the loaded flowchart.
+     */
+    public final Flowchart readFlowchartData(InputStream stream) {
+        Flowchart chart = new Flowchart(false);
+        byte[] data = null;
+        try {
+            byte[] bSize = new byte[4];
+            stream.read(bSize, 0, 4);
+            int fileSize = BinaryUtil.bytesToInt(bSize, 0);
+            data = new byte[fileSize];
+            stream.read(data, 0, fileSize);
+            stream.close();
+        } catch(IOException e) {
+            System.err.println("Could not read flowchart from input stream: " + e);
+        }
+        if (data != null) {
+            chart.passStyleManager(styleManager);
+            chart.fromBinary(data, 0, this);
+            return chart;
+        } else {
+            System.err.println("Unable to read flowchart, using the default flowchart instead.");
+            return new Flowchart(true);
+        }
+    }
+    
+    /**
+     * Saves this FlowchartWindow's current flowchart to a destination
+     * stream.
+     * This function flushes and closes the OutputStream.
+     * @param stream the destination stream, opened.
+     */
+    public void writeFlowchartData(OutputStream stream) {
+        byte[] data = new byte[flowchart.bytes()];
+        flowchart.toBinary(data, 0);
+        try {
+            byte[] fileSize = new byte[4];
+            stream.write(fileSize);
+            stream.write(data, 0, data.length);
+            stream.flush();
+            stream.close();
+        } catch(IOException e) {
+            System.err.println("Could not write flowchart to output stream: " + e);
+        }
+    }
+    
+    /**
+     * Opens a file chooser so the user can save the current flowchart.
+     */
+    public void saveFlowchart() {
+        if (file == null) {
+            saveAsFlowchart();
+        } else {
+            try {
+                writeFlowchartData(Files.newOutputStream(file.toPath()));
+            } catch (IOException ex) {
+                System.err.println("Could not open output stream to " + file.toString() + ": " + ex);
+            }
+        }
+    }
+    
+    /**
+     * Opens a file chooser so the user can save as the current flowchart.
+     */
+    public void saveAsFlowchart() {
+        int response = fc.showSaveDialog(this);
+        if (response == JFileChooser.APPROVE_OPTION) {
+            file = fc.getSelectedFile();
+            saveFlowchart();
+        }
+    }
+    
+    /**
+     * Opens a file chooser so the user can open the current flowchart.
+     */
+    public void openFlowchart() {
+        
     }
 }

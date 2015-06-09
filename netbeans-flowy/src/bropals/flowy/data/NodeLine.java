@@ -22,6 +22,7 @@ package bropals.flowy.data;
 import bropals.flowy.style.LineStyle;
 import java.awt.Graphics;
 import bropals.flowy.Camera;
+import bropals.flowy.FlowchartWindow;
 import bropals.flowy.style.FontStyle;
 
 /**
@@ -29,7 +30,7 @@ import bropals.flowy.style.FontStyle;
  * The arrow points on the head side of the line.
  * @author Jonathon
  */
-public class NodeLine implements Selectable {
+public class NodeLine implements Selectable, BinaryData {
     
     /**
      * The parent node of this line.
@@ -179,5 +180,40 @@ public class NodeLine implements Selectable {
     @Override
     public FontStyle getFontStyle() {
         return style;
+    }
+
+    @Override
+    public int bytes() {
+        /*
+            Node line is special due to the fact that the ID numbers of the
+            child and parent node is before the actual reading of the node
+            line. The 8 is here to represent the two integers before the
+            chunk of data read by the "fromBinary" function.
+        */
+        return 8 + BinaryUtil.bytesForString(tailText) + BinaryUtil.bytesForString(centerText)
+               + BinaryUtil.bytesForString(headText) + style.bytes();
+    }
+
+    @Override
+    public void toBinary(byte[] arr, int pos) {
+        int tailBytes = BinaryUtil.bytesForString(tailText);
+        int centerBytes = BinaryUtil.bytesForString(centerText);
+        int headBytes = BinaryUtil.bytesForString(headText);
+        BinaryUtil.stringToBytes(tailText, arr, pos);
+        BinaryUtil.stringToBytes(centerText, arr, pos+tailBytes);
+        BinaryUtil.stringToBytes(headText, arr, pos+tailBytes+centerBytes);
+        style.toBinary(arr, pos+tailBytes+centerBytes+headBytes);
+    }
+
+    @Override
+    public void fromBinary(byte[] arr, int pos, FlowchartWindow window) {
+        int tailBytes = BinaryUtil.bytesForString(tailText);
+        int centerBytes = BinaryUtil.bytesForString(centerText);
+        int headBytes = BinaryUtil.bytesForString(headText);
+        tailText = BinaryUtil.bytesToString(arr, pos);
+        centerText = BinaryUtil.bytesToString(arr, pos+tailBytes);
+        headText = BinaryUtil.bytesToString(arr, pos+tailBytes+centerBytes);
+        style = new LineStyle();
+        style.fromBinary(arr, pos+tailBytes+centerBytes+headBytes, window);
     }
 }

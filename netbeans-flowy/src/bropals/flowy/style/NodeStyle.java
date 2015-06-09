@@ -19,13 +19,16 @@
  */
 package bropals.flowy.style;
 
+import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.BinaryUtil;
+import bropals.flowy.data.BinaryData;
 import java.awt.Color;
 
 /**
  * Controls how a node looks.
  * @author Jonathon
  */
-public class NodeStyle extends FontStyle{
+public class NodeStyle extends FontStyle implements BinaryData {
     
     /**
      * The shape of the Node.
@@ -134,4 +137,42 @@ public class NodeStyle extends FontStyle{
         return other;
     }
     
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof NodeStyle)) {
+            return false;
+        }
+        NodeStyle ns = (NodeStyle)other;
+        return ns.getShape() == this.getShape() &&
+               ns.getBorderColor().equals(this.getBorderColor()) &&
+               ns.getBorderSize() == this.getBorderSize() &&
+               ns.getFillColor().equals(this.getFillColor()) &&
+               ns.getFontColor().equals(this.getFontColor()) &&
+               ns.getFontSize() == this.getFontSize() &&
+               ns.getFontType().equals(this.getFontType());
+    }
+
+    @Override
+    public int bytes() {
+        return 11 + super.bytes();
+    }
+    
+    @Override
+    public void toBinary(byte[] arr, int pos) {
+        arr[pos] = shape.toByte();
+        BinaryUtil.colorToBytes(borderColor, arr, pos+1);
+        BinaryUtil.colorToBytes(fillColor, arr, pos+4);
+        BinaryUtil.intToBytes(borderSize, arr, pos+7);
+        super.toBinary(arr, pos+11);
+    }
+
+    @Override
+    public void fromBinary(byte[] arr, int pos, FlowchartWindow window) {
+        shape = Shape.fromByte(arr[pos]);
+        borderColor = BinaryUtil.bytesToColor(arr, pos+1);
+        fillColor = BinaryUtil.bytesToColor(arr, pos+4);
+        borderSize = BinaryUtil.bytesToInt(arr, pos+7);
+        super.fromBinary(arr, pos+11, window);
+        
+    }
 }

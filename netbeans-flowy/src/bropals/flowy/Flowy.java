@@ -19,6 +19,7 @@
  */
 package bropals.flowy;
 
+import bropals.flowy.data.BinaryUtil;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 
@@ -35,7 +36,6 @@ public class Flowy {
      */
     public static void main(String[] args) {
         FlowchartWindowManager fwm = new FlowchartWindowManager();
-        
     }
     
 }

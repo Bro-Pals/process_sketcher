@@ -35,6 +35,7 @@ public class OpenFlowchartListener extends AbstractFlowyListener implements Acti
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        getFlowchartWindow().openFlowchart();
     }
     
 }

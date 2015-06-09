@@ -35,6 +35,7 @@ public class SaveAsFlowchartListener extends AbstractFlowyListener implements Ac
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        getFlowchartWindow().saveAsFlowchart();
     }
     
 }

@@ -19,6 +19,9 @@
  */
 package bropals.flowy.style;
 
+import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.BinaryUtil;
+import bropals.flowy.data.BinaryData;
 import java.awt.Color;
 import java.awt.Font;
 
@@ -26,7 +29,7 @@ import java.awt.Font;
  * Controls the look of the text on a node or a node line.
  * @author Jonathon
  */
-public class FontStyle {
+public class FontStyle implements BinaryData {
     
     /**
      * The color of the text when it's rendered.
@@ -92,5 +95,25 @@ public class FontStyle {
      */
     public void setFontType(Font fontType) {
         this.fontType = fontType.deriveFont((float)getFontSize());
+    }
+
+    @Override
+    public int bytes() {
+        return 7 + BinaryUtil.bytesForFont(fontType);
+    }
+
+    @Override
+    public void toBinary(byte[] arr, int pos) {
+        BinaryUtil.colorToBytes(getFontColor(), arr, pos);
+        BinaryUtil.intToBytes(getFontSize(), arr, pos+3);
+        BinaryUtil.fontToBytes(getFontType(), arr, pos+7);   
+    }
+
+    @Override
+    public void fromBinary(byte[] arr, int pos, FlowchartWindow window) {
+        setFontColor(BinaryUtil.bytesToColor(arr, pos));
+        int fontSize = BinaryUtil.bytesToInt(arr, pos+3);
+        setFontType(BinaryUtil.bytesToFont(arr, pos+7));
+        setFontSize(fontSize);    
     }
 }

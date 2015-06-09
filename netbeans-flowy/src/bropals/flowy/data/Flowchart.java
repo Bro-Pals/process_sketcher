@@ -19,25 +19,36 @@
  */
 package bropals.flowy.data;
 
+import bropals.flowy.FlowchartWindow;
+import bropals.flowy.StyleManager;
+import bropals.flowy.style.LineStyle;
+import bropals.flowy.style.NodeStyle;
 import java.util.ArrayList;
 
 /**
  * An object to represent a flowchart.
  * @author Jonathon
  */
-public class Flowchart {
+public class Flowchart implements BinaryData {
     /**
      * The nodes that make up this Flowchart.
      */
     private ArrayList<Node> nodes;
-
+    /**
+     * A reference to the style manager
+     */
+    private StyleManager styleManager;
+    
     /**
      * Create the default flowchart.
+     * @param def whether or not it should be the default flowchart.
      */
-    public Flowchart() {
+    public Flowchart(boolean def) {
         nodes = new ArrayList<>();
-        Node firstNode = new Node(100, 100);
-        nodes.add(firstNode);
+        if (def) {
+            Node firstNode = new Node(100, 100);
+            nodes.add(firstNode);
+        }
     }
     
     /**
@@ -65,5 +76,87 @@ public class Flowchart {
         return lines;
     }
     
-    
+    /**
+     * Lend a reference to style manager to Flowchart for saving and loading.
+     * @param styleManager the style manager.
+     */
+    public void passStyleManager(StyleManager styleManager) {
+        this.styleManager = styleManager;
+    }
+
+    @Override
+    public int bytes() {
+        ArrayList<NodeLine> nodeLines = getNodeLines();
+        NodeStyle[] nodeStyles = styleManager.listNodeStyles();
+        LineStyle[] lineStyles = styleManager.listLineStyles();
+        String[] nodeStyleNames = styleManager.listNodeStyleNames();
+        String[] lineStyleNames = styleManager.listLineStyleNames();
+        int size = 16; //4 integers to store the size of each type
+        for (int i=0; i<nodes.size(); i++) {
+            size += nodes.get(i).bytes();
+        }
+        for (int i=0; i<nodeLines.size(); i++) {
+            size += nodeLines.get(i).bytes();
+        }
+        for (int i=0; i<nodeStyles.length; i++) {
+            size += (BinaryUtil.bytesForString(nodeStyleNames[i]) + nodeStyles[i].bytes());
+        }
+        for (int i=0; i<lineStyles.length; i++) {
+            size += (BinaryUtil.bytesForString(lineStyleNames[i]) + lineStyles[i].bytes());
+        }
+        return size;
+    }
+
+    @Override
+    public void toBinary(byte[] arr, int pos) {
+        ArrayList<NodeLine> nodeLines = getNodeLines();
+        System.out.println(nodeLines.size() + " node lines");
+        NodeStyle[] nodeStyles = styleManager.listNodeStyles();
+        LineStyle[] lineStyles = styleManager.listLineStyles();
+        String[] nodeStyleNames = styleManager.listNodeStyleNames();
+        String[] lineStyleNames = styleManager.listLineStyleNames();
+        //Write the number of node styles
+        BinaryUtil.intToBytes(nodeStyles.length, arr, pos);
+        //Write the number of line styles
+        BinaryUtil.intToBytes(lineStyles.length, arr, pos+4);
+        //Write the number of nodes
+        BinaryUtil.intToBytes(nodes.size(), arr, pos+8);
+        //Write the number of node lines
+        BinaryUtil.intToBytes(nodeLines.size(), arr, pos+12);
+        int mark = 16;
+        for (int i=0; i<nodeStyles.length; i++) {
+            BinaryUtil.stringToBytes(nodeStyleNames[i], arr, pos+mark);
+            mark += BinaryUtil.bytesForString(nodeStyleNames[i]);
+            nodeStyles[i].toBinary(arr, pos+mark);
+            mark += nodeStyles[i].bytes();
+        }
+        for (int i=0; i<lineStyles.length; i++) {
+            BinaryUtil.stringToBytes(lineStyleNames[i], arr, pos+mark);
+            mark += BinaryUtil.bytesForString(lineStyleNames[i]);
+            lineStyles[i].toBinary(arr, pos+mark);
+            mark += lineStyles[i].bytes();
+        }
+        for (int i=0; i<nodes.size(); i++) {
+            nodes.get(i).toBinary(arr, pos+mark);
+            mark += nodes.get(i).bytes();
+        }
+        for (int i=0; i<nodeLines.size(); i++) {
+            BinaryUtil.intToBytes(
+                    nodes.indexOf(nodeLines.get(i).getChild()), arr, pos+mark
+            );
+            mark += 4;
+            BinaryUtil.intToBytes(
+                    nodes.indexOf(nodeLines.get(i).getParent()), arr, pos+mark
+            );
+            mark += 4;
+            nodeLines.get(i).toBinary(arr, pos+mark);
+            mark += nodeLines.get(i).bytes();
+        }
+    }
+
+    @Override
+    public void fromBinary(byte[] arr, int pos, FlowchartWindow window) {
+        nodes.clear();
+        
+    }
 }
