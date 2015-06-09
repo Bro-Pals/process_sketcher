@@ -879,7 +879,7 @@ public class FlowchartWindow extends JFrame {
         byte[] data = null;
         try {
             byte[] bSize = new byte[4];
-            stream.read(bSize, 0, 4);
+            stream.read(bSize);
             int fileSize = BinaryUtil.bytesToInt(bSize, 0);
             data = new byte[fileSize];
             stream.read(data, 0, fileSize);
@@ -909,9 +909,12 @@ public class FlowchartWindow extends JFrame {
         try {
             byte[] fileSize = new byte[4];
             stream.write(fileSize);
-            stream.write(data, 0, data.length);
+            stream.write(data);
             stream.flush();
             stream.close();
+        } catch(ArrayIndexOutOfBoundsException aio) { 
+            System.err.println("Did not correctly predict the number of bytes: "
+                    + aio + "\nexpected only " + data.length + " bytes");
         } catch(IOException e) {
             System.err.println("Could not write flowchart to output stream: " + e);
         }

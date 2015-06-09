@@ -56,7 +56,7 @@ public class BooleanBlinker implements Runnable {
             try {
                 Thread.sleep(millisecondsBetween);
             } catch(Exception e) {
-                System.out.println(e);
+                System.err.println(e);
             }
             
             value = !value;

@@ -35,8 +35,11 @@ public class BinaryUtil {
      * @param num the integer to write.
      * @param arr the byte array to place the int in.
      * @param pos the index of the first byte in the 4 byte sequence.
+     * @throws IllegalArgumentException if the position is out of the 
+     * range of the byte array.
      */
-    public static void intToBytes(int num, byte[] arr, int pos) {
+    public static void intToBytes(int num, byte[] arr, int pos) throws IllegalArgumentException {
+        checkBounds(arr, pos);
         arr[pos] = (byte) ((num & 0xFF000000) >> 24);
         arr[pos + 1] = (byte) ((num & 0x00FF0000) >> 16);
         arr[pos + 2] = (byte) ((num & 0x0000FF00) >> 8);
@@ -49,8 +52,10 @@ public class BinaryUtil {
      * @param num the float to write.
      * @param arr the byte array to place the int in.
      * @param pos the index of the first byte in the 4 byte sequence.
+     * @throws IllegalArgumentException if the position is out of the 
+     * range of the byte array.
      */
-    public static void floatToBytes(float num, byte[] arr, int pos) {
+    public static void floatToBytes(float num, byte[] arr, int pos) throws IllegalArgumentException {
         intToBytes(Float.floatToIntBits(num), arr, pos);
     }
 
@@ -63,8 +68,11 @@ public class BinaryUtil {
      * @param str the string to write.
      * @param arr the array to write the string to.
      * @param pos the position of the first byte of the string block.
+     * @throws IllegalArgumentException if the position is out of the 
+     * range of the byte array.
      */
-    public static void stringToBytes(String str, byte[] arr, int pos) {
+    public static void stringToBytes(String str, byte[] arr, int pos) throws IllegalArgumentException {
+        checkBounds(arr, pos);
         char[] carr = str.toCharArray();
         intToBytes(carr.length, arr, pos);
         for (int i = 0; i < carr.length; i++) {
@@ -78,8 +86,11 @@ public class BinaryUtil {
      * @param c the character to write
      * @param arr the array to write the character to.
      * @param pos the position of the character's first byte.
+     * @throws IllegalArgumentException if the position is out of the 
+     * range of the byte array.
      */
-    public static void charToBytes(char c, byte[] arr, int pos) {
+    public static void charToBytes(char c, byte[] arr, int pos) throws IllegalArgumentException {
+        checkBounds(arr, pos);
         arr[pos] = (byte) ((c & 0xFF00) >> 8);
         arr[pos + 1] = (byte) (c & 0x00FF);
     }
@@ -90,8 +101,11 @@ public class BinaryUtil {
      * @param color the color to write.
      * @param arr the byte array to place it in.
      * @param pos the index of the first byte, the red component.
+     * @throws IllegalArgumentException if the position is out of the 
+     * range of the byte array.
      */
-    public static void colorToBytes(Color color, byte[] arr, int pos) {
+    public static void colorToBytes(Color color, byte[] arr, int pos) throws IllegalArgumentException {
+        checkBounds(arr, pos);
         int rgb = color.getRGB();
         arr[pos] = (byte) ((rgb & 0x00FF0000) >> 16);
         arr[pos + 1] = (byte) ((rgb & 0x0000FF00) >> 8);
@@ -102,9 +116,11 @@ public class BinaryUtil {
      * Writes the given font object to the byte array.
      * @param font the font to write.
      * @param arr the byte array to place it in.
-     * @param pos 
+     * @param pos the position to write the font in.
+     * @throws IllegalArgumentException if the position is out of the 
+     * range of the byte array.
      */
-    public static void fontToBytes(Font font, byte[] arr, int pos) {
+    public static void fontToBytes(Font font, byte[] arr, int pos) throws IllegalArgumentException {
         stringToBytes(font.getFontName(), arr, pos);
     }
     
@@ -114,8 +130,11 @@ public class BinaryUtil {
      * @param arr the byte array.
      * @param pos the position of the first byte of the int.
      * @return the interpreted int.
+     * @throws IllegalArgumentException if the position is out of the 
+     * range of the byte array.
      */
-    public static int bytesToInt(byte[] arr, int pos) {
+    public static int bytesToInt(byte[] arr, int pos) throws IllegalArgumentException {
+        checkBounds(arr, pos);
         return (((int) arr[pos] << 24) & 0xFF000000)
                 | (((int) arr[pos + 1] << 16) & 0x00FF0000)
                 | (((int) arr[pos + 2] << 8) & 0x0000FF00)
@@ -128,8 +147,10 @@ public class BinaryUtil {
      * @param arr the byte array.
      * @param pos the position of the first byte of the int.
      * @return the interpreted float.
+     * @throws IllegalArgumentException if the position is out of the 
+     * range of the byte array.
      */
-    public static float bytesToFloat(byte[] arr, int pos) {
+    public static float bytesToFloat(byte[] arr, int pos) throws IllegalArgumentException {
         return Float.intBitsToFloat(bytesToInt(arr, pos));
     }
 
@@ -138,8 +159,11 @@ public class BinaryUtil {
      * @param arr the byte array to read the string from.
      * @param pos the position of the string's first byte.
      * @return the read string.
+     * @throws IllegalArgumentException if the position is out of the 
+     * range of the byte array.
      */
-    public static String bytesToString(byte[] arr, int pos) {
+    public static String bytesToString(byte[] arr, int pos) throws IllegalArgumentException {
+        checkBounds(arr, pos);
         int charCount = bytesToInt(arr, pos);
         String str = "";
         for (int i=0; i<charCount; i++) {
@@ -154,8 +178,11 @@ public class BinaryUtil {
      * @param arr the array to read the character from.
      * @param pos the position of the character's first byte.
      * @return the read character.
+     * @throws IllegalArgumentException if the position is out of the 
+     * range of the byte array.
      */
-    public static char bytesToChar(byte[] arr, int pos) {
+    public static char bytesToChar(byte[] arr, int pos) throws IllegalArgumentException {
+        checkBounds(arr, pos);
         return (char) ((((short) arr[pos] << 8) & 0xFF00)
                 | ((short) arr[pos + 1] & 0x00FF));
     }
@@ -166,8 +193,11 @@ public class BinaryUtil {
      * @param arr the byte array to place it in.
      * @param pos the index of the first byte, the red component.
      * @return the read color.
+     * @throws IllegalArgumentException if the position is out of the 
+     * range of the byte array.
      */
-    public static Color bytesToColor(byte[] arr, int pos) {
+    public static Color bytesToColor(byte[] arr, int pos) throws IllegalArgumentException {
+        checkBounds(arr, pos);
         return new Color(
                 arr[pos] & 0x000000FF,
                 arr[pos + 1] & 0x000000FF,
@@ -179,8 +209,10 @@ public class BinaryUtil {
      * @param arr the byte array.
      * @param pos the position of the first byte of the font.
      * @return the interpreted font.
+     * @throws IllegalArgumentException if the position is out of the 
+     * range of the byte array.
      */
-    public static Font bytesToFont(byte[] arr, int pos) {
+    public static Font bytesToFont(byte[] arr, int pos) throws IllegalArgumentException {
         String fontName = bytesToString(arr, pos);
         Font font = Font.decode(fontName);
         if (font == null) {
@@ -188,6 +220,21 @@ public class BinaryUtil {
             font = new Font(Font.SERIF, Font.PLAIN, 12);
         }
         return font;
+    }
+    
+    /**
+     * Checks the position to the bounds of the byte array.
+     * @param arr the byte array
+     * @param pos the position in the byte array
+     * @throws IllegalArgumentException thrown if the position is out of the 
+     * byte array's bounds.
+     */
+    private static void checkBounds(byte[] arr, int pos) throws IllegalArgumentException {
+        if (pos < 0 || pos >= arr.length) {
+            throw new IllegalArgumentException("Position is out of bounds of "
+                    + "the byte array: position is " + pos + " while the byte"
+                    + " array only accepts 0 to " + (arr.length-1) );
+        }
     }
     
     /**
@@ -205,6 +252,6 @@ public class BinaryUtil {
      * @return the number of bytes to store the font.
      */
     public static int bytesForFont(Font font) {
-        return 4 + (font.getFontName().length()*2);
+        return bytesForString(font.getFontName());
     }
 }

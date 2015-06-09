@@ -317,10 +317,6 @@ public class DragManager {
         moveDragging = (Node[])selectionManager.getSelectedNodes().toArray(
                 new Node[0]);
         
-        System.out.println("Dragging the following:");
-        for (Node n : moveDragging)
-            System.out.println(n);
-        
         initialX = mouseX;
         initialY = mouseY;
         offsetX = 0;

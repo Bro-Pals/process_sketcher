@@ -92,18 +92,34 @@ public class Flowchart implements BinaryData {
         String[] nodeStyleNames = styleManager.listNodeStyleNames();
         String[] lineStyleNames = styleManager.listLineStyleNames();
         int size = 16; //4 integers to store the size of each type
+        int nodeSize = 0;
+        int nodeLineSize = 0;
+        int nodeStyleSize = 0;
+        int lineStyleSize = 0;
         for (int i=0; i<nodes.size(); i++) {
-            size += nodes.get(i).bytes();
+            nodeSize += nodes.get(i).bytes();
         }
         for (int i=0; i<nodeLines.size(); i++) {
-            size += nodeLines.get(i).bytes();
+            nodeLineSize += nodeLines.get(i).bytes();
         }
         for (int i=0; i<nodeStyles.length; i++) {
-            size += (BinaryUtil.bytesForString(nodeStyleNames[i]) + nodeStyles[i].bytes());
+            nodeStyleSize += (BinaryUtil.bytesForString(nodeStyleNames[i]) + nodeStyles[i].bytes());
         }
         for (int i=0; i<lineStyles.length; i++) {
-            size += (BinaryUtil.bytesForString(lineStyleNames[i]) + lineStyles[i].bytes());
+            lineStyleSize += (BinaryUtil.bytesForString(lineStyleNames[i]) + lineStyles[i].bytes());
         }
+        size += nodeSize;
+        size += nodeLineSize;
+        size += nodeStyleSize;
+        size += lineStyleSize;
+        System.out.println("Flowchart file byte breakdown");
+        System.out.println("\tHeader: 16 bytes");
+        System.out.println("\tNodes: " + nodeSize + " bytes");
+        System.out.println("\tNode Lines: " + nodeLineSize + " bytes");
+        System.out.println("\tNode Styles: " + nodeStyleSize + " bytes");
+        System.out.println("\tLine Styles: " + lineStyleSize + " bytes");
+        System.out.println("\tTotal: " + size + " bytes");
+        System.out.println();
         return size;
     }
 
@@ -149,6 +165,7 @@ public class Flowchart implements BinaryData {
                     nodes.indexOf(nodeLines.get(i).getParent()), arr, pos+mark
             );
             mark += 4;
+            System.out.println("Mark is at position " + mark);
             nodeLines.get(i).toBinary(arr, pos+mark);
             mark += nodeLines.get(i).bytes();
         }
