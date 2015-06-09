@@ -266,7 +266,7 @@ public enum LineType {
         // Render the Text
 
         // set the font for drawing the font
-        g.setFont(n.getStyle().getFontType().deriveFont((float) (n.getStyle().getFontSize() / camera.getZoom())));
+        g.setFont(n.getStyle().getFontType().deriveFont((n.getStyle().getFontSize()) / camera.getZoom()));
         g.setColor(n.getStyle().getFontColor());
 
         // Variables to track the location of the cursor

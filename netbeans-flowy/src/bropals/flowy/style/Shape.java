@@ -261,7 +261,7 @@ public enum Shape {
         int startEverythingX = camera.convertWorldToCanvasX(node.getX()) + padding; // canvas units
         int startEverythingY = camera.convertWorldToCanvasY(node.getY()) + fm.getHeight() + padding; // canvas units
         // the width each row can't get longer than (in canvas units)
-        int width = camera.convertWorldToCanvasX(node.getWidth()) - (padding * 2);
+        int width =  camera.convertWorldToCanvasLength(node.getWidth() - (padding * 2));
         
         if (cursorLocation > node.getInnerText().length()) {
             cursorLocation = node.getInnerText().length();
@@ -297,9 +297,9 @@ public enum Shape {
                 
                 drawPolygonFromPoints(g2, node, new Point.Float[] { p1, p2, p3, p4 }, camera);
                 
-                startEverythingX += (node.getWidth()/4) / camera.getZoom();
-                startEverythingY += (node.getHeight()/4) / camera.getZoom();
-                width -= (node.getWidth()/2) / camera.getZoom();
+                startEverythingX += camera.convertWorldToCanvasLength(node.getWidth()/4);
+                startEverythingY += camera.convertWorldToCanvasLength(node.getHeight()/4);
+                width -= camera.convertWorldToCanvasLength(node.getWidth()/2);
                 break;
             case START_END:
                 p1 = new Point.Float(node.getX(), node.getY());
@@ -319,9 +319,9 @@ public enum Shape {
                 g2.setStroke(new BasicStroke(1));
                 
                 float constant = (float)(1-(Math.sqrt(2)/2))/2;
-                startEverythingX += (node.getWidth()*constant) / camera.getZoom();
-                startEverythingY += (node.getHeight()*constant) / camera.getZoom();
-                width -= (node.getWidth()*constant*2) / camera.getZoom();
+                startEverythingX += camera.convertWorldToCanvasLength(node.getWidth()*constant);
+                startEverythingY += camera.convertWorldToCanvasLength(node.getHeight()*constant);
+                width -= camera.convertWorldToCanvasLength(node.getWidth()*constant*2);
                 break;
             case MERGE:
                 p1 = new Point.Float(node.getX() + (node.getWidth()/2), node.getY() + node.getHeight() );
@@ -330,8 +330,8 @@ public enum Shape {
                                 
                 drawPolygonFromPoints(g2, node, new Point.Float[]{p1, p2, p3}, camera);
                 
-                startEverythingX += (node.getWidth()/4) / camera.getZoom();
-                width -= (node.getWidth()/2) / camera.getZoom();
+                startEverythingX += camera.convertWorldToCanvasLength(node.getWidth()/4);
+                width -= camera.convertWorldToCanvasLength(node.getWidth()/2);
                 break;
             case DELAY:
                 p1 = new Point.Float(node.getX(), node.getY());
@@ -370,8 +370,8 @@ public enum Shape {
                 
                 drawPolygonFromPoints(g2, node, new Point.Float[]{p1, p2, p3, p4}, camera);           
                 
-                startEverythingX += (node.getWidth()/4) / camera.getZoom();
-                width -= (node.getWidth()/2) / camera.getZoom();
+                startEverythingX += camera.convertWorldToCanvasLength(node.getWidth()/4);
+                width -= (node.getWidth()/2);
                 break;
             case DOCUMENT:
                 p1 = new Point.Float(node.getX(), node.getY());
@@ -403,14 +403,15 @@ public enum Shape {
                 break;
         }
 
+        String[] words = node.getInnerText().split(" ");
+
         // only draw text if there is text
-        if (node.getInnerText().length() > 0) {
+        if (node.getInnerText().length() > 0 && words.length > 0) {
             g2.setColor(node.getStyle().getFontColor());
             
             // seperate the text into rows according to their lengths, not extending canvas units
             // the array for the text. Every element of the array represents one row of text
             ArrayList<String> text = new ArrayList<>();
-            String[] words = node.getInnerText().split(" ");
             text.add(words[0]); // first word goes into the first row
 
             // what row is currently being filled
@@ -427,6 +428,13 @@ public enum Shape {
                     // otherwise if there isn't enough space on this new row
                 } else {
                     // add the word to the next row
+                    
+                    // add a space to the end of the current row
+                    String endOfRowString = text.get(rowOn) + " ";
+                    text.remove(rowOn);
+                    text.add(rowOn, endOfRowString);
+                    
+                    // create a new row
                     text.add(words[i]);
                     rowOn++;
                 }
@@ -442,12 +450,11 @@ public enum Shape {
             for (int r = 0; r < text.size(); r++) {
                 g.drawString(text.get(r), (int) startEverythingX,
                         (int) startEverythingY + (r * lineHeight));
-                if (sumOfCharsPrevRows + text.get(r).length() >= cursorLocation) {
+                if (sumOfCharsPrevRows + text.get(r).length() > cursorLocation) {
                    if (!drawnCursorYet && blinkCursor) {
                         // get the offset for where to draw the cursor
-                        int thisRowOffset = (int)(g.getFontMetrics().getStringBounds(
-                                (text.get(r).substring(0, cursorLocation - sumOfCharsPrevRows)), g).getWidth() 
-                                / camera.getZoom());
+                        int thisRowOffset = camera.convertWorldToCanvasLength((float)g.getFontMetrics().getStringBounds(
+                                (text.get(r).substring(0, cursorLocation - sumOfCharsPrevRows)), g).getWidth());
                         //draw the cursor
                         g2.fillRect((int)startEverythingX + thisRowOffset, 
                             (int)startEverythingY + (lineHeight * (r - 1)) - 2, 
@@ -458,7 +465,16 @@ public enum Shape {
                     sumOfCharsPrevRows += text.get(r).length();
                 }
             }
-
+            
+            // draw it at the end if not yet drawn
+            if (blinkCursor && !drawnCursorYet) {
+                int lastRow = text.size() - 1;
+                //draw the cursor
+                g2.fillRect((int)startEverythingX + camera.convertWorldToCanvasLength((float)g.getFontMetrics().getStringBounds(
+                       text.get(lastRow), g).getWidth()), 
+                    (int)startEverythingY + (lineHeight * (lastRow - 1)) - 2, 
+                    3, lineHeight + 4);
+            }
         // only draw the cursor is there is no text to go through
         } else {
             int lineHeight = g.getFontMetrics().getHeight();

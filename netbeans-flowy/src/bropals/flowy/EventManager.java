@@ -19,6 +19,7 @@
  */
 package bropals.flowy;
 
+import bropals.flowy.action.*;
 import bropals.flowy.data.Node;
 import bropals.flowy.data.NodeLine;
 import bropals.flowy.data.Selectable;
@@ -57,6 +58,10 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      */
     private TextTypeManager textTypeManager;
     /**
+     * The HistoryManager to manage the history and implement the undo feature.
+     */
+    private HistoryManager historyManager;
+    /**
      * The variable to track if the spacebar is held down or not.
      */
     private boolean spacebar;
@@ -76,6 +81,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         selectionManager = new SelectionManager(instance);
         dragManager = new DragManager(selectionManager);
         textTypeManager = new TextTypeManager();
+        historyManager = new HistoryManager(instance);
     }
 
     /**
@@ -104,6 +110,9 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      */
     public void deleteSelected() {
         selectionManager.removeSelectables(selectionManager.getSelected());
+        // add it to history
+        historyManager.addToHistory(new Deleted(selectionManager.getSelected()));
+        
         selectionManager.clearSelection();
         window.redrawView();
     }
@@ -112,7 +121,6 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      * Make a new flowchart window
      */
     public void createNewFlowchart() {
-        System.out.println("Creating a flowchart");
         window.getFlowchartWindowManager().newFlowchart();
         window.redrawView();
     }
@@ -133,6 +141,8 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         if (!selectionManager.getSelected().isEmpty()) {
             dragManager.setStuffInClipboard(selectionManager.getSelected());
             selectionManager.removeSelectables(selectionManager.getSelected());
+            // add the cut action to hisotory
+            historyManager.addToHistory(new Cutted(selectionManager.getSelected()));
             selectionManager.clearSelection();
         }
         window.redrawView();
@@ -199,7 +209,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     selectionManager.select(nl);
             }
             
-            System.out.println("Pasted " + pastedNodes.size() + " nodes");
+            historyManager.addToHistory(new Pasted(pastedNodes));
         }
     }
     
@@ -207,6 +217,9 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      * Select everything in the flowchart
      */
     public void selectAll() {
+        ArrayList<Selectable> currentSelection = new ArrayList<>();
+        currentSelection.addAll(selectionManager.getSelected());
+        
         selectionManager.clearSelection();
         for (int i = 0; i < window.getFlowchart().getNodes().size(); i++) {
             if (!selectionManager.getSelected().contains(window.getFlowchart().getNodes().get(i))) {
@@ -216,6 +229,15 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         for (int i = 0; i < window.getFlowchart().getNodeLines().size(); i++) {
             selectionManager.select(window.getFlowchart().getNodeLines().get(i));
         }
+        
+        // make a list of all the things newly added to the selection
+        ArrayList<Selectable> newlySelected = new ArrayList<>();
+        for (Selectable s : selectionManager.getSelected()) {
+            if (!currentSelection.contains(s)) {
+                newlySelected.add(s);
+            }
+        }
+        historyManager.addToHistory(new Selected(newlySelected));
     }
 
     /**
@@ -231,7 +253,10 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         if (selectionManager.getLastSelected() != null
                 && selectionManager.getLastSelected() instanceof Node) {
             Node selectedNode = (Node) selectionManager.getLastSelected();
-
+             
+            ArrayList<Selectable> initialSelected = new ArrayList<>();
+            initialSelected.addAll(selectionManager.getSelected());
+            
             boolean nextNodeIsThere = false;
             if (!selectedNode.getLinesConnected().isEmpty()) {
                 Node nextNode = null;
@@ -258,7 +283,6 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     nextNodeIsThere = true;
                     selectionManager.clearSelection();
                     selectionManager.select(nextNode);
-                    //System.out.println("selecting next node");
                 }
             }
 
@@ -278,7 +302,9 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 // select your newly created node
                 selectionManager.clearSelection();
                 selectionManager.select(createdNode);
-                //System.out.println("New node " + createdNode + " from the node " + selectedNode);
+            } else {
+                // if no node is created the action was a selection from tabbing
+                historyManager.addToHistory(new SelectedTabbed(initialSelected));
             }
         }
         window.redrawView();
@@ -326,7 +352,6 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
     
     @Override
     public void keyTyped(KeyEvent e) {
-        //System.out.println("Typed a character: " + e.getKeyChar());
 
         // if you're selecting soemthing that you aren't holding alt or control (for a different action)
         if (selectionManager.getLastSelected() != null && !e.isAltDown() && !e.isControlDown()) {
@@ -355,13 +380,6 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     if (textTypeManager.getLocationOfTypeCursor() > 0) {
                         textTypeManager.decrementLocationOfTypeCursor();
                     }
-                } else if (((int) e.getKeyChar()) == KeyEvent.VK_ENTER) {
-                    // add a new line
-                    /*System.out.println("insert a new line");
-                    editNode.setInnerText(insertCharacter(editNode.getInnerText(), 
-                            " " + newLineSequence + " ", textTypeManager.getLocationOfTypeCursor()));
-                    textTypeManager.getLocationOfTypeCursor() +=2;
-                    */
                 } else if (((int) e.getKeyChar()) != KeyEvent.VK_BACK_SPACE) {
                     // add the typed character to the end
                     editNode.setInnerText(insertCharacter(editNode.getInnerText(), 
@@ -547,7 +565,6 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
             }
             return;
         }
-        //System.out.println(node);
         // actions involving a node
         if (node != null) {
             if (!dragManager.isDragging()) { // not yet dragging anything...
@@ -575,7 +592,6 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     node.getLinesConnected().add(line);
                     dragManager.setNewlyMadeNode(createdNode);
                     dragManager.setRightMouseDown(true);
-                    //System.out.println("New node " + createdNode + " from the node " + node);
                     window.redrawView();
                 }
             }

@@ -275,7 +275,7 @@ public class FlowchartWindow extends JFrame {
             if (eventManager.isSelected(n)) {
                 // draw the box around the node if it's being selected
                 g.setColor(selectionColor);
-                float offset = 3 / camera.getZoom(); // for the selection box
+                float offset = camera.convertWorldToCanvasLength(3); // for the selection box
                 Point topLeftCorner = camera.convertWorldToCanvas(new Point.Float(n.getX(), n.getY()));
                 g.drawRect((int)(topLeftCorner.getX() - offset), 
                         (int)(topLeftCorner.getY() - offset), 
@@ -288,7 +288,7 @@ public class FlowchartWindow extends JFrame {
                         eventManager.getTextTypeManager().getLocationOfTypeCursor(), eventManager.getTextTypeManager().getLinePartTyping());
                 if (eventManager.isSelected(nl)) {
                     g.setColor(selectionColor);
-                    float offset = 3 / camera.getZoom();
+                    float offset = camera.convertWorldToCanvasLength(3);
                     g.drawLine((int)(linePoints[0].getX() + offset), 
                             (int)(linePoints[0].getY() + offset), 
                             (int)(linePoints[1].getX() + offset), 
@@ -307,8 +307,8 @@ public class FlowchartWindow extends JFrame {
                 Math.abs(eventManager.getDragManager().getOffsetY()) > 3) {
             int startX = camera.convertWorldToCanvasX(eventManager.getDragManager().getInitialX());
             int startY = camera.convertWorldToCanvasY(eventManager.getDragManager().getInitialY());
-            int offsetX = (int)(eventManager.getDragManager().getOffsetX() / camera.getZoom());
-            int offsetY = (int)(eventManager.getDragManager().getOffsetY() / camera.getZoom());
+            int offsetX = camera.convertWorldToCanvasLength(eventManager.getDragManager().getOffsetX());
+            int offsetY = camera.convertWorldToCanvasLength(eventManager.getDragManager().getOffsetY());
             
             // adjust values if there are negative values for the offset
             if (offsetX < 0) {
