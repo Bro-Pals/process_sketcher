@@ -304,6 +304,14 @@ public class DragManager {
         this.resizing = resizing;
     }
     
+    /**
+     * Return the node that is being resized, if there is one.
+     * @return the node being resized. If there are no nodes being resized, it returns null.
+     */
+    public Node getResizingNode() {
+        return resizing;
+    }
+    
     public boolean isDragResizing() {
         return (resizingRight || resizingLeft || resizingTop || resizingBottom) && dragging;
     }
@@ -340,6 +348,15 @@ public class DragManager {
         }
     }
     
+    
+    public Node[] getMoveDraggingNodesArray() {
+        return moveDragging;
+    }
+    
+    public float[][] getMoveDraggingOffsetsArray() {
+        return moveDragOffsets;
+    }
+    
     public void updateDragResize(float mouseX, float mouseY) {
         if (resizingLeft) {
             float right = resizing.getX() + resizing.getWidth();
@@ -370,6 +387,7 @@ public class DragManager {
         setLeftMouseDown(false);
         dragging = false;
         resizing = null;
+        
     }
     
     public void endDragMove() {

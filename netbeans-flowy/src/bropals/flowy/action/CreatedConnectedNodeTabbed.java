@@ -20,6 +20,10 @@
 package bropals.flowy.action;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.Node;
+import bropals.flowy.data.NodeLine;
+import bropals.flowy.data.Selectable;
+import java.util.ArrayList;
 
 /**
  * An action that occurs when you create a node from tabbing
@@ -27,8 +31,14 @@ import bropals.flowy.FlowchartWindow;
  */
 public class CreatedConnectedNodeTabbed extends Action {
 
-    public CreatedConnectedNodeTabbed() {
-        
+    private ArrayList<Selectable> selectables;
+    private Node node;
+    private NodeLine line;
+    
+    public CreatedConnectedNodeTabbed(Node createdNode, NodeLine createdLine, ArrayList<Selectable> previouslySelected) {
+        node = createdNode;
+        line = createdLine;
+        selectables = previouslySelected;
     }
     
     @Override
