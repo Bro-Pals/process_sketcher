@@ -19,6 +19,7 @@
  */
 package bropals.flowy;
 
+import bropals.flowy.action.*;
 import bropals.flowy.data.Node;
 import bropals.flowy.data.NodeLine;
 import bropals.flowy.data.Selectable;
@@ -57,6 +58,10 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      */
     private TextTypeManager textTypeManager;
     /**
+     * The HistoryManager to manage the history and implement the undo feature.
+     */
+    private HistoryManager historyManager;
+    /**
      * The variable to track if the spacebar is held down or not.
      */
     private boolean spacebar;
@@ -76,6 +81,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         selectionManager = new SelectionManager(instance);
         dragManager = new DragManager(selectionManager);
         textTypeManager = new TextTypeManager();
+        historyManager = new HistoryManager(instance);
     }
 
     /**
@@ -104,6 +110,9 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      */
     public void deleteSelected() {
         selectionManager.removeSelectables(selectionManager.getSelected());
+        // add it to history
+        historyManager.addToHistory(new Deleted(selectionManager.getSelected()));
+        
         selectionManager.clearSelection();
         window.redrawView();
     }
@@ -132,6 +141,8 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         if (!selectionManager.getSelected().isEmpty()) {
             dragManager.setStuffInClipboard(selectionManager.getSelected());
             selectionManager.removeSelectables(selectionManager.getSelected());
+            // add the cut action to hisotory
+            historyManager.addToHistory(new Cutted(selectionManager.getSelected()));
             selectionManager.clearSelection();
         }
         window.redrawView();
@@ -198,6 +209,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     selectionManager.select(nl);
             }
             
+            historyManager.addToHistory(new Pasted(pastedNodes));
         }
     }
     
@@ -205,6 +217,9 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      * Select everything in the flowchart
      */
     public void selectAll() {
+        ArrayList<Selectable> currentSelection = new ArrayList<>();
+        currentSelection.addAll(selectionManager.getSelected());
+        
         selectionManager.clearSelection();
         for (int i = 0; i < window.getFlowchart().getNodes().size(); i++) {
             if (!selectionManager.getSelected().contains(window.getFlowchart().getNodes().get(i))) {
@@ -214,6 +229,15 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         for (int i = 0; i < window.getFlowchart().getNodeLines().size(); i++) {
             selectionManager.select(window.getFlowchart().getNodeLines().get(i));
         }
+        
+        // make a list of all the things newly added to the selection
+        ArrayList<Selectable> newlySelected = new ArrayList<>();
+        for (Selectable s : selectionManager.getSelected()) {
+            if (!currentSelection.contains(s)) {
+                newlySelected.add(s);
+            }
+        }
+        historyManager.addToHistory(new Selected(newlySelected));
     }
 
     /**
@@ -229,7 +253,10 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         if (selectionManager.getLastSelected() != null
                 && selectionManager.getLastSelected() instanceof Node) {
             Node selectedNode = (Node) selectionManager.getLastSelected();
-
+             
+            ArrayList<Selectable> initialSelected = new ArrayList<>();
+            initialSelected.addAll(selectionManager.getSelected());
+            
             boolean nextNodeIsThere = false;
             if (!selectedNode.getLinesConnected().isEmpty()) {
                 Node nextNode = null;
@@ -275,6 +302,9 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 // select your newly created node
                 selectionManager.clearSelection();
                 selectionManager.select(createdNode);
+            } else {
+                // if no node is created the action was a selection from tabbing
+                historyManager.addToHistory(new SelectedTabbed(initialSelected));
             }
         }
         window.redrawView();
