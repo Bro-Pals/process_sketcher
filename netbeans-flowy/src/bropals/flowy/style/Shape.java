@@ -98,6 +98,55 @@ public enum Shape {
         return null;
     }
 
+    /**
+     * Gets the byte representation of this shape.
+     * @return the byte representation of this shape.
+     */
+    public byte toByte() {
+        switch(this) {
+            case ACTION:
+                return 0;
+            case DECISION:
+                return 1;
+            case DELAY:
+                return 2;
+            case DOCUMENT:
+                return 3;
+            case INPUT_OUTPUT:
+                return 4;
+            case MERGE:
+                return 5;
+            case START_END:
+                return 6;
+        }
+        return -1;
+    }
+    
+    /**
+     * Interprets the given byte as a shape.
+     * @param b the byte to interpret.
+     * @return the shape that the byte represents.
+     */
+    public static Shape fromByte(byte b) {
+        switch(b) {
+            case 0:
+                return ACTION;
+            case 1:
+                return DECISION;
+            case 2:
+                return DELAY;
+            case 3:
+                return DOCUMENT;
+            case 4:
+                return INPUT_OUTPUT;
+            case 5:
+                return MERGE;
+            case 6:
+                return START_END;
+        }
+        return null;
+    }
+    
     @Override
     public String toString() {
         switch(this) {

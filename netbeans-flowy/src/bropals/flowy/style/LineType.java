@@ -47,6 +47,39 @@ public enum LineType {
      */
     DOTTED;
 
+    /**
+     * Gets the byte representation of this line type.
+     * @return the byte representation of this line type.
+     */
+    public byte toByte() {
+        switch (this) {
+            case SOLID:
+                return 0;
+            case DASHED:
+                return 1;
+            case DOTTED:
+                return 2;
+        }
+        return -1;
+    }
+    
+    /**
+     * Gets the line type from its byte representation.
+     * @param b the byte representation.
+     * @return the corresponding line type.
+     */
+    public static LineType fromByte(byte b) {
+        switch (b) {
+            case 0:
+                return SOLID;
+            case 1:
+                return DASHED;
+            case 2:
+                return DOTTED;
+        }
+        return null;
+    }
+    
     @Override
     public String toString() {
         switch (this) {

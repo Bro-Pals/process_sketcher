@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import javax.swing.JButton;
@@ -114,9 +115,10 @@ public class FlowchartWindowManager implements WindowListener {
      * Opens a flowchart file.
      * @param stream the input stream to read the flowchart data from.
      * @param name the name of the chart to open.
+     * @param file the file the flowchart came from, if any.
      */
-    public void openFlowchart(InputStream stream, String name) {
-        FlowchartWindow window = new FlowchartWindow(this, stream);
+    public void openFlowchart(InputStream stream, String name, File file) {
+        FlowchartWindow window = new FlowchartWindow(this, stream, file);
         window.setTitle("Flowy | " + name);
         addToStack(window);
     }

@@ -19,13 +19,16 @@
  */
 package bropals.flowy.style;
 
+import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.BinaryUtil;
+import bropals.flowy.data.BinaryData;
 import java.awt.Color;
 
 /**
  * Controls how a node line looks.
  * @author Jonathon
  */
-public class LineStyle extends FontStyle {
+public class LineStyle extends FontStyle implements BinaryData {
     
     /**
      * The type of the line.
@@ -109,5 +112,38 @@ public class LineStyle extends FontStyle {
         return other;
     }
     
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof LineStyle)) {
+            return false;
+        }
+        LineStyle ls = (LineStyle)other;
+        return ls.getLineColor().equals(this.getLineColor()) &&
+               ls.getLineSize() == this.getLineSize() &&
+               ls.getType() == this.getType() &&
+               ls.getFontColor().equals(this.getFontColor()) &&
+               ls.getFontSize() == this.getFontSize() &&
+               ls.getFontType().equals(this.getFontType());
+    }
+
+    @Override
+    public int bytes() {
+        return 8 + super.bytes();
+    }
     
+    @Override
+    public void toBinary(byte[] arr, int pos) {
+        arr[pos] = type.toByte();
+        BinaryUtil.colorToBytes(lineColor, arr, pos+1);
+        BinaryUtil.intToBytes(lineSize, arr, pos+4);
+        super.toBinary(arr, pos+8);
+    }
+
+    @Override
+    public void fromBinary(byte[] arr, int pos, FlowchartWindow window) {
+        type = LineType.fromByte(arr[pos]);
+        lineColor = BinaryUtil.bytesToColor(arr, pos+1);
+        lineSize = BinaryUtil.bytesToInt(arr, pos+4);
+        super.fromBinary(arr, pos+8, window);
+    }    
 }

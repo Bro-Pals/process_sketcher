@@ -19,10 +19,92 @@
  */
 package bropals.flowy;
 
+import bropals.flowy.style.LineStyle;
+import bropals.flowy.style.NodeStyle;
+import java.util.Collection;
+import java.util.HashMap;
+
 /**
- *
+ * Manages the styles that are to be saved.
  * @author Jonathon
  */
 public class StyleManager {
-    // no plan yet :(
+
+    private HashMap<String, NodeStyle> nodeStyles;
+    private HashMap<String, LineStyle> lineStyles;
+    
+    public StyleManager() {
+        nodeStyles = new HashMap<>();
+        lineStyles = new HashMap<>();
+    }
+    
+    /**
+     * Save a node style to the style manager.
+     * @param name the name to save the style as.
+     * @param ns the node style.
+     */
+    public void saveNodeStyle(String name, NodeStyle ns) {
+        nodeStyles.put(name, (NodeStyle)ns.clone());
+    }
+    
+     /**
+     * Save a line style to the style manager.
+     * @param name the name to save the style as.
+     * @param ls the line style.
+     */
+    public void saveLineStyle(String name, LineStyle ls) {
+        lineStyles.put(name, (LineStyle)ls.clone());
+    }
+    
+    /**
+     * Removes a node style from the style manager.
+     * @param name the name of the style to remove.
+     */
+    public void removeNodeStyle(String name) {
+        nodeStyles.remove(name);
+    }
+    
+    /**
+     * Removes a line style from the style manager.
+     * @param name the name of the style to remove.
+     */
+    public void removeLineStyle(String name) {
+        lineStyles.remove(name);
+    }
+    
+    /**
+     * Lists the saved node styles as an array.
+     * @return a list of the saved node styles.
+     */
+    public NodeStyle[] listNodeStyles() {
+        Collection ns = nodeStyles.values();
+        return (NodeStyle[])ns.toArray(new NodeStyle[0]);
+    }
+    
+    /**
+     * Lists the saved node style names as an array.
+     * @return a list of the saved node style names.
+     */
+    public String[] listNodeStyleNames() {
+        Collection ns = nodeStyles.keySet();
+        return (String[])ns.toArray(new String[0]);
+    }
+    
+    /**
+     * Lists the saved line styles as an array.
+     * @return a list of the saved line styles.
+     */
+    public LineStyle[] listLineStyles() {
+        Collection ns = lineStyles.values();
+        return (LineStyle[])ns.toArray(new LineStyle[0]);
+    }
+    
+    /**
+     * Lists the saved line style names as an array.
+     * @return a list of the saved line style names.
+     */
+    public String[] listLineStyleNames() {
+        Collection ns = lineStyles.keySet();
+        return (String[])ns.toArray(new String[0]);
+    }
 }

@@ -21,6 +21,7 @@ package bropals.flowy.data;
 
 import bropals.flowy.Camera;
 import bropals.flowy.EventManager;
+import bropals.flowy.FlowchartWindow;
 import bropals.flowy.style.FontStyle;
 import bropals.flowy.style.NodeStyle;
 import java.awt.Graphics;
@@ -30,7 +31,7 @@ import java.util.ArrayList;
  * An object to represent a node in a flowchart.
  * @author Jonathon
  */
-public class Node implements Selectable {
+public class Node implements Selectable, BinaryData {
     
     /**
      * The smallest value for the width / height of a node.
@@ -202,5 +203,31 @@ public class Node implements Selectable {
     @Override
     public FontStyle getFontStyle() {
         return style;
+    }
+
+    @Override
+    public int bytes() {
+        return 16+BinaryUtil.bytesForString(innerText)+style.bytes();
+    }
+
+    @Override
+    public void toBinary(byte[] arr, int pos) {
+        BinaryUtil.floatToBytes(x, arr, pos);
+        BinaryUtil.floatToBytes(y, arr, pos+4);
+        BinaryUtil.floatToBytes(width, arr, pos+8);
+        BinaryUtil.floatToBytes(height, arr, pos+12);
+        BinaryUtil.stringToBytes(innerText, arr, pos+16);
+        style.toBinary(arr, pos+16+BinaryUtil.bytesForString(innerText));
+    }
+
+    @Override
+    public void fromBinary(byte[] arr, int pos, FlowchartWindow window) {
+        x = BinaryUtil.bytesToFloat(arr, pos);
+        y = BinaryUtil.bytesToFloat(arr, pos+4);
+        width = BinaryUtil.bytesToFloat(arr, pos+8);
+        height = BinaryUtil.bytesToFloat(arr, pos+12);
+        innerText = BinaryUtil.bytesToString(arr, pos+16);
+        style = new NodeStyle();
+        style.fromBinary(arr, pos+16+BinaryUtil.bytesForString(innerText), window);
     }
 }
