@@ -70,6 +70,7 @@ public class SelectionManager {
         selected.add(selectable);
         instance.refreshStylesTabVisiblity();
         instance.refreshValuesOfStylesTabDueToNewSelection(selectable);
+        instance.revalidateStyles();
     }
     
     /**
@@ -79,6 +80,7 @@ public class SelectionManager {
     public void deselect(Selectable selectable) {
         selected.remove(selectable);
         instance.refreshStylesTabVisiblity();
+        instance.revalidateStyles();
     }
     
     /**

@@ -624,6 +624,7 @@ public class FlowchartWindow extends JFrame {
      */
     public void revalidateStyles() {
         stylesTab.revalidate();
+        buttonPanel.repaint();
     }
     
     
@@ -660,20 +661,16 @@ public class FlowchartWindow extends JFrame {
                 } else if (eventManager.getSelectionManager().getSelected().get(i) instanceof NodeLine) {
                     hasLine = true;
                 }
-                if (hasNode && hasLine) {
-                    makeAllStylesVisible();
-                    revalidateStyles();
-                    return;
-                }
             }
             getFontStylePanel().setVisible(true);
             if (hasNode) {
                 getNodeStylePanel().setVisible(true);
-            } else if (hasLine) {
+            }
+            if (hasLine) {
                 getLineStylePanel().setVisible(true);
+                getLineStylePanel().revalidate();
             }
         }
-        revalidateStyles();
     }
     
     /**

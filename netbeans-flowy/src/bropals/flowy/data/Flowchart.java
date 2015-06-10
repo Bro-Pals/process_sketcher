@@ -126,7 +126,6 @@ public class Flowchart implements BinaryData {
     @Override
     public void toBinary(byte[] arr, int pos) {
         ArrayList<NodeLine> nodeLines = getNodeLines();
-        System.out.println(nodeLines.size() + " node lines");
         NodeStyle[] nodeStyles = styleManager.listNodeStyles();
         LineStyle[] lineStyles = styleManager.listLineStyles();
         String[] nodeStyleNames = styleManager.listNodeStyleNames();
@@ -140,34 +139,31 @@ public class Flowchart implements BinaryData {
         //Write the number of node lines
         BinaryUtil.intToBytes(nodeLines.size(), arr, pos+12);
         int mark = 16;
-        for (int i=0; i<nodeStyles.length; i++) {
+        int i;
+        for (i=0; i<nodeStyles.length; i++) {
             BinaryUtil.stringToBytes(nodeStyleNames[i], arr, pos+mark);
             mark += BinaryUtil.bytesForString(nodeStyleNames[i]);
             nodeStyles[i].toBinary(arr, pos+mark);
             mark += nodeStyles[i].bytes();
         }
-        for (int i=0; i<lineStyles.length; i++) {
+        for (i=0; i<lineStyles.length; i++) {
             BinaryUtil.stringToBytes(lineStyleNames[i], arr, pos+mark);
             mark += BinaryUtil.bytesForString(lineStyleNames[i]);
             lineStyles[i].toBinary(arr, pos+mark);
             mark += lineStyles[i].bytes();
         }
-        for (int i=0; i<nodes.size(); i++) {
-            nodes.get(i).toBinary(arr, pos+mark);
-            mark += nodes.get(i).bytes();
+        for (Node node : nodes) {
+            node.toBinary(arr, pos+mark);
+            mark += node.bytes();
         }
-        for (int i=0; i<nodeLines.size(); i++) {
-            BinaryUtil.intToBytes(
-                    nodes.indexOf(nodeLines.get(i).getChild()), arr, pos+mark
-            );
+        for (NodeLine nodeLine : nodeLines) {
+            BinaryUtil.intToBytes(nodes.indexOf(nodeLine.getChild()), arr, pos+mark);
             mark += 4;
-            BinaryUtil.intToBytes(
-                    nodes.indexOf(nodeLines.get(i).getParent()), arr, pos+mark
-            );
+            BinaryUtil.intToBytes(nodes.indexOf(nodeLine.getParent()), arr, pos+mark);
             mark += 4;
-            System.out.println("Mark is at position " + mark);
-            nodeLines.get(i).toBinary(arr, pos+mark);
-            mark += nodeLines.get(i).bytes();
+            nodeLine.toBinary(arr, pos+mark);
+            mark += (nodeLine.bytes()-8); 
+            //Minus 8 because the other bytes have already been added
         }
     }
 
