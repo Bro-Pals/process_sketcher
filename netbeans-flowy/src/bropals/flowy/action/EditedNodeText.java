@@ -39,6 +39,7 @@ public class EditedNodeText extends Action {
     @Override
     public void undo(FlowchartWindow instance) {
         System.out.println("undo edited node text");
+        node.setInnerText(text);
     }
     
 }

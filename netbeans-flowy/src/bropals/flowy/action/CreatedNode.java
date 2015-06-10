@@ -20,6 +20,7 @@
 package bropals.flowy.action;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.Node;
 
 /**
  * The action that occurs when you make a node using the "Add" GUI button
@@ -27,9 +28,16 @@ import bropals.flowy.FlowchartWindow;
  */
 public class CreatedNode extends Action {
 
+    private Node node;
+    
+    public CreatedNode(Node createdNode) {
+        node = createdNode;
+    }
+    
     @Override
     public void undo(FlowchartWindow instance) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        System.out.println("Undo adding a new node");
+        instance.getFlowchart().getNodes().remove(node);
     }
     
 }

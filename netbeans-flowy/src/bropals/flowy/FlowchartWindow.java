@@ -101,7 +101,7 @@ public class FlowchartWindow extends JFrame {
     /**
      * The window manager for all windows.
      */
-    private FlowchartWindowManager flowchartWindowManager;
+    private final FlowchartWindowManager flowchartWindowManager;
     /**
      * The flowchart that this FlowchartWindow is currently editing.
      */
@@ -113,11 +113,11 @@ public class FlowchartWindow extends JFrame {
     /**
      * Manages events related to the view.
      */
-    private EventManager eventManager;
+    private final EventManager eventManager;
     /**
      * Handles the saved styles.
      */
-    private StyleManager styleManager;
+    private final StyleManager styleManager;
     /**
      * The file chooser.
      */

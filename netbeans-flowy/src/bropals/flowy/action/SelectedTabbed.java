@@ -20,6 +20,7 @@
 package bropals.flowy.action;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.Node;
 import bropals.flowy.data.Selectable;
 import java.util.ArrayList;
 
@@ -27,18 +28,28 @@ import java.util.ArrayList;
  * An action that occurs when you press Tab to select the next or previous Node
  * @author Kevin
  */
-public class SelectedTabbed extends Selected {
+public class SelectedTabbed extends Action {
 
-    public SelectedTabbed(ArrayList<Selectable> addedToSelection) {
-        super(addedToSelection);
+    private ArrayList<Selectable> deselected;
+    
+    public SelectedTabbed(ArrayList<Selectable> deselectedStuff) {
+        deselected = deselectedStuff;
     }
-    /**
-     * The node
-     */
+
     
     @Override
     public void undo(FlowchartWindow instance) {
         System.out.println("Undo selection with tabbing");
+        
+        // clear the selection
+        instance.getEventManager().getSelectionManager().getSelected().clear();
+        
+        // reselect the things that were deselected
+        for (Selectable s : deselected) {
+            if (!instance.getEventManager().getSelectionManager().getSelected().contains(s)) {
+                instance.getEventManager().getSelectionManager().getSelected().add(s);
+            }
+        }
     }
     
     

@@ -20,6 +20,8 @@
 package bropals.flowy.action;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.Selectable;
+import java.util.ArrayList;
 
 /**
  * An action that occurs when you deselect a Selectable or many Selectables
@@ -27,9 +29,16 @@ import bropals.flowy.FlowchartWindow;
  */
 public class Deselected extends Action {
 
+    ArrayList<Selectable> deselected;
+    
+    public Deselected(ArrayList<Selectable> deselectedSelectables) {
+        deselected = deselectedSelectables;
+    }
+    
     @Override
     public void undo(FlowchartWindow instance) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        System.out.println("Undo deselecting nodes");
+        instance.getEventManager().getSelectionManager().getSelected().addAll(deselected);
     }
     
 }

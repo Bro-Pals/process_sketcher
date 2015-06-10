@@ -20,6 +20,7 @@
 package bropals.flowy.action;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.TextTypeManager;
 import bropals.flowy.data.NodeLine;
 
 /**
@@ -41,6 +42,17 @@ public class EditedNodeLineText extends Action {
     @Override
     public void undo(FlowchartWindow instance) {
         System.out.println("Undo changing text on a NodeLine");
+        switch(partOfLine) {
+            case TextTypeManager.CENTER:
+                line.setCenterText(oldText);
+                break;
+            case TextTypeManager.TAIL:
+                line.setTailText(oldText);
+                break;
+            case TextTypeManager.HEAD:
+                line.setHeadText(oldText);
+                break;
+        }
     }
     
 }

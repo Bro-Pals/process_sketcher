@@ -20,6 +20,7 @@
 package bropals.flowy.action;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.Node;
 import bropals.flowy.data.NodeLine;
 
 /**
@@ -40,6 +41,11 @@ public class ConnectedNodes extends Action {
     @Override
     public void undo(FlowchartWindow instance) {
         System.out.println("Undid connecting two lines together");
+        Node parent = line.getParent();
+        Node child = line.getChild();
+        parent.getLinesConnected().remove(line);
+        child.getLinesConnected().remove(line);
+        line = null;
     }
     
 }

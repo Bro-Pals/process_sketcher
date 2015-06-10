@@ -37,7 +37,7 @@ public class DragManager {
     /**
      * The selection manager for the current FlowchartWindow.
      */
-    private SelectionManager selectionManager;
+    private final SelectionManager selectionManager;
     /**
      * The selectables that are currently on the clipboard.
      */

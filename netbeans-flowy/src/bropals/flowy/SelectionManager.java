@@ -234,11 +234,13 @@ public class SelectionManager {
                         // look through the other nodes...
                         for (Node other : instance.getFlowchart().getNodes()) {
                             // to delete any node line that references the node we're removing
-                            for (NodeLine nl : other.getLinesConnected()) {
-                                // if the line references the removed node AT ALL
-                                if (other != removedNode && nl.getChild() == removedNode || nl.getParent() == removedNode) {
-                                    other.getLinesConnected().remove(nl);
-                                    break;
+                            if (other != removedNode) {
+                                for (NodeLine nl : other.getLinesConnected()) {
+                                    // if the line references the removed node AT ALL
+                                    if (nl.getChild() == removedNode || nl.getParent() == removedNode) {
+                                        other.getLinesConnected().remove(nl);
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -248,9 +250,12 @@ public class SelectionManager {
                 }
             } else if (s instanceof NodeLine) {
                 for (int i=0; i<instance.getFlowchart().getNodes().size(); i++) {
-                    for (int l=0; l<instance.getFlowchart().getNodes().get(i).getLinesConnected().size(); l++) {
-                        if (((NodeLine)s) == instance.getFlowchart().getNodes().get(i).getLinesConnected().get(l)) {
-                            instance.getFlowchart().getNodes().get(i).getLinesConnected().remove(l);
+                    // only remove the lines from nodes that are not being deleted
+                    if (!stuff.contains(instance.getFlowchart().getNodes().get(i)) ) {
+                        for (int l=0; l<instance.getFlowchart().getNodes().get(i).getLinesConnected().size(); l++) {
+                            if (((NodeLine)s) == instance.getFlowchart().getNodes().get(i).getLinesConnected().get(l)) {
+                                instance.getFlowchart().getNodes().get(i).getLinesConnected().remove(l);
+                            }
                         }
                     }
                 }

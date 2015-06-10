@@ -40,6 +40,8 @@ public class ScaledNode extends Action {
     @Override
     public void undo(FlowchartWindow instance) {
         System.out.println("Undid scaling a node");
+        node.setWidth((float)dimension.getWidth());
+        node.setHeight((float)dimension.getHeight());
     }
     
 }

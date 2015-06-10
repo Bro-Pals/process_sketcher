@@ -36,11 +36,11 @@ public class HistoryManager {
     /**
      * The limit to how many Action objects can be stored in the actions array.
      */
-    private final int HISTORY_LIMIT = 10;
+    private final int HISTORY_LIMIT = 20;
     /**
      * The FlowchartWindow this HistoryManager is keeping track of the history of.
      */
-    private FlowchartWindow instance;
+    private final FlowchartWindow instance;
     /**
      * Used for saving the size of something.
      */

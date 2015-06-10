@@ -20,6 +20,8 @@
 package bropals.flowy.action;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.Node;
+import bropals.flowy.data.NodeLine;
 import bropals.flowy.data.Selectable;
 import java.util.ArrayList;
 
@@ -38,6 +40,28 @@ public class Deleted extends Action {
     @Override
     public void undo(FlowchartWindow instance) {
         System.out.println("Undo deletion");
+        
+        ArrayList<Node> addedNodes = new ArrayList<>();
+        ArrayList<NodeLine> addedLines = new ArrayList<>();
+
+        for (int i=0; i<deleted.size(); i++) {
+            if (deleted.get(i) instanceof Node) {
+                addedNodes.add((Node)deleted.get(i));
+            } else {
+                addedLines.add((NodeLine)deleted.get(i));
+            }
+        }
+        
+        instance.getFlowchart().getNodes().addAll(addedNodes);
+        
+        for (int i=0; i<addedLines.size(); i++) {
+            if (!addedLines.get(i).getChild().getLinesConnected().contains(addedLines.get(i))) {
+                addedLines.get(i).getChild().getLinesConnected().add(addedLines.get(i));
+            }
+            if (!addedLines.get(i).getParent().getLinesConnected().contains(addedLines.get(i))) {
+                addedLines.get(i).getParent().getLinesConnected().add(addedLines.get(i));
+            }
+        }
     }
     
 }
