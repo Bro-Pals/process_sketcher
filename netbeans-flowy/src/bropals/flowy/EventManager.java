@@ -45,23 +45,23 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
     /**
      * The SelectionManager used by this object and the window.
      */
-    private SelectionManager selectionManager;
+    private final SelectionManager selectionManager;
     /**
      * The window that this event manager is a listener for.
      */
-    private FlowchartWindow window;
+    private final FlowchartWindow window;
     /**
      * The DragManager for containing information about dragging things.
      */
-    private DragManager dragManager;
+    private final DragManager dragManager;
     /**
      * Contains all the information and methods for typing text.
      */
-    private TextTypeManager textTypeManager;
+    private final TextTypeManager textTypeManager;
     /**
      * The HistoryManager to manage the history and implement the undo feature.
      */
-    private HistoryManager historyManager;
+    private final HistoryManager historyManager;
     /**
      * The variable to track if the spacebar is held down or not.
      */
@@ -110,9 +110,19 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      * Delete all the selected nodes and deselect
      */
     public void deleteSelected() {
+        ArrayList<Selectable> deletedThings = new ArrayList<>();
+        deletedThings.addAll(selectionManager.getSelected());
+        
+        // add a nodeline to the deleted list of it's parent and child are being deleted too
+        for (NodeLine nl : window.getFlowchart().getNodeLines()) {
+            if (!deletedThings.contains(nl) && deletedThings.contains(nl.getChild()) && 
+                    deletedThings.contains(nl.getParent())) {
+                deletedThings.add(nl);
+            }
+        }
         selectionManager.removeSelectables(selectionManager.getSelected());
         // add it to history
-        historyManager.addToHistory(new Deleted(selectionManager.getSelected()));
+        historyManager.addToHistory(new Deleted(deletedThings));
         
         selectionManager.clearSelection();
         window.redrawView();
@@ -646,17 +656,25 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 }
             }
         } else if (nodeLine != null) { // actions only for node lines
-            if (!e.isShiftDown()) {
-                selectionManager.clearSelection();
-            }
             if (!selectionManager.getSelected().contains(clickedOnThing)) {
+                if (!e.isShiftDown()) {
+                    selectionManager.clearSelection();
+                }
                 selectionManager.select(clickedOnThing);
+                // record that it was added to the selection
+                historyManager.addToHistory(new Selected(clickedOnThing));
             }
         }
 
         if (node == null && nodeLine == null && e.getButton() == MouseEvent.BUTTON1) {
             // clear selection if you don't click anything
             if (!e.isShiftDown()) {
+                ArrayList<Selectable> deselectedThings = new ArrayList<>();
+                deselectedThings.addAll(selectionManager.getSelected());
+                //track how many things were deselected only if something was deselected
+                if (!deselectedThings.isEmpty()) {
+                    historyManager.addToHistory(new Deselected(deselectedThings));
+                }
                 selectionManager.clearSelection();
             }
 
@@ -941,4 +959,12 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         return textTypeManager;
     }
 
+    /**
+     * Get the history manager used by this event manager
+     * @return the history manager used by this event manager
+     */
+    public HistoryManager getHistoryManager() {
+        return historyManager;
+    }
+    
 }

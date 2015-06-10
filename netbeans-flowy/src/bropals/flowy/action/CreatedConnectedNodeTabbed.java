@@ -43,7 +43,17 @@ public class CreatedConnectedNodeTabbed extends Action {
     
     @Override
     public void undo(FlowchartWindow instance) {
-        System.out.println("Create the connected node tabbed");
+        System.out.println("Undo creating a connected node with tab");
+        Node parent = line.getParent();
+        Node child = line.getChild();
+        parent.getLinesConnected().remove(line);
+        child.getLinesConnected().remove(line);
+        line = null;
+        instance.getFlowchart().getNodes().remove(node);
+        
+        // make the select to what it was
+        instance.getEventManager().getSelectionManager().clearSelection();
+        instance.getEventManager().getSelectionManager().getSelected().addAll(selectables);
     }
     
 }

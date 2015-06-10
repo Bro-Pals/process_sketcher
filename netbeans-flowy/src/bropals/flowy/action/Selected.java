@@ -46,6 +46,7 @@ public class Selected extends Action {
     @Override
     public void undo(FlowchartWindow instance) {
         System.out.println("Undo selection action");
+        instance.getEventManager().getSelectionManager().getSelected().removeAll(selected);
     }
     
 }

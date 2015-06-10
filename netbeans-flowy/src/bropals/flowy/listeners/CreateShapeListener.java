@@ -20,6 +20,7 @@
 package bropals.flowy.listeners;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.action.CreatedNode;
 import bropals.flowy.data.Node;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -36,8 +37,6 @@ public class CreateShapeListener extends AbstractFlowyListener implements Action
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        System.out.println("Creating shape");
-        
         // add a shape, placing it in the center of the screen
         Node node = new Node(0, 0);
         getFlowchartWindow().getFlowchart().getNodes().add(node);
@@ -51,6 +50,8 @@ public class CreateShapeListener extends AbstractFlowyListener implements Action
         // position the node to the center
         node.setX(centerX - (node.getWidth()/2));
         node.setY(centerY - (node.getHeight()/2));
+        
+        getFlowchartWindow().getEventManager().getHistoryManager().addToHistory(new CreatedNode(node));
         
         // redraw the view
         getFlowchartWindow().redrawView();

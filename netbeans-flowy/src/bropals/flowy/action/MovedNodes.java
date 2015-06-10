@@ -46,6 +46,10 @@ public class MovedNodes extends Action {
     @Override
     public void undo(FlowchartWindow instance) {
         System.out.println("Undo moving Nodes");
+        for (int i=0; i<nodesMoved.length; i++) {
+            nodesMoved[i].setX(initialXPos + offsetsOfNodes[i][0]);
+            nodesMoved[i].setY(initialYPos + offsetsOfNodes[i][1]);
+        }
     }
     
 }
