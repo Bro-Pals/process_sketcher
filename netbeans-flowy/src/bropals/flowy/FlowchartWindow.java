@@ -51,6 +51,10 @@ import bropals.flowy.listeners.PrintFlowchartListener;
 import bropals.flowy.listeners.ResetViewListener;
 import bropals.flowy.listeners.SaveAsFlowchartListener;
 import bropals.flowy.listeners.SaveFlowchartListener;
+import bropals.flowy.listeners.SaveLineStylesListener;
+import bropals.flowy.listeners.SaveNodeStylesListener;
+import bropals.flowy.listeners.SavedLineStylesListener;
+import bropals.flowy.listeners.SavedNodeStylesListener;
 import bropals.flowy.listeners.SelectNextNodeListener;
 import bropals.flowy.listeners.SelectPreviousNodeListener;
 import bropals.flowy.listeners.ShapeListener;
@@ -71,7 +75,6 @@ import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.print.PrinterException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -87,6 +90,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.ListCellRenderer;
@@ -140,6 +144,16 @@ public class FlowchartWindow extends JFrame {
 
     private JPanel stylesTab;
 
+    //Node style saving buttons
+    private JPanel savedNodeStylesPanel;
+    private JComboBox<String> savedNodeStyles;
+    private JButton saveNodeStyle;
+    
+    //Node style saving buttons
+    private JPanel savedLineStylesPanel;
+    private JComboBox<String> savedLineStyles;
+    private JButton saveLineStyle;
+    
     //Font style buttons
     private JPanel fontStylePanel;
     private JSpinner fontSize;
@@ -216,7 +230,7 @@ public class FlowchartWindow extends JFrame {
         fc.setFileFilter(new FileNameExtensionFilter("Flowy flowchart files (*.fwy)", "fwy"));
         eventManager = new EventManager(this);
         buttonPanel = new JTabbedPane();
-        buttonPanel.setPreferredSize(new Dimension(400, 105));
+        buttonPanel.setPreferredSize(new Dimension(400, 125));
         camera = new Camera();
         view = new JComponent() {
             @Override
@@ -425,7 +439,7 @@ public class FlowchartWindow extends JFrame {
         fileTab.add(exportChartToPDF);
         fileTab.add(exportChartToImage);
 
-        buttonPanel.addTab("File", fileTab);
+        buttonPanel.addTab("File", wrapInScrollPane(fileTab));
 
         JPanel editTab = new JPanel();
         editTab.setLayout(new BoxLayout(editTab, BoxLayout.X_AXIS));
@@ -470,7 +484,7 @@ public class FlowchartWindow extends JFrame {
         autoformatHorizontally.setToolTipText("Formats the flowchart horizontally");
         autoformatVertically.setToolTipText("Formats the flowchart vertically");
 
-        buttonPanel.addTab("Edit", editTab);
+        buttonPanel.addTab("Edit", wrapInScrollPane(editTab));
 
         JPanel viewTab = new JPanel();
         viewTab.setLayout(new BoxLayout(viewTab, BoxLayout.X_AXIS));
@@ -495,11 +509,45 @@ public class FlowchartWindow extends JFrame {
         viewTab.add(resetView);
         viewTab.add(fitToView);
 
-        buttonPanel.addTab("View", viewTab);
+        buttonPanel.addTab("View", wrapInScrollPane(viewTab));
 
         stylesTab = new JPanel();
         stylesTab.setLayout(new BoxLayout(stylesTab, BoxLayout.X_AXIS));
 
+        savedNodeStylesPanel = new JPanel();
+        savedNodeStylesPanel.setLayout(new BoxLayout(savedNodeStylesPanel, BoxLayout.Y_AXIS));
+        
+        savedNodeStyles = new JComboBox(styleManager.listNodeStyleNames());
+        saveNodeStyle = new JButton(getIcon("saveNodeStyleIcon.png"));
+        
+        savedNodeStylesPanel.add(savedNodeStyles);
+        savedNodeStylesPanel.add(saveNodeStyle);
+        
+        savedNodeStyles.addActionListener(new SavedNodeStylesListener(this));
+        saveNodeStyle.addActionListener(new SaveNodeStylesListener(this));
+        
+        savedNodeStyles.setToolTipText("Set the style of the currently selected node to a saved style");
+        saveNodeStyle.setToolTipText("Save the style of the currently selected node for later use");
+        
+        stylesTab.add(savedNodeStylesPanel);
+        
+        savedLineStylesPanel = new JPanel();
+        savedLineStylesPanel.setLayout(new BoxLayout(savedLineStylesPanel, BoxLayout.Y_AXIS));
+        
+        savedLineStyles = new JComboBox(styleManager.listLineStyleNames());
+        saveLineStyle = new JButton(getIcon("saveLineStyleIcon.png"));
+        
+        savedLineStylesPanel.add(savedLineStyles);
+        savedLineStylesPanel.add(saveLineStyle);
+        
+        savedLineStyles.addActionListener(new SavedLineStylesListener(this));
+        saveLineStyle.addActionListener(new SaveLineStylesListener(this));
+        
+        savedLineStyles.setToolTipText("Set the style of the currently selected node line to a saved style");
+        saveLineStyle.setToolTipText("Save the style of the currently selected node line for later use");
+        
+        stylesTab.add(savedLineStylesPanel);
+        
         //Need to make different panels to separate the buttons
         fontStylePanel = new JPanel();
         fontStylePanel.setLayout(new GridLayout(2, 2));
@@ -569,7 +617,26 @@ public class FlowchartWindow extends JFrame {
 
         stylesTab.add(nodeStylePanel);
 
-        buttonPanel.addTab("Styles", stylesTab);
+        //Need to make the panels invisible initially
+        nodeStylePanel.setVisible(false);
+        savedNodeStylesPanel.setVisible(false);
+        lineStylePanel.setVisible(false);
+        savedLineStylesPanel.setVisible(false);
+        fontStylePanel.setVisible(false);
+        
+        buttonPanel.addTab("Styles", wrapInScrollPane(stylesTab));
+    }
+    
+    /**
+     * Wraps a panel in a scroll pane.
+     * @param panel the panel to wrap.
+     * @return a scroll panel that contains the given panel.
+     */
+    private JScrollPane wrapInScrollPane(JPanel panel) {
+        JScrollPane pane = new JScrollPane(panel);
+        pane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        pane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        return pane;
     }
 
     /**
@@ -647,8 +714,8 @@ public class FlowchartWindow extends JFrame {
      */
     public void makeAllStylesInvisible() {
         getFontStylePanel().setVisible(false);
-        getLineStylePanel().setVisible(false);
-        getNodeStylePanel().setVisible(false);
+        setLineRelatedPanelVisible(false);
+        setNodeRelatedPanelVisible(false);
     }
 
     /**
@@ -656,8 +723,8 @@ public class FlowchartWindow extends JFrame {
      */
     public void makeAllStylesVisible() {
         getFontStylePanel().setVisible(true);
-        getLineStylePanel().setVisible(true);
-        getNodeStylePanel().setVisible(true);
+        setLineRelatedPanelVisible(true);
+        setNodeRelatedPanelVisible(true);
     }
 
     /**
@@ -678,10 +745,10 @@ public class FlowchartWindow extends JFrame {
             }
             getFontStylePanel().setVisible(true);
             if (hasNode) {
-                getNodeStylePanel().setVisible(true);
+               setNodeRelatedPanelVisible(true);
             }
             if (hasLine) {
-                getLineStylePanel().setVisible(true);
+                setLineRelatedPanelVisible(true);
             }
         }
     }
@@ -805,6 +872,24 @@ public class FlowchartWindow extends JFrame {
         }
     }
 
+    /**
+     * Sets the visibility of the node related panels.
+     * @param visible the visibility of the node related panel.
+     */
+    public void setNodeRelatedPanelVisible(boolean visible) {
+        nodeStylePanel.setVisible(visible);
+        savedNodeStylesPanel.setVisible(visible);
+    }
+    
+    /**
+     * Sets the visibility of the line related panels.
+     * @param visible the visibility of the line related panel.
+     */
+    public void setLineRelatedPanelVisible(boolean visible) {
+        lineStylePanel.setVisible(visible);
+        savedLineStylesPanel.setVisible(visible);
+    }
+    
     /**
      * Get the font combo box component
      *
