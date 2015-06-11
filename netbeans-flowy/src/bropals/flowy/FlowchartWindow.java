@@ -236,6 +236,7 @@ public class FlowchartWindow extends JFrame {
         });
         add(buttonPanel, BorderLayout.NORTH);
         add(view, BorderLayout.CENTER);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setSize(800, 600);
         view.setFocusable(true);
         view.setFocusTraversalKeysEnabled(false);
@@ -652,7 +653,7 @@ public class FlowchartWindow extends JFrame {
      * Refresh what tabs are visible according to what's selected.
      */
     public void refreshStylesTabVisiblity() {
-        if (eventManager.getSelectionManager().getSelected().isEmpty()) {
+        if (eventManager.getSelectionManager().hasEmptySelection()) {
             makeAllStylesInvisible();
         } else {
             boolean hasNode = false;
@@ -670,7 +671,6 @@ public class FlowchartWindow extends JFrame {
             }
             if (hasLine) {
                 getLineStylePanel().setVisible(true);
-                getLineStylePanel().revalidate();
             }
         }
     }

@@ -88,7 +88,7 @@ public class FlowchartWindowManager implements WindowListener {
         FlowchartWindow window = (FlowchartWindow)e.getWindow();
         
         //Be sure to handle saving before closing here
-        tryCloseWindow(window);        
+        window.closeWindow();
     }
 
     @Override
@@ -148,16 +148,21 @@ public class FlowchartWindowManager implements WindowListener {
      * @param window the window to close.
      */
     public void tryCloseWindow(FlowchartWindow window) {
+        boolean close = false;
         int response = JOptionPane.showConfirmDialog(welcomeWindow, "Save changes before closing?", "Save flowchart?", JOptionPane.YES_NO_CANCEL_OPTION);
         if (response == JOptionPane.YES_OPTION) {
             window.saveFlowchart();
+            close = true;
         } else if (response == JOptionPane.NO_OPTION) {
             //Do nothing
+            close = true;
         } else if (response == JOptionPane.CANCEL_OPTION) {
-            return;
+            close = false;
         }
-        windows.remove(window);
-        window.dispose();
+        if (close) {
+            windows.remove(window);
+            window.dispose();
+        }
     }
     
     /**

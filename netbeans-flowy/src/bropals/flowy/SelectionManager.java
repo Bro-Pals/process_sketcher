@@ -265,4 +265,11 @@ public class SelectionManager {
         }
     }
     
+    /**
+     * Checks to see if selection manager is not selecting anything.
+     * @return <code>true</code> if nothing is selected.
+     */
+    public boolean hasEmptySelection() {
+        return selected.isEmpty();
+    }
 }
