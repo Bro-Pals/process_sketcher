@@ -19,14 +19,19 @@
  */
 package bropals.flowy;
 
+import bropals.flowy.data.Flowchart;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
 /**
@@ -44,6 +49,10 @@ public class FlowchartWindowManager implements WindowListener {
      */
     private JFrame welcomeWindow;
     /**
+     * The default file chooser.
+     */
+    private JFileChooser fc;
+    /**
      * How many flowcharts that have been opened this session. 
      * The actual number will be one less than this value.
      */
@@ -54,11 +63,16 @@ public class FlowchartWindowManager implements WindowListener {
      */
     public FlowchartWindowManager() {
         windows = new ArrayList<>();
+        fc = new JFileChooser();
         welcomeWindow = new JFrame("Welcome to Flowy");
+        welcomeWindow.setLayout(new FlowLayout());
         welcomeWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         JButton newFlowchart = new JButton("New Flowchart");
         welcomeWindow.add(newFlowchart);
         newFlowchart.addActionListener(new NewFlowchartListener());
+        JButton openFlowchart = new JButton("Open Flowchart");
+        welcomeWindow.add(openFlowchart);
+        openFlowchart.addActionListener(new OpenFlowchartListener());
         welcomeWindow.setSize(400, 300);
         welcomeWindow.setLocationRelativeTo(null);
         welcomeWindow.setVisible(true);
@@ -114,12 +128,11 @@ public class FlowchartWindowManager implements WindowListener {
     /**
      * Opens a flowchart file.
      * @param stream the input stream to read the flowchart data from.
-     * @param name the name of the chart to open.
      * @param file the file the flowchart came from, if any.
      */
-    public void openFlowchart(InputStream stream, String name, File file) {
+    public void openFlowchart(InputStream stream, File file) {
         FlowchartWindow window = new FlowchartWindow(this, stream, file);
-        window.setTitle("Flowy | " + name);
+        window.refreshWindowTitle();
         addToStack(window);
     }
     
@@ -139,6 +152,28 @@ public class FlowchartWindowManager implements WindowListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             newFlowchart();
+        }
+    }
+    
+    /**
+     * The action listener for the welcome window's button.
+     */
+    class OpenFlowchartListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            int response = fc.showOpenDialog(welcomeWindow);
+            if (response == JFileChooser.APPROVE_OPTION) {
+                File file = fc.getSelectedFile();
+                try {
+                    openFlowchart(
+                        Files.newInputStream(file.toPath()),
+                        file
+                    );
+                } catch (IOException ex) {
+                    System.err.println("Unable to read flowchart data from " + file + ", " + ex);
+                }
+            }
         }
     }
 }

@@ -23,6 +23,8 @@ import bropals.flowy.FlowchartWindow;
 import bropals.flowy.StyleManager;
 import bropals.flowy.style.LineStyle;
 import bropals.flowy.style.NodeStyle;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 /**
@@ -170,6 +172,93 @@ public class Flowchart implements BinaryData {
     @Override
     public void fromBinary(byte[] arr, int pos, FlowchartWindow window) {
         nodes.clear();
-        
+        int nodeStyleCount = BinaryUtil.bytesToInt(arr, pos);
+        int lineStyleCount = BinaryUtil.bytesToInt(arr, pos+4);
+        int nodeCount = BinaryUtil.bytesToInt(arr, pos+8);
+        int nodeLineCount = BinaryUtil.bytesToInt(arr, pos+12);
+        int mark = 16; //The position in the byte array from position
+        int i;
+        String name;
+        NodeStyle nodeStyle;
+        for (i=0; i<nodeStyleCount; i++) {
+            nodeStyle = new NodeStyle();
+            name = BinaryUtil.bytesToString(arr, pos+mark);
+            mark += BinaryUtil.bytesForString(name);
+            nodeStyle.fromBinary(arr, pos+mark, window);
+            mark += nodeStyle.bytes();
+            //Place it in the style manager after it is loaded in
+            styleManager.saveNodeStyle(name, nodeStyle);
+        }
+        LineStyle lineStyle;
+        for (i=0; i<lineStyleCount; i++) {
+            lineStyle = new LineStyle();
+            name = BinaryUtil.bytesToString(arr, pos+mark);
+            mark += BinaryUtil.bytesForString(name);
+            lineStyle.fromBinary(arr, pos+mark, window);
+            mark += lineStyle.bytes();
+            //Place it in the style manager after it is loaded in
+            styleManager.saveLineStyle(name, lineStyle);
+        }
+        Node node;
+        for (i=0; i<nodeCount; i++) {
+            node = new Node(0, 0);
+            node.fromBinary(arr, pos+mark, window);
+            mark += node.bytes();
+            nodes.add(node);
+        }
+        NodeLine nodeLine;
+        int nodeLineChild;
+        int nodeLineParent;
+        for (i=0; i<nodeLineCount; i++) {
+            nodeLine = new NodeLine(null, null);
+            nodeLineChild = BinaryUtil.bytesToInt(arr, pos+mark);
+            mark += 4;
+            nodeLineParent = BinaryUtil.bytesToInt(arr, pos+mark);
+            mark += 4;
+            nodeLine.fromBinary(arr, pos+mark, window);
+            Node child = nodes.get(nodeLineChild);
+            Node parent = nodes.get(nodeLineParent);
+            nodeLine.setChild(child);
+            nodeLine.setParent(parent);
+            child.getLinesConnected().add(nodeLine);
+            parent.getLinesConnected().add(nodeLine);
+            mark += (nodeLine.bytes()-8);
+            //Minus 8 because the other bytes have already been added
+        }
     }
+    
+    /**
+     * Creates a flowchart from data obtained from an InputStream.
+     * This function closes the InputStream.
+     * @param stream the stream with the flowchart data, opened.
+     * @param window the window using the flowchart
+     * @return the loaded flowchart.
+     */
+    public static final Flowchart readFlowchartData(InputStream stream, FlowchartWindow window) {
+        Flowchart chart = new Flowchart(false);
+        byte[] data = null;
+        try {
+            byte[] bSize = new byte[4];
+            stream.read(bSize);
+            int fileSize = BinaryUtil.bytesToInt(bSize, 0);
+            data = new byte[fileSize];
+            int actualRead;
+            if ((actualRead = stream.read(data)) != data.length) {
+                System.err.println("The file was expected to be " + data.length
+                 + " bytes long, but it was actually " + actualRead + " bytes long");
+            }
+            stream.close();
+        } catch(IOException e) {
+            System.err.println("Could not read flowchart from input stream: " + e);
+        }
+        if (data != null) {
+            chart.passStyleManager(window.getStyleManager());
+            chart.fromBinary(data, 0, window);
+            return chart;
+        } else {
+            System.err.println("Unable to read flowchart, using the default flowchart instead.");
+            return new Flowchart(true);
+        }
+    }
+    
 }
