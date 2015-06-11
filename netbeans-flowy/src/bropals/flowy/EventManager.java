@@ -647,7 +647,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     // if shift was not held down, only select and transform the clicked on node
                     if (!e.isShiftDown()) {
                         selectionManager.clearSelection();
-                        selectionManager.getSelected().add(node);
+                        selectionManager.select(node);
                     }
                     dragManager.startDragMove(mousePosition.x, mousePosition.y);
                     dragManager.setLeftMouseDown(true);
