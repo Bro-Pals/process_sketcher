@@ -80,6 +80,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
@@ -755,28 +756,295 @@ public class FlowchartWindow extends JFrame {
     }
 
     /**
-     * Refreshes the styles tab GUI in the flowchart window using a Selectable
-     *
-     * @param s The selectable whose values will be used in updating the GUI.
+     * Refreshes the styles tab GUI in the flowchart window using the 
+     * current selection.
      */
-    public void refreshValuesOfStylesTabDueToNewSelection(Selectable s) {
-        Node n = null;
-        NodeLine nl = null;
-        if (s instanceof Node) {
-            n = (Node) s;
-        } else if (s instanceof NodeLine) {
-            nl = (NodeLine) s;
-        }
-        setFontPanelStyles(s.getFontStyle().getFontType(), s.getFontStyle().getFontColor(), s.getFontStyle().getFontSize());
-        if (n != null) {
-            //Node
-            setNodePanelStyles(n.getStyle().getShape(), n.getStyle().getBorderColor(), n.getStyle().getFillColor(), n.getStyle().getBorderSize());
-        } else if (nl != null) {
-            //NodeLine
-            setLinePanelStyles(nl.getStyle().getType(), nl.getStyle().getLineColor(), nl.getStyle().getLineSize());
-        }
+    public void refreshValuesOfStylesTabDueToUpdatedSelection() {
+       ArrayList<Selectable> selected = getEventManager().getSelectionManager().getSelected();
+       if (!selected.isEmpty()) {
+           Font font = getSameFont(selected);
+           int fontSize = getSameFontSize(selected);
+           Color fontColor = getSameFontColor(selected);
+           LineType lineType = getSameLineType(selected);
+           Color lineColor = getSameLineColor(selected);
+           int lineSize = getSameLineSize(selected);
+           Shape shape = getSameShape(selected);
+           int borderSize = getSameBorderSize(selected);
+           Color borderColor = getSameBorderColor(selected);
+           Color fillColor = getSameFillColor(selected);
+           setFontPanelStyles(font, fontColor, fontSize);
+           setNodePanelStyles(shape, borderColor, fillColor, borderSize);
+           setLinePanelStyles(lineType, lineColor, lineSize);
+       }
     }
 
+    /**
+     * Gets the font name that is the same for all selectables in
+     * the given list, or <code>null</code> if they do not all have
+     * the same font.
+     * @param selected the list of selected objects.
+     * @return the font name that is common to all selectables, or
+     * <code>null</code> if the font name is not common.
+     */
+    private Font getSameFont(ArrayList<Selectable> selected) {
+        Font font = selected.get(0).getFontStyle().getFontType();
+        for (int i=1; i<selected.size(); i++) {
+            if (!selected.get(i).getFontStyle().getFontType().getFontName().equals(font.getFontName())) {
+                return null;
+            }
+        }
+        return font;
+    }
+    
+    /**
+     * Gets the font size that is the same for all selectables in
+     * the given list, or <code>-1</code> if they do not all have
+     * the same font size.
+     * @param selected the list of selected objects.
+     * @return the font size that is common to all selectables, or
+     * <code>-1</code> if the font size is not common.
+     */
+    private int getSameFontSize(ArrayList<Selectable> selected) {
+        int size = selected.get(0).getFontStyle().getFontSize();
+        for (int i=1; i<selected.size(); i++) {
+            if (size != selected.get(i).getFontStyle().getFontSize()) {
+                //The border size is not common
+                return -1;
+            }
+        }
+        return size;
+    }
+    
+    /**
+     * Gets the font color that is the same for all selectables in
+     * the given list, or <code>null</code> if they do not all have
+     * the same font color.
+     * @param selected the list of selected objects.
+     * @return the font color that is common to all selectables, or
+     * <code>null</code> if the font color is not common.
+     */
+    private Color getSameFontColor(ArrayList<Selectable> selected) {
+        Color color = selected.get(0).getFontStyle().getFontColor();
+        for (int i=1; i<selected.size(); i++) {
+            if (!selected.get(i).getFontStyle().getFontColor().equals(color)) {
+                return null;
+            }
+        }
+        return color;
+    }
+    
+    /**
+     * Gets the line type that is the same for all selectables in
+     * the given list, or <code>null</code> if they do not all have
+     * the same line type.
+     * @param selected the list of selected objects.
+     * @return the line type that is common to all selectables, or
+     * <code>null</code> if the line type is not common.
+     */
+    private LineType getSameLineType(ArrayList<Selectable> selected) {
+        int firstNodeLine = indexOfFirstNodeLine(selected);
+        if (firstNodeLine == -1) {
+            //No nodes in this selection anyway
+            return null;
+        }
+        LineType type = ((NodeLine)selected.get(firstNodeLine)).getStyle().getType();
+        for (int i=firstNodeLine+1; i<selected.size(); i++) {
+            if (selected.get(i) instanceof NodeLine) {
+                if (type != ((NodeLine)selected.get(i)).getStyle().getType()) {
+                    //The border size is not common
+                    return null;
+                }
+            }
+        }
+        return type;
+    }
+    
+    /**
+     * Gets the line color that is the same for all selectables in
+     * the given list, or <code>null</code> if they do not all have
+     * the same line color.
+     * @param selected the list of selected objects.
+     * @return the line color that is common to all selectables, or
+     * <code>null</code> if the line color is not common.
+     */
+    private Color getSameLineColor(ArrayList<Selectable> selected) {
+        int firstNodeLine = indexOfFirstNodeLine(selected);
+        if (firstNodeLine == -1) {
+            //No nodes in this selection anyway
+            return null;
+        }
+        Color color = ((NodeLine)selected.get(firstNodeLine)).getStyle().getLineColor();
+        for (int i=firstNodeLine+1; i<selected.size(); i++) {
+            if (selected.get(i) instanceof NodeLine) {
+                if (color != ((NodeLine)selected.get(i)).getStyle().getLineColor()) {
+                    //The border size is not common
+                    return null;
+                }
+            }
+        }
+        return color;
+    }
+    
+    /**
+     * Gets the line size that is the same for all selectables in
+     * the given list, or <code>-1</code> if they do not all have
+     * the same line size.
+     * @param selected the list of selected objects.
+     * @return the line size that is common to all selectables, or
+     * <code>-1</code> if the line size is not common.
+     */
+    private int getSameLineSize(ArrayList<Selectable> selected) {
+        int firstNodeLine = indexOfFirstNodeLine(selected);
+        if (firstNodeLine == -1) {
+            //No nodes in this selection anyway
+            return -1;
+        }
+        int size = ((NodeLine)selected.get(firstNodeLine)).getStyle().getLineSize();
+        for (int i=firstNodeLine+1; i<selected.size(); i++) {
+            if (selected.get(i) instanceof NodeLine) {
+                if (size != ((NodeLine)selected.get(i)).getStyle().getLineSize()) {
+                    //The border size is not common
+                    return -1;
+                }
+            }
+        }
+        return size;
+    }
+    
+    /**
+     * Gets the shape that is the same for all selectables in
+     * the given list, or <code>null</code> if they do not all have
+     * the same shape.
+     * @param selected the list of selected objects.
+     * @return the shape that is common to all selectables, or
+     * <code>null</code> if the shape is not common.
+     */
+    private Shape getSameShape(ArrayList<Selectable> selected) {
+        int firstNode = indexOfFirstNode(selected);
+        if (firstNode == -1) {
+            //No nodes in this selection anyway
+            return null;
+        }
+        Shape shape = ((Node)selected.get(firstNode)).getStyle().getShape();
+        for (int i=firstNode+1; i<selected.size(); i++) {
+            if (selected.get(i) instanceof Node) {
+                if (shape != ((Node)selected.get(i)).getStyle().getShape()) {
+                    //The border size is not common
+                    return null;
+                }
+            }
+        }
+        return shape;
+    }
+    
+    /**
+     * Gets the fill color that is the same for all selectables in
+     * the given list, or <code>null</code> if they do not all have
+     * the same fill color.
+     * @param selected the list of selected objects.
+     * @return the fill color that is common to all selectables, or
+     * <code>null</code> if the fill color is not common.
+     */
+    private Color getSameFillColor(ArrayList<Selectable> selected) {
+        int firstNode = indexOfFirstNode(selected);
+        if (firstNode == -1) {
+            //No nodes in this selection anyway
+            return null;
+        }
+        Color color = ((Node)selected.get(firstNode)).getStyle().getFillColor();
+        for (int i=firstNode+1; i<selected.size(); i++) {
+            if (selected.get(i) instanceof Node) {
+                if (color != ((Node)selected.get(i)).getStyle().getFillColor()) {
+                    //The border size is not common
+                    return null;
+                }
+            }
+        }
+        return color;
+    }
+    
+    /**
+     * Gets the border color that is the same for all selectables in
+     * the given list, or <code>null</code> if they do not all have
+     * the same border color.
+     * @param selected the list of selected objects.
+     * @return the border color that is common to all selectables, or
+     * <code>null</code> if the border color is not common.
+     */
+    private Color getSameBorderColor(ArrayList<Selectable> selected) {
+        int firstNode = indexOfFirstNode(selected);
+        if (firstNode == -1) {
+            //No nodes in this selection anyway
+            return null;
+        }
+        Color color = ((Node)selected.get(firstNode)).getStyle().getBorderColor();
+        for (int i=firstNode+1; i<selected.size(); i++) {
+            if (selected.get(i) instanceof Node) {
+                if (color != ((Node)selected.get(i)).getStyle().getBorderColor()) {
+                    //The border size is not common
+                    return null;
+                }
+            }
+        }
+        return color;
+    }
+    
+    /**
+     * Gets the border size that is the same for all selectables in
+     * the given list, or <code>-1</code> if they do not all have
+     * the same border size.
+     * @param selected the list of selected objects.
+     * @return the border size that is common to all selectables, or
+     * <code>-1</code> if the border size is not common.
+     */
+    private int getSameBorderSize(ArrayList<Selectable> selected) {
+        int firstNode = indexOfFirstNode(selected);
+        if (firstNode == -1) {
+            //No nodes in this selection anyway
+            return -1;
+        }
+        int size = ((Node)selected.get(firstNode)).getStyle().getBorderSize();
+        for (int i=firstNode+1; i<selected.size(); i++) {
+            if (selected.get(i) instanceof Node) {
+                if (size != ((Node)selected.get(i)).getStyle().getBorderSize()) {
+                    //The border size is not common
+                    return -1;
+                }
+            }
+        }
+        return size;
+    }
+    
+    /**
+     * Gets the index of the first selectable that is a node. If there
+     * is no node, then this returns <code>-1</code>.
+     * @param selected the list of selectables.
+     * @return the index of the first selectable that is a node.
+     */
+    private int indexOfFirstNode(ArrayList<Selectable> selected) {
+        for (int i=0; i<selected.size(); i++) {
+            if (selected.get(i) instanceof Node) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    
+    /**
+     * Gets the index of the first selectable that is a node line. If there
+     * is no node line, then this returns <code>-1</code>.
+     * @param selected the list of selectables.
+     * @return the index of the first selectable that is a node line.
+     */
+    private int indexOfFirstNodeLine(ArrayList<Selectable> selected) {
+        for (int i=0; i<selected.size(); i++) {
+            if (selected.get(i) instanceof NodeLine) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    
     /**
      * Inits the list of possible Shapes for a node.
      *
@@ -824,9 +1092,21 @@ public class FlowchartWindow extends JFrame {
      * @param fontSize the font size to display in the font size editor.
      */
     public void setFontPanelStyles(Font font, Color fontColor, int fontSize) {
-        this.font.setSelectedItem(font);
-        this.fontColor.setBackground(fontColor);
-        this.fontSize.setValue(fontSize);
+        if (font != null) {
+            this.font.setSelectedItem(font);
+        } else {
+            this.font.setSelectedIndex(-1);
+        }
+        if (fontColor != null) {
+            this.fontColor.setBackground(fontColor);
+        } else {
+            this.fontColor.setBackground(getBackground());
+        }
+        if (fontSize != -1) {
+            this.fontSize.setValue(fontSize);
+        } else {
+            this.fontSize.setValue(0);
+        }
     }
 
     /**
@@ -838,10 +1118,26 @@ public class FlowchartWindow extends JFrame {
      * @param borderSize the border size to display in the border size editor.
      */
     public void setNodePanelStyles(Shape shape, Color borderColor, Color fillColor, int borderSize) {
-        this.shape.setSelectedItem(shape.toString());
-        this.borderColor.setBackground(borderColor);
-        this.fillColor.setBackground(fillColor);
-        this.borderSize.setValue(borderSize);
+        if (shape != null) {
+            this.shape.setSelectedItem(shape.toString());
+        } else {
+            this.shape.setSelectedIndex(-1);
+        }
+        if (borderColor != null) {
+            this.borderColor.setBackground(borderColor);
+        } else {
+            this.borderColor.setBackground(getBackground());
+        }
+        if (fillColor != null) {
+            this.fillColor.setBackground(fillColor);
+        } else {
+            this.fillColor.setBackground(getBackground());
+        }
+        if (borderSize != -1) {
+            this.borderSize.setValue(borderSize);
+        } else {
+            this.borderSize.setValue(0);
+        }
     }
 
     /**
@@ -852,9 +1148,21 @@ public class FlowchartWindow extends JFrame {
      * @param lineSize the line size to display in the line size editor.
      */
     public void setLinePanelStyles(LineType lineType, Color lineColor, int lineSize) {
-        this.lineType.setSelectedItem(lineType.toString());
-        this.lineColor.setBackground(lineColor);
-        this.lineSize.setValue(lineSize);
+        if (lineType != null) {
+            this.lineType.setSelectedItem(lineType.toString());
+        } else {
+            this.lineType.setSelectedIndex(-1);
+        }
+        if (lineColor != null) {
+            this.lineColor.setBackground(lineColor);
+        } else {
+            this.lineColor.setBackground(getBackground());
+        }
+        if (lineSize != -1) {
+            this.lineSize.setValue(lineSize);
+        } else {
+            this.lineSize.setValue(0);
+        }
     }
 
     /**

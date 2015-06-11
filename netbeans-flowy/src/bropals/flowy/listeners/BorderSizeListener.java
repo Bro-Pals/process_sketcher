@@ -21,6 +21,7 @@ package bropals.flowy.listeners;
 
 import bropals.flowy.FlowchartWindow;
 import bropals.flowy.data.Node;
+import java.util.ArrayList;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -38,8 +39,9 @@ public class BorderSizeListener extends AbstractFlowyListener implements ChangeL
     public void stateChanged(ChangeEvent e) {
         int value = (Integer)getFlowchartWindow().getBorderSizeSpinner().getValue();
         if (value > 0) {
-            Node n = (Node)getLastSelected();
-            n.getStyle().setBorderSize(value);
+            for (Node n : getSelectedNodes()) {
+                n.getStyle().setBorderSize(value);
+            }
             getFlowchartWindow().redrawView();
         } else {
             getFlowchartWindow().getBorderSizeSpinner().setValue(1);

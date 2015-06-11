@@ -39,11 +39,12 @@ public class FontColorListener extends AbstractFlowyListener implements ActionLi
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Selectable s = getLastSelected();
         JButton fontColor = getFlowchartWindow().getFontColorButton();
-        fontColor.setBackground(JColorChooser.showDialog(getFlowchartWindow(), "Pick a font Color", s.getFontStyle().getFontColor()));
+        fontColor.setBackground(JColorChooser.showDialog(getFlowchartWindow(), "Pick a font Color", fontColor.getBackground()));
         //Use the color chooser to change the color of the button
-        s.getFontStyle().setFontColor(fontColor.getBackground());
+        for (Selectable s : getSelected()) {
+            s.getFontStyle().setFontColor(fontColor.getBackground());
+        }
         getFlowchartWindow().redrawView();
     }
     

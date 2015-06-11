@@ -38,10 +38,11 @@ public class LineColorListener extends AbstractFlowyListener implements ActionLi
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        NodeLine n = (NodeLine)getLastSelected();
         JButton lineColor = getFlowchartWindow().getLineColorButton();
-        lineColor.setBackground(JColorChooser.showDialog(getFlowchartWindow(), "Pick the line color", n.getStyle().getLineColor()));
-        n.getStyle().setLineColor(lineColor.getBackground());
+        lineColor.setBackground(JColorChooser.showDialog(getFlowchartWindow(), "Pick the line color", lineColor.getBackground()));
+        for (NodeLine n : getSelectedNodeLines()) {
+            n.getStyle().setLineColor(lineColor.getBackground());
+        }
         getFlowchartWindow().redrawView();
     }
     

@@ -23,6 +23,7 @@ import bropals.flowy.FlowchartWindow;
 import bropals.flowy.data.Node;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 
@@ -38,10 +39,11 @@ public class FillColorListener extends AbstractFlowyListener implements ActionLi
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Node n = (Node)getLastSelected();
-        JButton borderColor = getFlowchartWindow().getFillColorButton();
-        borderColor.setBackground(JColorChooser.showDialog(getFlowchartWindow(), "Pick the fill color", n.getStyle().getFillColor()));
-        n.getStyle().setFillColor(borderColor.getBackground());
+        JButton fillColor = getFlowchartWindow().getFillColorButton();
+        fillColor.setBackground(JColorChooser.showDialog(getFlowchartWindow(), "Pick the fill color", fillColor.getBackground()));
+        for (Node n : getSelectedNodes()) {
+            n.getStyle().setFillColor(fillColor.getBackground());
+        }
         getFlowchartWindow().redrawView();
     }
     

@@ -37,9 +37,12 @@ public class LineStyleListener extends AbstractFlowyListener implements ActionLi
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        NodeLine n = (NodeLine)getLastSelected();
-        n.getStyle().setType(LineType.fromString((String)getFlowchartWindow().getLineTypeComboBox().getSelectedItem()));
-        getFlowchartWindow().redrawView();
+        if (getFlowchartWindow().getLineTypeComboBox().getSelectedIndex() != -1) {
+            for (NodeLine n : getSelectedNodeLines()) {
+                n.getStyle().setType(LineType.fromString((String)getFlowchartWindow().getLineTypeComboBox().getSelectedItem()));
+            }
+            getFlowchartWindow().redrawView();
+        }
     }
     
 }

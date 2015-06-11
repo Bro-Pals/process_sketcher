@@ -38,8 +38,9 @@ public class LineSizeListener extends AbstractFlowyListener implements ChangeLis
     public void stateChanged(ChangeEvent e) {
         int value = (Integer)getFlowchartWindow().getLineSizeSpinner().getValue();
         if (value > 0) {
-            NodeLine n = (NodeLine)getLastSelected();
-            n.getStyle().setLineSize(value);
+            for (NodeLine n : getSelectedNodeLines()) {
+                n.getStyle().setLineSize(value);
+            }
             getFlowchartWindow().redrawView();
         } else {
             getFlowchartWindow().getLineSizeSpinner().setValue(1);

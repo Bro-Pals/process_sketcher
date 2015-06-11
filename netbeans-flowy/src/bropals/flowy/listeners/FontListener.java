@@ -37,8 +37,9 @@ public class FontListener extends AbstractFlowyListener implements ActionListene
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Selectable s = getLastSelected();
-        s.getFontStyle().setFontType(((Font)getFlowchartWindow().getFontComboBox().getSelectedItem()));
+        for (Selectable s : getSelected()) {
+            s.getFontStyle().setFontType(((Font)getFlowchartWindow().getFontComboBox().getSelectedItem()));
+        }
         getFlowchartWindow().redrawView();
     }
     
