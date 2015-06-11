@@ -81,6 +81,11 @@ public class SelectionManager {
      * @param selectables A list of all the selectables being selected
      */
     public void select(ArrayList<Selectable> selectables) {
+        // don't do anything if nothing is being changed
+        if (selectables == null || selectables.isEmpty()) {
+            return;
+        }
+        
         for (Selectable sel : selectables) {
             if (!selected.contains(sel)) {
                 selected.add(sel);
@@ -106,6 +111,11 @@ public class SelectionManager {
      * @param selectables A list of all the selectables being deselected
      */
     public void deselect(ArrayList<Selectable> selectables) {
+        // don't do anything if nothing is being changed
+        if (selectables == null || selectables.isEmpty()) {
+            return;
+        }
+        
         selected.removeAll(selectables);
         instance.refreshStylesTabVisiblity();
         instance.revalidateStyles();

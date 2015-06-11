@@ -20,7 +20,7 @@
 package bropals.flowy.action;
 
 import bropals.flowy.FlowchartWindow;
-import bropals.flowy.data.Node;
+import bropals.flowy.data.Selectable;
 import java.util.ArrayList;
 
 /**
@@ -29,15 +29,16 @@ import java.util.ArrayList;
  */
 public class Pasted extends Action {
 
-    private ArrayList<Node> pasted;
+    private ArrayList<Selectable> pasted;
     
-    public Pasted(ArrayList<Node> pastedNodes) {
-        pasted = pastedNodes;
+    public Pasted(ArrayList<Selectable> pastedStuff) {
+        pasted = pastedStuff;
     }
     
     @Override
     public void undo(FlowchartWindow instance) {
         System.out.println("Undo pasted action");
+        instance.getEventManager().getSelectionManager().removeSelectables(pasted);
     }
     
 }

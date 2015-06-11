@@ -22,6 +22,7 @@ package bropals.flowy.action;
 import bropals.flowy.FlowchartWindow;
 import bropals.flowy.data.Node;
 import java.awt.Dimension;
+import java.awt.Point;
 
 /**
  * An action that occurs when you scale a Node
@@ -31,10 +32,12 @@ public class ScaledNode extends Action {
 
     private Node node;
     private Dimension dimension;
+    private Point position;
     
-    public ScaledNode(Node editedNode, Dimension oldDimension) {
+    public ScaledNode(Node editedNode, Dimension oldDimension, Point initialPosition) {
         node = editedNode;
         dimension = oldDimension;
+        position = initialPosition;
     }
     
     @Override
@@ -42,6 +45,8 @@ public class ScaledNode extends Action {
         System.out.println("Undid scaling a node");
         node.setWidth((float)dimension.getWidth());
         node.setHeight((float)dimension.getHeight());
+        node.setX((float)position.getX());
+        node.setY((float)position.getY());
     }
     
 }

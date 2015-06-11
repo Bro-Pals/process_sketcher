@@ -45,11 +45,7 @@ public class SelectedTabbed extends Action {
         instance.getEventManager().getSelectionManager().getSelected().clear();
         
         // reselect the things that were deselected
-        for (Selectable s : deselected) {
-            if (!instance.getEventManager().getSelectionManager().getSelected().contains(s)) {
-                instance.getEventManager().getSelectionManager().getSelected().add(s);
-            }
-        }
+        instance.getEventManager().getSelectionManager().select(deselected);
     }
     
     

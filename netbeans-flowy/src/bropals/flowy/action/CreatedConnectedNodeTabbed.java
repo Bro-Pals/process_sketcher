@@ -53,7 +53,7 @@ public class CreatedConnectedNodeTabbed extends Action {
         
         // make the select to what it was
         instance.getEventManager().getSelectionManager().clearSelection();
-        instance.getEventManager().getSelectionManager().getSelected().addAll(selectables);
+        instance.getEventManager().getSelectionManager().select(selectables);
     }
     
 }

@@ -115,12 +115,12 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         
         // add a nodeline to the deleted list of it's parent and child are being deleted too
         for (NodeLine nl : window.getFlowchart().getNodeLines()) {
-            if (!deletedThings.contains(nl) && deletedThings.contains(nl.getChild()) && 
-                    deletedThings.contains(nl.getParent())) {
+            if (!deletedThings.contains(nl) && (deletedThings.contains(nl.getChild()) || 
+                    deletedThings.contains(nl.getParent()))) {
                 deletedThings.add(nl);
             }
         }
-        selectionManager.removeSelectables(selectionManager.getSelected());
+        selectionManager.removeSelectables(deletedThings);
         // add it to history
         historyManager.addToHistory(new Deleted(deletedThings));
         
@@ -150,10 +150,24 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
      */
     public void cutSelected() {
         if (!selectionManager.getSelected().isEmpty()) {
-            dragManager.setStuffInClipboard(selectionManager.getSelected());
-            selectionManager.removeSelectables(selectionManager.getSelected());
+            ArrayList<Selectable> oldClipboard = new ArrayList<>();
+            oldClipboard.addAll(dragManager.getClipboard());
+            ArrayList<Selectable> deletedThings = new ArrayList<>();
+            deletedThings.addAll(selectionManager.getSelected());
+
+            // add a nodeline to the deleted list of it's parent and child are being deleted too
+            for (NodeLine nl : window.getFlowchart().getNodeLines()) {
+                if (!deletedThings.contains(nl) && (deletedThings.contains(nl.getChild()) || 
+                        deletedThings.contains(nl.getParent()))) {
+                    deletedThings.add(nl);
+                }
+            }
+            dragManager.setStuffInClipboard(deletedThings);
+            selectionManager.removeSelectables(deletedThings);
             // add the cut action to hisotory
-            historyManager.addToHistory(new Cutted(selectionManager.getSelected()));
+            
+            
+            historyManager.addToHistory(new Cutted(new Deleted(deletedThings), oldClipboard));
             selectionManager.clearSelection();
         }
         window.redrawView();
@@ -181,22 +195,27 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
             
             // clone in the node lines if the parent and child nodes of the line are in the pasted array
             for (int i=0; i<pastedNodes.size(); i++) {
-                int parentIndex = i;
                 // copy the array of the original lines from the original array
                 ArrayList<NodeLine> linesConnected = ((Node)(dragManager.getClipboard().get(i))).getLinesConnected();
                 for (int l=0; l<linesConnected.size(); l++) {
                     int childIndex = -1;
+                    int parentIndex = -1;
                     // find the location of the child in the original array for the original line
                     for (int n=0; n<dragManager.getClipboard().size(); n++) {
-                        if (n != parentIndex && dragManager.getClipboard().get(n) == linesConnected.get(l).getChild()) {
+                        if (dragManager.getClipboard().get(n) == linesConnected.get(l).getChild()) {
                             childIndex = n;
+                        } else if (dragManager.getClipboard().get(n) == linesConnected.get(l).getParent()) {
+                            parentIndex = n;
+                        }
+                        // finish early if both parent and child are found
+                        if (parentIndex != -1 && childIndex != -1) {
                             break;
                         }
                     }
                     
                     // if the child was found in the original array then add the new 
                     //  line using the same (copy) of the parent and childs
-                    if (childIndex != -1) {
+                    if (childIndex != -1 && parentIndex != -1) {
                         NodeLine clonedLine = (NodeLine)(linesConnected.get(l).clone());
                         clonedLine.setParent(pastedNodes.get(parentIndex));
                         clonedLine.setChild(pastedNodes.get(childIndex));
@@ -220,7 +239,9 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     selectionManager.select(nl);
             }
             
-            historyManager.addToHistory(new Pasted(pastedNodes));
+            ArrayList<Selectable> pastedThings = new ArrayList<>();
+            pastedThings.addAll(pastedNodes);
+            historyManager.addToHistory(new Pasted(pastedThings));
         }
     }
     
@@ -600,6 +621,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 window.resizeRightCursor();
             }
             historyManager.saveDimension(new Dimension((int)resizing.getWidth(), (int)resizing.getHeight()));
+            historyManager.savePoint(new Point((int)resizing.getX(), (int)resizing.getY()));
             return;
         }
         // actions involving a node
@@ -675,7 +697,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 if (!deselectedThings.isEmpty()) {
                     historyManager.addToHistory(new Deselected(deselectedThings));
                 }
-                selectionManager.clearSelection();
+                selectionManager.deselect(deselectedThings);
             }
 
             // you only start dragging a box when the spacebar is not held down
@@ -856,7 +878,8 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 // record the scale to history only if it changed
                 if ((int)dragManager.getResizingNode().getWidth() != (int)historyManager.getSavedDimension().getWidth() ||
                         (int)dragManager.getResizingNode().getHeight() != (int)historyManager.getSavedDimension().getHeight()) {
-                    historyManager.addToHistory(new ScaledNode(dragManager.getResizingNode(), historyManager.getSavedDimension()));
+                    historyManager.addToHistory(new ScaledNode(dragManager.getResizingNode(), 
+                            historyManager.getSavedDimension(), historyManager.getSavedPoint()));
                 }
                 dragManager.endDragResize();
                 window.defaultCursor();
@@ -882,13 +905,16 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
             if (!e.isShiftDown()) {
                 selectionManager.clearSelection();
             }
+            // make a list of all the things newly selected
             ArrayList<Selectable> addedToSelection = new ArrayList<>();
             for (int i = 0; i < selectedItems.size(); i++) {
                 if (!selectionManager.getSelected().contains(selectedItems.get(i))) {
-                    selectionManager.select(selectedItems.get(i));
                     addedToSelection.add(selectedItems.get(i));
                 }
             }
+            
+            selectionManager.select(addedToSelection);
+            
             // record the newly selected items only if there was anything newly selected
             if (!addedToSelection.isEmpty()) {
                 historyManager.addToHistory(new Selected(addedToSelection));

@@ -38,7 +38,7 @@ public class Deselected extends Action {
     @Override
     public void undo(FlowchartWindow instance) {
         System.out.println("Undo deselecting nodes");
-        instance.getEventManager().getSelectionManager().getSelected().addAll(deselected);
+        instance.getEventManager().getSelectionManager().select(deselected);
     }
     
 }

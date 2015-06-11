@@ -35,6 +35,7 @@ public class UndoListener extends AbstractFlowyListener implements ActionListene
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        getFlowchartWindow().getEventManager().getHistoryManager().undoLastAction();
     }
     
 }

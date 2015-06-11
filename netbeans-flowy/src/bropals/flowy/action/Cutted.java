@@ -29,15 +29,25 @@ import java.util.ArrayList;
  */
 public class Cutted extends Action {
 
-    private ArrayList<Selectable> cutted;
+    /**
+     * The deleted action is a part of the cutting action
+     */
+    private Deleted deletedAction;
+    private ArrayList<Selectable> clipboard;
     
-    public Cutted(ArrayList<Selectable> cuttedSelectables) {
-        cutted = cuttedSelectables;
+    public Cutted(Deleted deleted, ArrayList<Selectable> oldClipboard) {
+        clipboard = oldClipboard;
+        deletedAction = deleted;
     }
     
     @Override
     public void undo(FlowchartWindow instance) {
         System.out.println("Undo the cut action");
+        // reset the clipboard back to where it was
+        instance.getEventManager().getDragManager().setStuffInClipboard(clipboard);
+        
+        // undo the cutted things being deleted
+        deletedAction.undo(instance);
     }
     
 }

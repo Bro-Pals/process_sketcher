@@ -21,6 +21,7 @@ package bropals.flowy.action;
 
 import bropals.flowy.FlowchartWindow;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.util.ArrayList;
 
 /**
@@ -45,6 +46,10 @@ public class HistoryManager {
      * Used for saving the size of something.
      */
     private Dimension savedSize;
+    /**
+     * Used for saving the position of something.
+     */
+    private Point savedPoint;
     
     /**
      * Creates a new HistoryManager for the given FlowchartWindow.
@@ -95,4 +100,22 @@ public class HistoryManager {
     public Dimension getSavedDimension() {
         return savedSize;
     }
+
+    /**
+     * Get the saved point
+     * @return the saved point
+     */
+    public Point getSavedPoint() {
+        return savedPoint;
+    }
+
+    /**
+     * Save a given point to the HistoryManager
+     * @param savedPoint The point to save
+     */
+    public void savePoint(Point savedPoint) {
+        this.savedPoint = savedPoint;
+    }
+    
+    
 }
