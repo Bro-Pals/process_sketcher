@@ -23,6 +23,7 @@ import bropals.flowy.style.LineStyle;
 import bropals.flowy.style.NodeStyle;
 import java.util.Collection;
 import java.util.HashMap;
+import javax.swing.JOptionPane;
 
 /**
  * Manages the styles that are to be saved.
@@ -106,5 +107,77 @@ public class StyleManager {
     public String[] listLineStyleNames() {
         Collection ns = lineStyles.keySet();
         return (String[])ns.toArray(new String[0]);
+    }
+    
+    /**
+     * Checks the name to see if it is OK to use.
+     * @param name the name to test.
+     * @param style the style that is to have that name.
+     * @param window the flowchart window.
+     * @return whether or not the name is OK to use.
+     */
+    public boolean isValidNodeStyle(String name, NodeStyle style, FlowchartWindow window) {
+        if (name.equals("")) {
+            JOptionPane.showMessageDialog(window, "Invalid name: can't be an empty string.", "Unable to save Node style", JOptionPane.INFORMATION_MESSAGE);
+            return false;
+        } else if (nodeStyles.containsKey(name)) {
+            JOptionPane.showMessageDialog(window, "Invalid name: that name already exists.", "Unable to save Node style", JOptionPane.INFORMATION_MESSAGE);
+            return false;
+        } else if (nodeStyles.containsValue(style)) {
+            JOptionPane.showMessageDialog(window, "Invalid style: that style already exists under the name " + getNameOf(style) + ".", "Unable to save Node style", JOptionPane.INFORMATION_MESSAGE);
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+     * Checks the name to see if it is OK to use.
+     * @param name the name to test.
+     * @return whether or not the name is OK to use.
+     */
+    public boolean isValidLineStyle(String name, LineStyle style, FlowchartWindow window) {
+        if (name.equals("")) {
+            JOptionPane.showMessageDialog(window, "Invalid name: can't be an empty string.", "Unable to save Line style", JOptionPane.INFORMATION_MESSAGE);
+            return false;
+        } else if (lineStyles.containsKey(name)) {
+            JOptionPane.showMessageDialog(window, "Invalid name: that name already exists.", "Unable to save Line style", JOptionPane.INFORMATION_MESSAGE);
+            return false;
+        } else if (lineStyles.containsValue(style)) {
+            JOptionPane.showMessageDialog(window, "Invalid style: that style already exists under the name " + getNameOf(style) + ".", "Unable to save Line style", JOptionPane.INFORMATION_MESSAGE);
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+     * Get the name of the given node style.
+     * @param style the node style to get the name of.
+     * @return the name of the node style, or <code>null</code> if it is
+     * not in the style manager.
+     */
+    public String getNameOf(NodeStyle style) {
+        String[] styles = listNodeStyleNames();
+        for (String styleName : styles) {
+            if (nodeStyles.get(styleName).equals(style)) {
+                return styleName;
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Get the name of the given line style.
+     * @param style the line style to get the name of.
+     * @return the name of the line style, or <code>null</code> if it is
+     * not in the style manager.
+     */
+    public String getNameOf(LineStyle style) {
+        String[] styles = listLineStyleNames();
+        for (String styleName : styles) {
+            if (lineStyles.get(styleName).equals(style)) {
+                return styleName;
+            }
+        }
+        return null;
     }
 }

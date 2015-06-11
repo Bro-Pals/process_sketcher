@@ -81,6 +81,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -980,6 +981,34 @@ public class FlowchartWindow extends JFrame {
         return lineColor;
     }
 
+    /**
+     * Refresh the GUI list of line styles to match the style manager's list.
+     */
+    public void refreshLineStyleList() {
+        String selected = (String)savedLineStyles.getSelectedItem();
+        DefaultComboBoxModel<String> box = (DefaultComboBoxModel<String>)savedLineStyles.getModel();
+        box.removeAllElements();
+        String[] lineStyles = getStyleManager().listLineStyleNames();
+        for (String name : lineStyles) {
+            box.addElement(name);
+        }
+        savedLineStyles.setSelectedItem(selected);
+    }
+    
+    /**
+     * Refresh the GUI list of node styles to match the style manager's list.
+     */
+    public void refreshNodeStyleList() {
+        String selected = (String)savedNodeStyles.getSelectedItem();
+        DefaultComboBoxModel<String> box = (DefaultComboBoxModel<String>)savedNodeStyles.getModel();
+        box.removeAllElements();
+        String[] nodeStyles = getStyleManager().listNodeStyleNames();
+        for (String name : nodeStyles) {
+            box.addElement(name);
+        }
+        savedNodeStyles.setSelectedItem(selected);
+    }
+    
     /**
      * Saves this FlowchartWindow's current flowchart to a destination stream.
      * This function flushes and closes the OutputStream.

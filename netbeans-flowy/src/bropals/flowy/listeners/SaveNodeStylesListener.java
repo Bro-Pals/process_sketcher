@@ -20,8 +20,10 @@
 package bropals.flowy.listeners;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.Node;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.JOptionPane;
 
 /**
  * Listener for saving a node style.
@@ -35,6 +37,11 @@ public class SaveNodeStylesListener extends AbstractFlowyListener implements Act
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        
+        Node n = (Node)getLastSelected();
+        String name = JOptionPane.showInputDialog("Name this style", "style name");
+        if (getFlowchartWindow().getStyleManager().isValidNodeStyle(name, n.getStyle(), getFlowchartWindow())) {
+            getFlowchartWindow().getStyleManager().saveNodeStyle(name, n.getStyle());
+            getFlowchartWindow().refreshNodeStyleList();
+        }
     }
 }
