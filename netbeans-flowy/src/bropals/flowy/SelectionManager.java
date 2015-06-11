@@ -77,11 +77,36 @@ public class SelectionManager {
     }
     
     /**
+     * Select many selectables
+     * @param selectables A list of all the selectables being selected
+     */
+    public void select(ArrayList<Selectable> selectables) {
+        for (Selectable sel : selectables) {
+            if (!selected.contains(sel)) {
+                selected.add(sel);
+            }
+        }
+        instance.refreshStylesTabVisiblity();
+        instance.refreshValuesOfStylesTabDueToNewSelection(getLastSelected());
+        instance.revalidateStyles();
+    }
+    
+    /**
      * Deselect a single selectable
      * @param selectable The selectable being deselected
      */
     public void deselect(Selectable selectable) {
         selected.remove(selectable);
+        instance.refreshStylesTabVisiblity();
+        instance.revalidateStyles();
+    }
+    
+    /**
+     * Deselect many selectables
+     * @param selectables A list of all the selectables being deselected
+     */
+    public void deselect(ArrayList<Selectable> selectables) {
+        selected.removeAll(selectables);
         instance.refreshStylesTabVisiblity();
         instance.revalidateStyles();
     }
