@@ -207,12 +207,12 @@ public class NodeLine implements Selectable, BinaryData {
 
     @Override
     public void fromBinary(byte[] arr, int pos, FlowchartWindow window) {
-        int tailBytes = BinaryUtil.bytesForString(tailText);
-        int centerBytes = BinaryUtil.bytesForString(centerText);
-        int headBytes = BinaryUtil.bytesForString(headText);
         tailText = BinaryUtil.bytesToString(arr, pos);
+        int tailBytes = BinaryUtil.bytesForString(tailText);
         centerText = BinaryUtil.bytesToString(arr, pos+tailBytes);
+        int centerBytes = BinaryUtil.bytesForString(centerText);
         headText = BinaryUtil.bytesToString(arr, pos+tailBytes+centerBytes);
+        int headBytes = BinaryUtil.bytesForString(headText);
         style = new LineStyle();
         style.fromBinary(arr, pos+tailBytes+centerBytes+headBytes, window);
     }
