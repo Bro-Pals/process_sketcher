@@ -72,7 +72,7 @@ public class SelectionManager {
     public void select(Selectable selectable) {
         selected.add(selectable);
         instance.refreshStylesTabVisiblity();
-        instance.refreshValuesOfStylesTabDueToNewSelection(selectable);
+        instance.refreshValuesOfStylesTabDueToUpdatedSelection();
         instance.revalidateStyles();
     }
     
@@ -92,7 +92,7 @@ public class SelectionManager {
             }
         }
         instance.refreshStylesTabVisiblity();
-        instance.refreshValuesOfStylesTabDueToNewSelection(getLastSelected());
+        instance.refreshValuesOfStylesTabDueToUpdatedSelection();
         instance.revalidateStyles();
     }
     

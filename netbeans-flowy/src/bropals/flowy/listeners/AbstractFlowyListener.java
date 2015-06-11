@@ -20,7 +20,10 @@
 package bropals.flowy.listeners;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.Node;
+import bropals.flowy.data.NodeLine;
 import bropals.flowy.data.Selectable;
+import java.util.ArrayList;
 
 /**
  * The abstract listener for all GUI element listeners. Provides
@@ -54,5 +57,29 @@ public abstract class AbstractFlowyListener {
      */
     public Selectable getLastSelected() {
         return getFlowchartWindow().getEventManager().getSelectionManager().getLastSelected();
+    }
+    
+    /**
+     * Gets the list of selected nodes.
+     * @return the list of selected nodes.
+     */
+    public ArrayList<Node> getSelectedNodes() {
+        return getFlowchartWindow().getEventManager().getSelectionManager().getSelectedNodes();
+    }
+    
+    /**
+     * Gets the list of selected node lines.
+     * @return the list of selected node lines.
+     */
+    public ArrayList<NodeLine> getSelectedNodeLines() {
+        return getFlowchartWindow().getEventManager().getSelectionManager().getSelectedNodeLines();
+    }
+    
+    /**
+     * Gets a list of all selected selectables.
+     * @return a list of all selected selectables.
+     */
+    public ArrayList<Selectable> getSelected() {
+        return getFlowchartWindow().getEventManager().getSelectionManager().getSelected();
     }
 }

@@ -37,9 +37,12 @@ public class ShapeListener extends AbstractFlowyListener implements ActionListen
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Node n = (Node)getLastSelected();
-        n.getStyle().setShape(Shape.fromString((String)getFlowchartWindow().getShapeComboBox().getSelectedItem()));
-        getFlowchartWindow().redrawView();
+        if (getFlowchartWindow().getShapeComboBox().getSelectedIndex() != -1) {
+            for (Node n : getSelectedNodes()) {
+                n.getStyle().setShape(Shape.fromString((String)getFlowchartWindow().getShapeComboBox().getSelectedItem()));
+            }
+            getFlowchartWindow().redrawView();
+        }
     }
     
 }

@@ -38,8 +38,9 @@ public class FontSizeListener extends AbstractFlowyListener implements ChangeLis
     public void stateChanged(ChangeEvent e) {
         int value = (Integer)getFlowchartWindow().getFontSizeSpinner().getValue();
         if (value > 0) {
-            Selectable s = getLastSelected();
-            s.getFontStyle().setFontSize(value);
+            for (Selectable s : getSelected()) {
+                s.getFontStyle().setFontSize(value);
+            }
             getFlowchartWindow().redrawView();
         } else {
             getFlowchartWindow().getFontSizeSpinner().setValue(1);
