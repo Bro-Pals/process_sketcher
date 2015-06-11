@@ -25,7 +25,10 @@ import bropals.flowy.data.NodeLine;
 import bropals.flowy.data.Selectable;
 import java.awt.Font;
 import java.awt.Point;
+import java.awt.print.PrinterException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Manages the current selection and enables other objects to 
