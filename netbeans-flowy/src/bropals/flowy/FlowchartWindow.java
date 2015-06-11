@@ -30,6 +30,7 @@ import bropals.flowy.listeners.AutoformatVerticallyListener;
 import bropals.flowy.listeners.BorderColorListener;
 import bropals.flowy.listeners.BorderSizeListener;
 import bropals.flowy.listeners.CameraControls;
+import bropals.flowy.listeners.CloseFlowchartListener;
 import bropals.flowy.listeners.CopyListener;
 import bropals.flowy.listeners.CreateShapeListener;
 import bropals.flowy.listeners.CutListener;
@@ -75,7 +76,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.util.regex.Pattern;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
@@ -164,11 +164,11 @@ public class FlowchartWindow extends JFrame {
     private JButton copy;
     private JButton cut;
     private JButton paste;
-    //private JLabel nodesSelectedCounter;
     private JButton newFlowchart;
     private JButton saveFlowchart;
     private JButton saveAsFlowchart;
     private JButton openFlowchart;
+    private JButton closeFlowchart;
     private JButton printFlowchart;
     private JButton exportChartToPDF;
     private JButton exportChartToImage;
@@ -382,6 +382,7 @@ public class FlowchartWindow extends JFrame {
         saveFlowchart = new JButton(getIcon("saveFlowchartIcon.png"));
         saveAsFlowchart = new JButton(getIcon("saveAsFlowchartIcon.png"));
         openFlowchart = new JButton(getIcon("openFlowchartIcon.png"));
+        closeFlowchart = new JButton(getIcon("closeFlowchartIcon.png"));
         printFlowchart = new JButton(getIcon("printFlowchartIcon.png"));
         exportChartToPDF = new JButton(getIcon("exportChartToPDFIcon.png"));
         exportChartToImage = new JButton(getIcon("exportChartToImageIcon.png"));
@@ -390,6 +391,7 @@ public class FlowchartWindow extends JFrame {
         saveFlowchart.addActionListener(new SaveFlowchartListener(this));
         saveAsFlowchart.addActionListener(new SaveAsFlowchartListener(this));
         openFlowchart.addActionListener(new OpenFlowchartListener(this));
+        closeFlowchart.addActionListener(new CloseFlowchartListener(this));
         printFlowchart.addActionListener(new PrintFlowchartListener(this));
         exportChartToPDF.addActionListener(new ExportChartToPDFListener(this));
         exportChartToImage.addActionListener(new ExportChartToImageListener(this));
@@ -398,6 +400,7 @@ public class FlowchartWindow extends JFrame {
         saveFlowchart.setToolTipText("Saves this flowchart to disk");
         saveAsFlowchart.setToolTipText("Saves this flowchart to disk as");
         openFlowchart.setToolTipText("Open a flowchart from disk");
+        closeFlowchart.setToolTipText("Closes this flowchart");
         printFlowchart.setToolTipText("Print this flowchart");
         exportChartToPDF.setToolTipText("Export this flowchart as a PDF");
         exportChartToImage.setToolTipText("Export this flowchart as an image");
@@ -406,6 +409,7 @@ public class FlowchartWindow extends JFrame {
         fileTab.add(saveFlowchart);
         fileTab.add(saveAsFlowchart);
         fileTab.add(openFlowchart);
+        fileTab.add(closeFlowchart);
         fileTab.add(printFlowchart);
         fileTab.add(exportChartToPDF);
         fileTab.add(exportChartToImage);
@@ -951,5 +955,12 @@ public class FlowchartWindow extends JFrame {
      */
     public StyleManager getStyleManager() {
         return styleManager;
+    }
+    
+    /**
+     * Closes this window.
+     */
+    public void closeWindow() {
+        flowchartWindowManager.tryCloseWindow(this);
     }
 }

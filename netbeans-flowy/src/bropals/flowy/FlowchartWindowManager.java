@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 /**
  * Keeps track of and manages all open FlowchartWindows.
@@ -87,9 +88,7 @@ public class FlowchartWindowManager implements WindowListener {
         FlowchartWindow window = (FlowchartWindow)e.getWindow();
         
         //Be sure to handle saving before closing here
-        
-        windows.remove(window);
-        window.dispose();
+        tryCloseWindow(window);        
     }
 
     @Override
@@ -142,6 +141,23 @@ public class FlowchartWindowManager implements WindowListener {
         welcomeWindow.setVisible(false);
         window.setLocationRelativeTo(null);
         window.setVisible(true);
+    }
+    
+    /**
+     * Closes a window, unless the user says otherwise.
+     * @param window the window to close.
+     */
+    public void tryCloseWindow(FlowchartWindow window) {
+        int response = JOptionPane.showConfirmDialog(welcomeWindow, "Save changes before closing?", "Save flowchart?", JOptionPane.YES_NO_CANCEL_OPTION);
+        if (response == JOptionPane.YES_OPTION) {
+            window.saveFlowchart();
+        } else if (response == JOptionPane.NO_OPTION) {
+            //Do nothing
+        } else if (response == JOptionPane.CANCEL_OPTION) {
+            return;
+        }
+        windows.remove(window);
+        window.dispose();
     }
     
     /**
