@@ -66,11 +66,22 @@ public class HistoryManager {
      * from the history.
      */
     public void undoLastAction() {
-        if (actions.size() > 0) {
-            int last = actions.size() - 1;
-            actions.get(last).undo(instance);
-            actions.remove(last);
+        Action lastAction = getLastAction();
+        if (lastAction != null) {
+            lastAction.undo(instance);
+            actions.remove(lastAction);
         }
+    }
+    
+    /**
+     * Get the last action added to the actions stack.
+     * @return The last action, or null if the actions stack is empty
+     */
+    protected Action getLastAction() {
+        if (actions.size() > 0) {
+            return actions.get(actions.size() - 1);
+        }
+        return null;
     }
     
     /**
@@ -79,7 +90,20 @@ public class HistoryManager {
      * @param a The action to add
      */
     public void addToHistory(Action a) {
-        actions.add(a);
+        // if text is still being added to history, combine them
+        if (a instanceof EditedText) {
+            Action lastAction = getLastAction();
+            if (!(lastAction != null && ((a instanceof EditedNodeText && 
+                    lastAction instanceof EditedNodeText) ||
+                    (a instanceof EditedNodeLineText && 
+                    lastAction instanceof EditedNodeLineText &&
+                    ((EditedNodeLineText)lastAction).sharesLinePartTyping((EditedNodeLineText)a)) )) ) {
+                actions.add(a);
+            }
+        } else {
+            actions.add(a);
+        }
+        
         if (actions.size() > HISTORY_LIMIT) {
             actions.remove(0);
         }

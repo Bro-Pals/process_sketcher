@@ -27,15 +27,14 @@ import bropals.flowy.data.NodeLine;
  * An action that occurs when you edit text in a node line.
  * @author Kevin
  */
-public class EditedNodeLineText extends Action {
+public class EditedNodeLineText extends EditedText {
 
     private NodeLine line;
-    private String oldText;
     private int partOfLine;
     
     public EditedNodeLineText(NodeLine lineEdited, String textOld, int partOfTheLine) {
+        super(textOld);
         line = lineEdited;
-        oldText = textOld;
         partOfLine = partOfTheLine;
     }
     
@@ -44,15 +43,23 @@ public class EditedNodeLineText extends Action {
         System.out.println("Undo changing text on a NodeLine");
         switch(partOfLine) {
             case TextTypeManager.CENTER:
-                line.setCenterText(oldText);
+                line.setCenterText(getOldText());
                 break;
             case TextTypeManager.TAIL:
-                line.setTailText(oldText);
+                line.setTailText(getOldText());
                 break;
             case TextTypeManager.HEAD:
-                line.setHeadText(oldText);
+                line.setHeadText(getOldText());
                 break;
         }
+        instance.getEventManager().getSelectionManager().select(line);
     }
     
+    public boolean sharesLinePartTyping(EditedNodeLineText otherAction) {
+        return otherAction.getPartOfLine() == partOfLine;
+    }
+    
+    public int getPartOfLine() {
+        return partOfLine;
+    }
 }
