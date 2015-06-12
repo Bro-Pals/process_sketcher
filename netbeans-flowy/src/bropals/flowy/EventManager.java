@@ -514,9 +514,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     textTypeManager.incrementLocationOfTypeCursor();
                 }
                 
-                if (!oldText.equals("")) {
-                    historyManager.addToHistory(new EditedNodeLineText(editLine, oldText, textTypeManager.getLinePartTyping()));
-                }
+                historyManager.addToHistory(new EditedNodeLineText(editLine, oldText, textTypeManager.getLinePartTyping()));
             }
         }
 

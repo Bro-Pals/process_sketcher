@@ -20,26 +20,25 @@
 package bropals.flowy.action;
 
 import bropals.flowy.FlowchartWindow;
-import bropals.flowy.data.Node;
 
 /**
- * An action that occurs when you edit text on a node
+ * An abstract class for any action that involves editing text
  * @author Kevin
  */
-public class EditedNodeText extends EditedText {
+public abstract class EditedText extends Action {
+    
+    private String oldText;
+    
+    public EditedText(String oldText) {
+        this.oldText = oldText;
+    }
 
-    private Node node;
-    
-    public EditedNodeText(Node editedNode, String oldText) {
-        super(oldText);
-        node = editedNode;
+    public String getOldText() {
+        return oldText;
     }
-    
-    @Override
-    public void undo(FlowchartWindow instance) {
-        System.out.println("undo edited node text");
-        node.setInnerText(getOldText());
-        instance.getEventManager().getSelectionManager().select(node);
+
+    public void setOldText(String oldText) {
+        this.oldText = oldText;
     }
-    
+
 }
