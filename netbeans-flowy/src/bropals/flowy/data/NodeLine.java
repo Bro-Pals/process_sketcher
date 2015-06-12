@@ -56,6 +56,10 @@ public class NodeLine implements Selectable, BinaryData {
      * The text that will render near the head of this line.
      */
     private String headText;
+    /**
+     * The style that this node line is linked with.
+     */
+    private String linkedStyle;
 
     /**
      * Creates a new NodeLine to relate two nodes together. 
@@ -165,6 +169,31 @@ public class NodeLine implements Selectable, BinaryData {
      */
     public void setHeadText(String headText) {
         this.headText = headText;
+    }
+    
+    /**
+     * Get the style that this node line is linked to, or <code>null</code>
+     * if it is not linked to any.
+     * @return the linked style name.
+     */
+    public String getLinkedStyle() {
+        return linkedStyle;
+    }
+    
+    /**
+     * Checks to see if this node line is linked to a style.
+     * @return if this node line is linked.
+     */
+    public boolean isLinked() {
+        return getLinkedStyle() != null;
+    }
+    
+    /**
+     * Assign a linked style to this node line.
+     * @param styleName the linked style name.
+     */
+    public void assignStyle(String styleName) {
+        linkedStyle = styleName;
     }
     
     @Override

@@ -42,6 +42,7 @@ public class SaveLineStylesListener extends AbstractFlowyListener implements Act
         String name = JOptionPane.showInputDialog("Name this style", "style name");
         if (getFlowchartWindow().getStyleManager().isValidLineStyle(name, n.getStyle(), getFlowchartWindow())) {
             getFlowchartWindow().getStyleManager().saveLineStyle(name, n.getStyle());
+            getFlowchartWindow().getStyleManager().assignStyle(name, n);
             getFlowchartWindow().refreshLineStyleList();
         }
     }

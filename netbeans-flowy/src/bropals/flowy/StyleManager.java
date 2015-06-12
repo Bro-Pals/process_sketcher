@@ -19,6 +19,8 @@
  */
 package bropals.flowy;
 
+import bropals.flowy.data.Node;
+import bropals.flowy.data.NodeLine;
 import bropals.flowy.style.LineStyle;
 import bropals.flowy.style.NodeStyle;
 import java.util.Collection;
@@ -179,5 +181,43 @@ public class StyleManager {
             }
         }
         return null;
+    }
+    
+    /**
+     * Checks for the existence of a given node style.
+     * @param name the name of the style to check
+     * @return if the node style exists.
+     */
+    public boolean hasNodeStyle(String name) {
+        return nodeStyles.containsKey(name);
+    }
+    
+    /**
+     * Checks for the existence of a given line style.
+     * @param name the name of the style to check
+     * @return if the line style exists.
+     */
+    public boolean hasLineStyle(String name) {
+        return lineStyles.containsKey(name);
+    }
+    
+    /**
+     * Assigns a style to a node.
+     * @param style the style to assign
+     * @param node the node to assign it to.
+     */
+    public void assignStyle(String style, Node node) {
+        node.assignStyle(style);
+        node.setStyle(nodeStyles.get(style));
+    }
+    
+    /**
+     * Assigns a style to a node line.
+     * @param style the style to assign
+     * @param nodeLine the node line to assign it to.
+     */
+    public void assignStyle(String style, NodeLine nodeLine) {
+        nodeLine.assignStyle(style);
+        nodeLine.setStyle(lineStyles.get(style));
     }
 }

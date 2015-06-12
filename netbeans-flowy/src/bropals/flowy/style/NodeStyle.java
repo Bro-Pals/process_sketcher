@@ -173,6 +173,19 @@ public class NodeStyle extends FontStyle implements BinaryData {
         fillColor = BinaryUtil.bytesToColor(arr, pos+4);
         borderSize = BinaryUtil.bytesToInt(arr, pos+7);
         super.fromBinary(arr, pos+11, window);
-        
+    }
+    
+    /**
+     * Sets the this style into the given style so they are the same.
+     * @param style the style to set this one to.
+     */
+    public void setTo(NodeStyle style) {
+        setFontType(style.getFontType());
+        setFontColor(style.getFontColor());
+        setFontSize(style.getFontSize());
+        setBorderColor(style.getBorderColor());
+        setFillColor(style.getFillColor());
+        setBorderSize(style.getBorderSize());
+        setShape(style.getShape());
     }
 }

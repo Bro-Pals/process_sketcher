@@ -42,7 +42,8 @@ public class LineStyle extends FontStyle implements BinaryData {
      * The thickness/stoke of the line.
      */
     private int lineSize;
-
+    
+    
     /**
      * Creates the default line sytle, which is a solid black 1 point size line.
      */
@@ -146,4 +147,17 @@ public class LineStyle extends FontStyle implements BinaryData {
         lineSize = BinaryUtil.bytesToInt(arr, pos+4);
         super.fromBinary(arr, pos+8, window);
     }    
+    
+    /**
+     * Copies the other style into this style so they are the same.
+     * @param style the style to set this one to.
+     */
+    public void setTo(LineStyle style) {
+        setFontType(style.getFontType());
+        setFontColor(style.getFontColor());
+        setFontSize(style.getFontSize());
+        setLineColor(style.getLineColor());
+        setLineSize(style.getLineSize());
+        setType(style.getType());
+    }
 }
