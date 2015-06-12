@@ -46,6 +46,8 @@ public class LineStyleListener extends AbstractFlowyListener implements ActionLi
             LineType typeToChangeTo = LineType.fromString((String)getFlowchartWindow().getLineTypeComboBox().getSelectedItem());
             for (NodeLine n : getSelectedNodeLines()) {
                 if (n.getStyle().getType() != typeToChangeTo) {
+                    n.unlink();
+                    getFlowchartWindow().deselectLinkedLineStyle();
                     changedSelectables.add(n);
                     oldTypes.add(n.getStyle().getType());
                     n.getStyle().setType(typeToChangeTo);

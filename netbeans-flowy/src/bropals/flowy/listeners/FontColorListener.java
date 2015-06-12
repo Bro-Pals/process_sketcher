@@ -51,6 +51,9 @@ public class FontColorListener extends AbstractFlowyListener implements ActionLi
         //Use the color chooser to change the color of the button
         for (Selectable s : getSelected()) {
             if (!s.getFontStyle().getFontColor().equals(colorToChangeTo)) {
+                s.unlink();
+                getFlowchartWindow().deselectLinkedNodeStyle();
+                getFlowchartWindow().deselectLinkedLineStyle();
                 changedSelectables.add(s);
                 oldValues.add(s.getFontStyle().getFontColor());
                 s.getFontStyle().setFontColor(colorToChangeTo);

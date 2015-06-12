@@ -772,9 +772,21 @@ public class FlowchartWindow extends JFrame {
            int borderSize = getSameBorderSize(selected);
            Color borderColor = getSameBorderColor(selected);
            Color fillColor = getSameFillColor(selected);
+           String nodeStyleName = getSameNodeStyleName(selected);
+           String lineStyleName = getSameLineStyleName(selected);
            setFontPanelStyles(font, fontColor, fontSize);
            setNodePanelStyles(shape, borderColor, fillColor, borderSize);
            setLinePanelStyles(lineType, lineColor, lineSize);
+           if (nodeStyleName != null) {
+               getSavedNodeStylesComboBox().setSelectedItem(nodeStyleName);
+           } else {
+               getSavedNodeStylesComboBox().setSelectedIndex(-1);
+           }
+           if (lineStyleName != null) {
+               getSavedLineStylesComboBox().setSelectedItem(lineStyleName);
+           } else {
+               getSavedLineStylesComboBox().setSelectedIndex(-1);
+           }
        }
     }
 
@@ -912,6 +924,32 @@ public class FlowchartWindow extends JFrame {
     }
     
     /**
+     * Gets the linked line style name that is the same for all selectables in
+     * the given list, or <code>null</code> if they do not all have
+     * the same linked line style name.
+     * @param selected the list of selected objects.
+     * @return the linked line style name that is common to all selectables, or
+     * <code>null</code> if the linked line style name is not common.
+     */
+    private String getSameLineStyleName(ArrayList<Selectable> selected) {
+        int firstNodeLine = indexOfFirstNodeLine(selected);
+        if (firstNodeLine == -1) {
+            //No nodes in this selection anyway
+            return null;
+        }
+        String name = ((NodeLine)selected.get(firstNodeLine)).getLinkedStyle();
+        for (int i=firstNodeLine+1; i<selected.size(); i++) {
+            if (selected.get(i) instanceof NodeLine) {
+                if (name != ((NodeLine)selected.get(i)).getLinkedStyle()) {
+                    //The border size is not common
+                    return null;
+                }
+            }
+        }
+        return name;
+    }
+    
+    /**
      * Gets the shape that is the same for all selectables in
      * the given list, or <code>null</code> if they do not all have
      * the same shape.
@@ -1013,6 +1051,32 @@ public class FlowchartWindow extends JFrame {
             }
         }
         return size;
+    }
+    
+    /**
+     * Gets the linked node style name that is the same for all selectables in
+     * the given list, or <code>null</code> if they do not all have
+     * the same linked node style name.
+     * @param selected the list of selected objects.
+     * @return the linked node style name that is common to all selectables, or
+     * <code>null</code> if the linked node style name is not common.
+     */
+    private String getSameNodeStyleName(ArrayList<Selectable> selected) {
+        int firstNode = indexOfFirstNode(selected);
+        if (firstNode == -1) {
+            //No nodes in this selection anyway
+            return null;
+        }
+        String name = ((Node)selected.get(firstNode)).getLinkedStyle();
+        for (int i=firstNode+1; i<selected.size(); i++) {
+            if (selected.get(i) instanceof Node) {
+                if (name != ((Node)selected.get(i)).getLinkedStyle()) {
+                    //The border size is not common
+                    return null;
+                }
+            }
+        }
+        return name;
     }
     
     /**
@@ -1303,6 +1367,20 @@ public class FlowchartWindow extends JFrame {
      */
     public JComboBox getSavedLineStylesComboBox() {
         return savedLineStyles;
+    }
+    
+    /**
+     * Sets the saved line styles box to no selection.
+     */
+    public void deselectLinkedLineStyle() {
+        savedLineStyles.setSelectedIndex(-1);
+    }
+    
+     /**
+     * Sets the saved line styles box to no selection.
+     */
+    public void deselectLinkedNodeStyle() {
+        savedNodeStyles.setSelectedIndex(-1);
     }
     
     /**

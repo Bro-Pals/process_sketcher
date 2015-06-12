@@ -45,6 +45,9 @@ public class FontSizeListener extends AbstractFlowyListener implements ChangeLis
             for (int i=0; i<getSelected().size(); i++) {
                 // if the value changed then add it to the list of changed values
                 if (getSelected().get(i).getFontStyle().getFontSize() != value) {
+                    getSelected().get(i).unlink();
+                    getFlowchartWindow().deselectLinkedNodeStyle();
+                    getFlowchartWindow().deselectLinkedLineStyle();
                     changedSelectables.add(getSelected().get(i));
                     oldValues.add(getSelected().get(i).getFontStyle().getFontSize());
                     getSelected().get(i).getFontStyle().setFontSize(value);

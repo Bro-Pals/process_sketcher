@@ -38,13 +38,14 @@ public class SaveLineStylesListener extends AbstractFlowyListener implements Act
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        NodeLine n = (NodeLine)getLastSelected();
+        NodeLine n = (NodeLine)getSelectedNodeLines().get(0);
         String name = JOptionPane.showInputDialog("Name this style", "style name");
         if (name != null) {
             if (getFlowchartWindow().getStyleManager().isValidLineStyle(name, n.getStyle(), getFlowchartWindow())) {
                 getFlowchartWindow().getStyleManager().saveLineStyle(name, n.getStyle());
                 getFlowchartWindow().getStyleManager().assignStyle(name, n);
                 getFlowchartWindow().refreshLineStyleList();
+                getFlowchartWindow().getSavedLineStylesComboBox().setSelectedItem(name);
             }
         }
     }

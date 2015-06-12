@@ -51,6 +51,8 @@ public class BorderColorListener extends AbstractFlowyListener implements Action
         
         for (Node n : getSelectedNodes()) {
             if (!n.getStyle().getBorderColor().equals(colorToChangeTo)) {
+                n.unlink();
+                getFlowchartWindow().deselectLinkedNodeStyle();
                 changedSelectables.add(n);
                 oldValues.add(n.getStyle().getBorderColor());
                 n.getStyle().setFillColor(colorToChangeTo);

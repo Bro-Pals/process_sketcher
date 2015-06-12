@@ -180,25 +180,17 @@ public class NodeLine implements Selectable, BinaryData {
         return linkedStyle;
     }
     
-    /**
-     * Checks to see if this node line is linked to a style.
-     * @return if this node line is linked.
-     */
+    @Override
     public boolean isLinked() {
         return getLinkedStyle() != null;
     }
     
-    /**
-     * Assign a linked style to this node line.
-     * @param styleName the linked style name.
-     */
+    @Override
     public void assignStyle(String styleName) {
         linkedStyle = styleName;
     }
     
-    /**
-     * Unlink this node line from a linked style.
-     */
+    @Override
     public void unlink() {
         linkedStyle = null;
     }
@@ -226,8 +218,13 @@ public class NodeLine implements Selectable, BinaryData {
             line. The 8 is here to represent the two integers before the
             chunk of data read by the "fromBinary" function.
         */
-        return 8 + BinaryUtil.bytesForString(tailText) + BinaryUtil.bytesForString(centerText)
-               + BinaryUtil.bytesForString(headText) + style.bytes();
+        if (isLinked()) {
+            return 9 + BinaryUtil.bytesForString(tailText) + BinaryUtil.bytesForString(centerText)
+                   + BinaryUtil.bytesForString(headText) + BinaryUtil.bytesForString(linkedStyle);
+        } else {
+            return 9 + BinaryUtil.bytesForString(tailText) + BinaryUtil.bytesForString(centerText)
+                   + BinaryUtil.bytesForString(headText) + style.bytes();
+        }
     }
 
     @Override
@@ -238,7 +235,13 @@ public class NodeLine implements Selectable, BinaryData {
         BinaryUtil.stringToBytes(tailText, arr, pos);
         BinaryUtil.stringToBytes(centerText, arr, pos+tailBytes);
         BinaryUtil.stringToBytes(headText, arr, pos+tailBytes+centerBytes);
-        style.toBinary(arr, pos+tailBytes+centerBytes+headBytes);
+        if (isLinked()) {
+            arr[pos+tailBytes+centerBytes+headBytes] = 1;
+            BinaryUtil.stringToBytes(linkedStyle, arr, pos+tailBytes+centerBytes+headBytes+1);
+        } else {
+            arr[pos+tailBytes+centerBytes+headBytes] = 0;
+            style.toBinary(arr, pos+tailBytes+centerBytes+headBytes+1);
+        }
     }
 
     @Override
@@ -250,6 +253,11 @@ public class NodeLine implements Selectable, BinaryData {
         headText = BinaryUtil.bytesToString(arr, pos+tailBytes+centerBytes);
         int headBytes = BinaryUtil.bytesForString(headText);
         style = new LineStyle();
-        style.fromBinary(arr, pos+tailBytes+centerBytes+headBytes, window);
+        if (arr[pos+tailBytes+centerBytes+headBytes] == 1) {
+            linkedStyle = BinaryUtil.bytesToString(arr, pos+tailBytes+centerBytes+headBytes+1);
+            style.setTo(window.getStyleManager().getLineStyle(linkedStyle));
+        } else {
+            style.fromBinary(arr, pos+tailBytes+centerBytes+headBytes+1, window);
+        }
     }
 }

@@ -29,15 +29,16 @@ import java.util.ArrayList;
 
 /**
  * An object to represent a node in a flowchart.
+ *
  * @author Jonathon
  */
 public class Node implements Selectable, BinaryData {
-    
+
     /**
      * The smallest value for the width / height of a node.
      */
-    public final static float MINIMUM_SIZE = (EventManager.DRAG_RESIZE_DISTANCE*2) + 4;
-    
+    public final static float MINIMUM_SIZE = (EventManager.DRAG_RESIZE_DISTANCE * 2) + 4;
+
     /**
      * If the style is null, revert to a default style.
      */
@@ -70,9 +71,10 @@ public class Node implements Selectable, BinaryData {
      * The style that this node is linked with.
      */
     private String linkedStyle;
-    
+
     /**
      * Creates the default node in the specified world coordinate position.
+     *
      * @param x the X position of the node in world coordinates.
      * @param y the Y position of the node in world coordinates.
      */
@@ -85,9 +87,10 @@ public class Node implements Selectable, BinaryData {
         linesConnected = new ArrayList<>();
         innerText = "";
     }
-    
+
     /**
      * Gets the node style that is controlling the look of this Node.
+     *
      * @return the style controlling the look of this Node.
      */
     public NodeStyle getStyle() {
@@ -96,6 +99,7 @@ public class Node implements Selectable, BinaryData {
 
     /**
      * Sets the node style that is to control the look of this Node.
+     *
      * @param style the style of this Node.
      */
     public void setStyle(NodeStyle style) {
@@ -104,6 +108,7 @@ public class Node implements Selectable, BinaryData {
 
     /**
      * Gets the X position of this node, in world coordinates.
+     *
      * @return the X position of the node, in world coordinates.
      */
     public float getX() {
@@ -112,6 +117,7 @@ public class Node implements Selectable, BinaryData {
 
     /**
      * Sets the X position of this node, in world coordinates.
+     *
      * @param x the new X position of this node, in world coordinates.
      */
     public void setX(float x) {
@@ -120,6 +126,7 @@ public class Node implements Selectable, BinaryData {
 
     /**
      * Gets the Y position of this node, in world coordinates.
+     *
      * @return the Y position of the node, in world coordinates.
      */
     public float getY() {
@@ -128,6 +135,7 @@ public class Node implements Selectable, BinaryData {
 
     /**
      * Sets the Y position of this node, in world coordinates.
+     *
      * @param y the new Y position of this node, in world coordinates.
      */
     public void setY(float y) {
@@ -136,6 +144,7 @@ public class Node implements Selectable, BinaryData {
 
     /**
      * Gets the width of this node, in world coordinates.
+     *
      * @return the width of this node, in world coordinates.
      */
     public float getWidth() {
@@ -144,6 +153,7 @@ public class Node implements Selectable, BinaryData {
 
     /**
      * Sets the width of this node, in world coordinates.
+     *
      * @param width the new width of this node, in world coordinates.
      */
     public void setWidth(float width) {
@@ -154,6 +164,7 @@ public class Node implements Selectable, BinaryData {
 
     /**
      * Gets the height of this node, in world coordinates.
+     *
      * @return the height of this node, in world coordinates.
      */
     public float getHeight() {
@@ -162,6 +173,7 @@ public class Node implements Selectable, BinaryData {
 
     /**
      * Sets the height of this node, in world coordinates.
+     *
      * @param height the new height of this node, in world coordinates.
      */
     public void setHeight(float height) {
@@ -172,6 +184,7 @@ public class Node implements Selectable, BinaryData {
 
     /**
      * Gets the list of node lines that are connected to this node.
+     *
      * @return the list of node lines connected to this node.
      */
     public ArrayList<NodeLine> getLinesConnected() {
@@ -180,6 +193,7 @@ public class Node implements Selectable, BinaryData {
 
     /**
      * Gets the text that this node contains.
+     *
      * @return the text that this node contains.
      */
     public String getInnerText() {
@@ -188,50 +202,44 @@ public class Node implements Selectable, BinaryData {
 
     /**
      * Sets the text that this node contains.
+     *
      * @param innerText the new body of text for this node to contain.
      */
     public void setInnerText(String innerText) {
         this.innerText = innerText;
     }
-    
+
     /**
-     * Get the style that this node is linked to, or <code>null</code>
-     * if it is not linked to any.
+     * Get the style that this node is linked to, or <code>null</code> if it is
+     * not linked to any.
+     *
      * @return the linked style name.
      */
     public String getLinkedStyle() {
         return linkedStyle;
     }
-    
-    /**
-     * Checks to see if this node is linked to a style.
-     * @return if this node is linked.
-     */
+
+    @Override
     public boolean isLinked() {
         return getLinkedStyle() != null;
     }
-    
-    /**
-     * Assign a linked style to this node.
-     * @param styleName the linked style name.
-     */
+
+    @Override
     public void assignStyle(String styleName) {
         linkedStyle = styleName;
     }
-    
-    /**
-     * Unlink this node from a linked style.
-     */
+
+    @Override
     public void unlink() {
         linkedStyle = null;
     }
-    
+
     @Override
     public Object clone() {
         Node other = new Node(getX(), getY());
         other.setWidth(getWidth());
         other.setHeight(getHeight());
-        other.setStyle((NodeStyle)style.clone()); // same style
+        other.setStyle((NodeStyle) style.clone()); // same style
         other.setInnerText(getInnerText()); // initially no text
         return other;
     }
@@ -243,27 +251,45 @@ public class Node implements Selectable, BinaryData {
 
     @Override
     public int bytes() {
-        return 16+BinaryUtil.bytesForString(innerText)+style.bytes();
+        if (isLinked()) {
+            return 18 + 
+                    BinaryUtil.bytesForString(innerText) +
+                    BinaryUtil.bytesForString(linkedStyle);
+        } else {
+            return 18 + BinaryUtil.bytesForString(innerText) + style.bytes();
+        }
     }
 
     @Override
     public void toBinary(byte[] arr, int pos) {
         BinaryUtil.floatToBytes(x, arr, pos);
-        BinaryUtil.floatToBytes(y, arr, pos+4);
-        BinaryUtil.floatToBytes(width, arr, pos+8);
-        BinaryUtil.floatToBytes(height, arr, pos+12);
-        BinaryUtil.stringToBytes(innerText, arr, pos+16);
-        style.toBinary(arr, pos+16+BinaryUtil.bytesForString(innerText));
+        BinaryUtil.floatToBytes(y, arr, pos + 4);
+        BinaryUtil.floatToBytes(width, arr, pos + 8);
+        BinaryUtil.floatToBytes(height, arr, pos + 12);
+        BinaryUtil.stringToBytes(innerText, arr, pos + 16);
+        if (isLinked()) {
+            arr[pos + 17] = 1;
+            BinaryUtil.stringToBytes(linkedStyle, arr, pos + 18 + BinaryUtil.bytesForString(innerText));
+        } else {
+            arr[pos + 17] = 0;
+            style.toBinary(arr, pos + 18 + BinaryUtil.bytesForString(innerText));
+        }
     }
 
     @Override
     public void fromBinary(byte[] arr, int pos, FlowchartWindow window) {
         x = BinaryUtil.bytesToFloat(arr, pos);
-        y = BinaryUtil.bytesToFloat(arr, pos+4);
-        width = BinaryUtil.bytesToFloat(arr, pos+8);
-        height = BinaryUtil.bytesToFloat(arr, pos+12);
-        innerText = BinaryUtil.bytesToString(arr, pos+16);
+        y = BinaryUtil.bytesToFloat(arr, pos + 4);
+        width = BinaryUtil.bytesToFloat(arr, pos + 8);
+        height = BinaryUtil.bytesToFloat(arr, pos + 12);
+        innerText = BinaryUtil.bytesToString(arr, pos + 16);
         style = new NodeStyle();
-        style.fromBinary(arr, pos+16+BinaryUtil.bytesForString(innerText), window);
+        if (arr[pos + 17] == 1) { //Linked
+            linkedStyle = BinaryUtil.bytesToString(arr, pos+18+BinaryUtil.bytesForString(innerText));
+            style.setTo(window.getStyleManager().getNodeStyle(linkedStyle));
+        } else {
+            style.fromBinary(arr, pos + 16 + BinaryUtil.bytesForString(innerText), window);
+        }
     }
+
 }

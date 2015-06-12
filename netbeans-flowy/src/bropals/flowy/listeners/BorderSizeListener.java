@@ -46,6 +46,8 @@ public class BorderSizeListener extends AbstractFlowyListener implements ChangeL
             for (int i=0; i<getSelectedNodes().size(); i++) {
                 // if the value changed then add it to the list of changed values
                 if (getSelectedNodes().get(i).getStyle().getBorderSize() != value) {
+                    getSelectedNodes().get(i).unlink();
+                    getFlowchartWindow().deselectLinkedNodeStyle();
                     changedSelectables.add(getSelectedNodes().get(i));
                     oldValues.add(getSelectedNodes().get(i).getStyle().getBorderSize());
                     getSelectedNodes().get(i).getStyle().setBorderSize(value);
