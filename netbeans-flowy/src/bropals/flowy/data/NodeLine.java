@@ -196,6 +196,13 @@ public class NodeLine implements Selectable, BinaryData {
         linkedStyle = styleName;
     }
     
+    /**
+     * Unlink this node line from a linked style.
+     */
+    public void unlink() {
+        linkedStyle = null;
+    }
+    
     @Override
     public Object clone() {
         NodeLine other = new NodeLine(parent, child);

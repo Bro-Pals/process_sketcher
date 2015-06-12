@@ -219,6 +219,13 @@ public class Node implements Selectable, BinaryData {
         linkedStyle = styleName;
     }
     
+    /**
+     * Unlink this node from a linked style.
+     */
+    public void unlink() {
+        linkedStyle = null;
+    }
+    
     @Override
     public Object clone() {
         Node other = new Node(getX(), getY());

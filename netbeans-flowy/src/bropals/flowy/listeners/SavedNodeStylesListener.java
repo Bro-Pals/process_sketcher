@@ -20,6 +20,7 @@
 package bropals.flowy.listeners;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.Node;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -35,6 +36,12 @@ public class SavedNodeStylesListener extends AbstractFlowyListener implements Ac
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        
+        String styleName = (String)getFlowchartWindow().getSavedNodeStylesComboBox().getSelectedItem();
+        if (styleName != null) {
+            for (Node n : getSelectedNodes()) {
+                getFlowchartWindow().getStyleManager().assignStyle(styleName, n);
+            }
+            getFlowchartWindow().redrawView();
+        }
     }
 }

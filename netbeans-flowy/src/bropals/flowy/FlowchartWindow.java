@@ -1290,6 +1290,22 @@ public class FlowchartWindow extends JFrame {
     }
 
     /**
+     * Gets the saved node styles combo box.
+     * @return the saved node styles combo box.
+     */
+    public JComboBox getSavedNodeStylesComboBox() {
+        return savedNodeStyles;
+    }
+    
+    /**
+     * Gets the saved line styles combo box.
+     * @return the saved line styles combo box.
+     */
+    public JComboBox getSavedLineStylesComboBox() {
+        return savedLineStyles;
+    }
+    
+    /**
      * Refresh the GUI list of line styles to match the style manager's list.
      */
     public void refreshLineStyleList() {
