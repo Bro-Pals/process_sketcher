@@ -66,6 +66,10 @@ public class Node implements Selectable, BinaryData {
      * The text that is inside of this Node.
      */
     private String innerText;
+    /**
+     * The style that this node is linked with.
+     */
+    private String linkedStyle;
     
     /**
      * Creates the default node in the specified world coordinate position.
@@ -188,6 +192,31 @@ public class Node implements Selectable, BinaryData {
      */
     public void setInnerText(String innerText) {
         this.innerText = innerText;
+    }
+    
+    /**
+     * Get the style that this node is linked to, or <code>null</code>
+     * if it is not linked to any.
+     * @return the linked style name.
+     */
+    public String getLinkedStyle() {
+        return linkedStyle;
+    }
+    
+    /**
+     * Checks to see if this node is linked to a style.
+     * @return if this node is linked.
+     */
+    public boolean isLinked() {
+        return getLinkedStyle() != null;
+    }
+    
+    /**
+     * Assign a linked style to this node.
+     * @param styleName the linked style name.
+     */
+    public void assignStyle(String styleName) {
+        linkedStyle = styleName;
     }
     
     @Override

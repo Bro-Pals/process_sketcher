@@ -41,6 +41,7 @@ public class SaveNodeStylesListener extends AbstractFlowyListener implements Act
         String name = JOptionPane.showInputDialog("Name this style", "style name");
         if (getFlowchartWindow().getStyleManager().isValidNodeStyle(name, n.getStyle(), getFlowchartWindow())) {
             getFlowchartWindow().getStyleManager().saveNodeStyle(name, n.getStyle());
+            getFlowchartWindow().getStyleManager().assignStyle(name, n);
             getFlowchartWindow().refreshNodeStyleList();
         }
     }
