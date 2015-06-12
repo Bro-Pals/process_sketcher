@@ -20,10 +20,12 @@
 package bropals.flowy.listeners;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.action.style.EditedFontColor;
 import bropals.flowy.data.Selectable;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 
@@ -41,10 +43,25 @@ public class FontColorListener extends AbstractFlowyListener implements ActionLi
     public void actionPerformed(ActionEvent e) {
         JButton fontColor = getFlowchartWindow().getFontColorButton();
         fontColor.setBackground(JColorChooser.showDialog(getFlowchartWindow(), "Pick a font Color", fontColor.getBackground()));
+        
+        ArrayList<Selectable> changedSelectables = new ArrayList<>();
+        ArrayList<Color> oldValues = new ArrayList<>();
+        Color colorToChangeTo = fontColor.getBackground();
+        
         //Use the color chooser to change the color of the button
         for (Selectable s : getSelected()) {
-            s.getFontStyle().setFontColor(fontColor.getBackground());
+            if (!s.getFontStyle().getFontColor().equals(colorToChangeTo)) {
+                changedSelectables.add(s);
+                oldValues.add(s.getFontStyle().getFontColor());
+                s.getFontStyle().setFontColor(colorToChangeTo);
+            }
         }
+        
+         // record it to the history if anything changed
+        if (!changedSelectables.isEmpty()) {
+            getFlowchartWindow().getEventManager().getHistoryManager().addToHistory(new EditedFontColor(changedSelectables, oldValues));
+        }
+        
         getFlowchartWindow().redrawView();
     }
     

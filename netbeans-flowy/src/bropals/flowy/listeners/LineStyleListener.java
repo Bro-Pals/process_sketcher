@@ -20,10 +20,13 @@
 package bropals.flowy.listeners;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.action.style.EditedLineType;
 import bropals.flowy.data.NodeLine;
+import bropals.flowy.data.Selectable;
 import bropals.flowy.style.LineType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 /**
  * The listener for the line style chooser.
@@ -38,9 +41,21 @@ public class LineStyleListener extends AbstractFlowyListener implements ActionLi
     @Override
     public void actionPerformed(ActionEvent e) {
         if (getFlowchartWindow().getLineTypeComboBox().getSelectedIndex() != -1) {
+            ArrayList<Selectable> changedSelectables = new ArrayList<>();
+            ArrayList<LineType> oldTypes = new ArrayList<>();
+            LineType typeToChangeTo = LineType.fromString((String)getFlowchartWindow().getLineTypeComboBox().getSelectedItem());
             for (NodeLine n : getSelectedNodeLines()) {
-                n.getStyle().setType(LineType.fromString((String)getFlowchartWindow().getLineTypeComboBox().getSelectedItem()));
+                if (n.getStyle().getType() != typeToChangeTo) {
+                    changedSelectables.add(n);
+                    oldTypes.add(n.getStyle().getType());
+                    n.getStyle().setType(typeToChangeTo);
+                }
             }
+            // add to history if anything changed
+            if (!changedSelectables.isEmpty()) {
+                getFlowchartWindow().getEventManager().getHistoryManager().addToHistory(new EditedLineType(changedSelectables, oldTypes));
+            }
+            
             getFlowchartWindow().redrawView();
         }
     }

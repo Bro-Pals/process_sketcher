@@ -20,7 +20,10 @@
 package bropals.flowy.listeners;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.action.style.EditedBorderColor;
 import bropals.flowy.data.Node;
+import bropals.flowy.data.Selectable;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -41,9 +44,24 @@ public class BorderColorListener extends AbstractFlowyListener implements Action
     public void actionPerformed(ActionEvent e) {
         JButton borderColor = getFlowchartWindow().getBorderColorButton();
         borderColor.setBackground(JColorChooser.showDialog(getFlowchartWindow(), "Pick the border color", borderColor.getBackground()));
+        
+        ArrayList<Selectable> changedSelectables = new ArrayList<>();
+        ArrayList<Color> oldValues = new ArrayList<>();
+        Color colorToChangeTo = borderColor.getBackground();
+        
         for (Node n : getSelectedNodes()) {
-            n.getStyle().setBorderColor(borderColor.getBackground());
+            if (!n.getStyle().getBorderColor().equals(colorToChangeTo)) {
+                changedSelectables.add(n);
+                oldValues.add(n.getStyle().getBorderColor());
+                n.getStyle().setFillColor(colorToChangeTo);
+            }
         }
+        
+         // record it to the history if anything changed
+        if (!changedSelectables.isEmpty()) {
+            getFlowchartWindow().getEventManager().getHistoryManager().addToHistory(new EditedBorderColor(changedSelectables, oldValues));
+        }
+        
         getFlowchartWindow().redrawView();
     }
     

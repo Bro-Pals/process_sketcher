@@ -20,9 +20,13 @@
 package bropals.flowy.listeners;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.action.style.EditedLineColor;
 import bropals.flowy.data.NodeLine;
+import bropals.flowy.data.Selectable;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 
@@ -40,9 +44,25 @@ public class LineColorListener extends AbstractFlowyListener implements ActionLi
     public void actionPerformed(ActionEvent e) {
         JButton lineColor = getFlowchartWindow().getLineColorButton();
         lineColor.setBackground(JColorChooser.showDialog(getFlowchartWindow(), "Pick the line color", lineColor.getBackground()));
-        for (NodeLine n : getSelectedNodeLines()) {
-            n.getStyle().setLineColor(lineColor.getBackground());
+        
+        ArrayList<Selectable> changedSelectables = new ArrayList<>();
+        ArrayList<Color> oldValues = new ArrayList<>();
+        Color colorToChangeTo = lineColor.getBackground();
+        
+        //Use the color chooser to change the color of the button
+        for (NodeLine nl : getSelectedNodeLines()) {
+            if (!nl.getStyle().getLineColor().equals(colorToChangeTo)) {
+                changedSelectables.add(nl);
+                oldValues.add(nl.getStyle().getLineColor());
+                nl.getStyle().setLineColor(colorToChangeTo);
+            }
         }
+        
+         // record it to the history if anything changed
+        if (!changedSelectables.isEmpty()) {
+            getFlowchartWindow().getEventManager().getHistoryManager().addToHistory(new EditedLineColor(changedSelectables, oldValues));
+        }
+        
         getFlowchartWindow().redrawView();
     }
     

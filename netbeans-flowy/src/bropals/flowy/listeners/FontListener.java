@@ -20,10 +20,12 @@
 package bropals.flowy.listeners;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.action.style.EditedFontType;
 import bropals.flowy.data.Selectable;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 /**
  * The listener for the font chooser.
@@ -37,9 +39,21 @@ public class FontListener extends AbstractFlowyListener implements ActionListene
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        ArrayList<Selectable> changedSelectables = new ArrayList<>();
+        ArrayList<Font> oldValues = new ArrayList<>();
+        Font fontToChangeTo = (Font)getFlowchartWindow().getFontComboBox().getSelectedItem();
         for (Selectable s : getSelected()) {
-            s.getFontStyle().setFontType(((Font)getFlowchartWindow().getFontComboBox().getSelectedItem()));
+            if (!s.getFontStyle().getFontType().equals(fontToChangeTo)) {
+                changedSelectables.add(s);
+                oldValues.add(s.getFontStyle().getFontType());
+                s.getFontStyle().setFontType(fontToChangeTo);
+            }
         }
+        // record it to the history if anything changed
+        if (!changedSelectables.isEmpty()) {
+            getFlowchartWindow().getEventManager().getHistoryManager().addToHistory(new EditedFontType(changedSelectables, oldValues));
+        }
+        
         getFlowchartWindow().redrawView();
     }
     

@@ -20,10 +20,14 @@
 package bropals.flowy.listeners;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.action.style.EditedFontType;
+import bropals.flowy.action.style.EditedShape;
 import bropals.flowy.data.Node;
+import bropals.flowy.data.Selectable;
 import bropals.flowy.style.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 /**
  * The listener for the shape chooser in the styles tab.
@@ -37,10 +41,23 @@ public class ShapeListener extends AbstractFlowyListener implements ActionListen
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        ArrayList<Selectable> changedSelectables = new ArrayList<>();
+        ArrayList<Shape> oldValues = new ArrayList<>();
+        Shape shapeToChangeTo = Shape.fromString((String)getFlowchartWindow().getShapeComboBox().getSelectedItem());
+        
         if (getFlowchartWindow().getShapeComboBox().getSelectedIndex() != -1) {
             for (Node n : getSelectedNodes()) {
-                n.getStyle().setShape(Shape.fromString((String)getFlowchartWindow().getShapeComboBox().getSelectedItem()));
+                if (n.getStyle().getShape() != shapeToChangeTo) {
+                    changedSelectables.add(n);
+                    oldValues.add(n.getStyle().getShape());
+                    n.getStyle().setShape(shapeToChangeTo);
+                }
             }
+            // record it to the history if anything changed
+            if (!changedSelectables.isEmpty()) {
+                getFlowchartWindow().getEventManager().getHistoryManager().addToHistory(new EditedShape(changedSelectables, oldValues));
+            }
+        
             getFlowchartWindow().redrawView();
         }
     }

@@ -20,7 +20,11 @@
 package bropals.flowy.listeners;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.action.style.EditedFillColor;
+import bropals.flowy.action.style.EditedFontColor;
 import bropals.flowy.data.Node;
+import bropals.flowy.data.Selectable;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -41,9 +45,24 @@ public class FillColorListener extends AbstractFlowyListener implements ActionLi
     public void actionPerformed(ActionEvent e) {
         JButton fillColor = getFlowchartWindow().getFillColorButton();
         fillColor.setBackground(JColorChooser.showDialog(getFlowchartWindow(), "Pick the fill color", fillColor.getBackground()));
+        
+        ArrayList<Selectable> changedSelectables = new ArrayList<>();
+        ArrayList<Color> oldValues = new ArrayList<>();
+        Color colorToChangeTo = fillColor.getBackground();
+        
         for (Node n : getSelectedNodes()) {
-            n.getStyle().setFillColor(fillColor.getBackground());
+            if (!n.getStyle().getFillColor().equals(colorToChangeTo)) {
+                changedSelectables.add(n);
+                oldValues.add(n.getStyle().getFillColor());
+                n.getStyle().setFillColor(colorToChangeTo);
+            }
         }
+        
+         // record it to the history if anything changed
+        if (!changedSelectables.isEmpty()) {
+            getFlowchartWindow().getEventManager().getHistoryManager().addToHistory(new EditedFillColor(changedSelectables, oldValues));
+        }
+        
         getFlowchartWindow().redrawView();
     }
     

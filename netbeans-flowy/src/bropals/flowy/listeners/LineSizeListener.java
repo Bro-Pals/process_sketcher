@@ -20,7 +20,11 @@
 package bropals.flowy.listeners;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.action.style.EditedFontSize;
+import bropals.flowy.action.style.EditedLineSize;
 import bropals.flowy.data.NodeLine;
+import bropals.flowy.data.Selectable;
+import java.util.ArrayList;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -40,6 +44,19 @@ public class LineSizeListener extends AbstractFlowyListener implements ChangeLis
         if (value > 0) {
             for (NodeLine n : getSelectedNodeLines()) {
                 n.getStyle().setLineSize(value);
+            }
+            ArrayList<Selectable> changedSelectables = new ArrayList<>();
+            ArrayList<Integer> oldValues = new ArrayList<>();
+            for (NodeLine n : getSelectedNodeLines()) {
+                if (n.getStyle().getLineSize() == value) {
+                    changedSelectables.add(n);
+                    oldValues.add(n.getStyle().getLineSize());
+                    n.getStyle().setLineSize(value);
+                }
+            }
+            // record into history if the font size changed for any number of elements
+            if (!changedSelectables.isEmpty()) {
+                getFlowchartWindow().getEventManager().getHistoryManager().addToHistory(new EditedLineSize(changedSelectables, oldValues));
             }
             getFlowchartWindow().redrawView();
         } else {

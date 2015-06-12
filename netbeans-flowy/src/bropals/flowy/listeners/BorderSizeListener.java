@@ -20,7 +20,9 @@
 package bropals.flowy.listeners;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.action.style.EditedBorderSize;
 import bropals.flowy.data.Node;
+import bropals.flowy.data.Selectable;
 import java.util.ArrayList;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -39,8 +41,19 @@ public class BorderSizeListener extends AbstractFlowyListener implements ChangeL
     public void stateChanged(ChangeEvent e) {
         int value = (Integer)getFlowchartWindow().getBorderSizeSpinner().getValue();
         if (value > 0) {
-            for (Node n : getSelectedNodes()) {
-                n.getStyle().setBorderSize(value);
+            ArrayList<Selectable> changedSelectables = new ArrayList<>();
+            ArrayList<Integer> oldValues = new ArrayList<>();
+            for (int i=0; i<getSelectedNodes().size(); i++) {
+                // if the value changed then add it to the list of changed values
+                if (getSelectedNodes().get(i).getStyle().getBorderSize() != value) {
+                    changedSelectables.add(getSelectedNodes().get(i));
+                    oldValues.add(getSelectedNodes().get(i).getStyle().getBorderSize());
+                    getSelectedNodes().get(i).getStyle().setBorderSize(value);
+                }
+            }
+            // record into history if the font size changed for any number of elements
+            if (!changedSelectables.isEmpty()) {
+                getFlowchartWindow().getEventManager().getHistoryManager().addToHistory(new EditedBorderSize(changedSelectables, oldValues));
             }
             getFlowchartWindow().redrawView();
         } else {
