@@ -20,10 +20,13 @@
 package bropals.flowy.listeners;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.action.style.EditedNodeLineStyle;
 import bropals.flowy.data.NodeLine;
+import bropals.flowy.data.Selectable;
 import bropals.flowy.style.LineStyle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 /**
  * Listener for when an option is selected in the list of saved lines.
@@ -39,8 +42,22 @@ public class SavedLineStylesListener extends AbstractFlowyListener implements Ac
     public void actionPerformed(ActionEvent e) {
         String styleName = (String)getFlowchartWindow().getSavedLineStylesComboBox().getSelectedItem();
         if (styleName != null) {
-            for (NodeLine n : getSelectedNodeLines()) {
-                getFlowchartWindow().getStyleManager().assignStyle(styleName, n);
+
+            ArrayList<Selectable> selectablesChanged = new ArrayList<>();
+            selectablesChanged.addAll(getSelectedNodes());
+            LineStyle styleToChangeTo = getFlowchartWindow().getStyleManager().getLineStyle(styleName);
+            ArrayList<LineStyle> oldStyles = new ArrayList<>();
+            
+            for (NodeLine nl : getSelectedNodeLines()) {
+                if (!nl.getStyle().equals(styleToChangeTo)) {
+                    selectablesChanged.add(nl);
+                    oldStyles.add(nl.getStyle());
+                    getFlowchartWindow().getStyleManager().assignStyle(styleName, nl);
+                }
+            }
+            
+            if (!selectablesChanged.isEmpty()) {
+                getFlowchartWindow().getEventManager().getHistoryManager().addToHistory(new EditedNodeLineStyle(selectablesChanged, oldStyles));
             }
             getFlowchartWindow().redrawView();
         }

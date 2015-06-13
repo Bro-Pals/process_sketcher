@@ -20,6 +20,7 @@
 package bropals.flowy.listeners;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.action.style.EditedNodeStyle;
 import bropals.flowy.action.style.EditedStyle;
 import bropals.flowy.data.Node;
 import bropals.flowy.data.Selectable;
@@ -43,16 +44,23 @@ public class SavedNodeStylesListener extends AbstractFlowyListener implements Ac
         String styleName = (String)getFlowchartWindow().getSavedNodeStylesComboBox().getSelectedItem();
         
         if (styleName != null) {
-             ArrayList<Selectable> selectablesChanged = new ArrayList<>();
+            ArrayList<Selectable> selectablesChanged = new ArrayList<>();
             selectablesChanged.addAll(getSelectedNodes());
             NodeStyle styleToChangeTo = getFlowchartWindow().getStyleManager().getNodeStyle(styleName);
             ArrayList<NodeStyle> oldStyles = new ArrayList<>();
             
             for (Node n : getSelectedNodes()) {
                 if (!n.getStyle().equals(styleToChangeTo)) {
+                    selectablesChanged.add(n);
+                    oldStyles.add(n.getStyle());
                     getFlowchartWindow().getStyleManager().assignStyle(styleName, n);
                 }
             }
+            
+            if (!selectablesChanged.isEmpty()) {
+                getFlowchartWindow().getEventManager().getHistoryManager().addToHistory(new EditedNodeStyle(selectablesChanged, oldStyles));
+            }
+            
             getFlowchartWindow().redrawView();
         }
     }
