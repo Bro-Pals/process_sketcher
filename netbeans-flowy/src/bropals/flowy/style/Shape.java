@@ -475,8 +475,8 @@ public enum Shape {
             if (blinkCursor && !drawnCursorYet) {
                 int lastRow = text.size() - 1;
                 //draw the cursor
-                g2.fillRect((int)startEverythingX + camera.convertWorldToCanvasLength((float)g.getFontMetrics().getStringBounds(
-                       text.get(lastRow), g).getWidth()), 
+                g2.fillRect((int)startEverythingX + g.getFontMetrics().stringWidth(
+                       text.get(lastRow)), 
                     (int)startEverythingY + (lineHeight * (lastRow - 1)) - 2, 
                     3, lineHeight + 4);
             }

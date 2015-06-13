@@ -338,7 +338,7 @@ public enum LineType {
             float diffY, float diffX, Graphics g, int cursorLocation, Camera camera, boolean blinkCursor) {
         int cursorRenderX = 0;
         int cursorRenderY = 0;
-        float xPositionOffset = (int) g.getFontMetrics().getStringBounds(text, g).getWidth() / 2;
+        float xPositionOffset = camera.convertCanvasToWorldLength(g.getFontMetrics().stringWidth(text)) / 2;
         Point.Float pp = new Point.Float(originalParentPointX + (distanceRatio * diffX * lineLength) - xPositionOffset,
                 originalParentPointY + (distanceRatio * diffY * lineLength));
         if (blinkCursor && partCursorDrawing == cursorConditional) {
@@ -346,7 +346,7 @@ public enum LineType {
                 cursorLocation = text.length();
             }
             cursorRenderX = camera.convertWorldToCanvasX((float) pp.getX())
-                    + (int) (g.getFontMetrics().getStringBounds(text.substring(0, cursorLocation), g).getWidth());
+                    + (int) (g.getFontMetrics().stringWidth(text.substring(0, cursorLocation)));
             cursorRenderY = (int) (camera.convertWorldToCanvasY((int) pp.getY()) - g.getFontMetrics().getHeight() - 2);
         }
         g.drawString(text,
