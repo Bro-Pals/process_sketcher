@@ -954,7 +954,7 @@ public class FlowchartWindow extends JFrame {
         String name = ((NodeLine)selected.get(firstNodeLine)).getLinkedStyle();
         for (int i=firstNodeLine+1; i<selected.size(); i++) {
             if (selected.get(i) instanceof NodeLine) {
-                if (name != ((NodeLine)selected.get(i)).getLinkedStyle()) {
+                if (!name.equals(((NodeLine)selected.get(i)).getLinkedStyle())) {
                     //The border size is not common
                     return null;
                 }
@@ -1084,7 +1084,7 @@ public class FlowchartWindow extends JFrame {
         String name = ((Node)selected.get(firstNode)).getLinkedStyle();
         for (int i=firstNode+1; i<selected.size(); i++) {
             if (selected.get(i) instanceof Node) {
-                if (name != ((Node)selected.get(i)).getLinkedStyle()) {
+                if (!name.equals(((Node)selected.get(i)).getLinkedStyle())) {
                     //The border size is not common
                     return null;
                 }

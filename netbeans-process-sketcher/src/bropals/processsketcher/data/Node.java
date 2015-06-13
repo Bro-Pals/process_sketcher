@@ -241,6 +241,7 @@ public class Node implements Selectable, BinaryData {
         other.setHeight(getHeight());
         other.setStyle((NodeStyle) style.clone()); // same style
         other.setInnerText(getInnerText()); // initially no text
+        other.assignStyle(getLinkedStyle());
         return other;
     }
 

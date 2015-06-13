@@ -202,6 +202,7 @@ public class NodeLine implements Selectable, BinaryData {
         other.setTailText(tailText);
         other.setCenterText(centerText);
         other.setStyle((LineStyle)(style.clone()));
+        other.assignStyle(other.getLinkedStyle());
         return other;
     }
    
