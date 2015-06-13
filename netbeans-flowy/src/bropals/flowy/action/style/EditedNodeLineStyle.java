@@ -25,7 +25,7 @@ import bropals.flowy.style.LineStyle;
 import java.util.ArrayList;
 
 /**
- *
+ * An action that occurs when a node line style is applied
  * @author Kevin
  */
 public class EditedNodeLineStyle extends EditedStyle {
