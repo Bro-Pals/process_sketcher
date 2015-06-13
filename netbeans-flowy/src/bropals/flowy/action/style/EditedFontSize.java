@@ -39,6 +39,10 @@ public class EditedFontSize extends EditedStyle {
     @Override
     public void undo(FlowchartWindow instance) {
         System.out.println("Undo editing the font size");
+        ArrayList<Selectable> things = getSelectables();
+        for (int i=0; i<things.size(); i++) {
+            things.get(i).getFontStyle().setFontSize(sizes.get(i));
+        }
     }
     
     

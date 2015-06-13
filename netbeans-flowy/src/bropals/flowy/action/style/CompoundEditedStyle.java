@@ -38,7 +38,9 @@ public class CompoundEditedStyle extends Action {
     @Override
     public void undo(FlowchartWindow instance) {
         System.out.println("Undoing many style in one action");
-        
+        for (EditedStyle es : styleEdits) {
+            es.undo(instance);
+        }
         System.out.println("Finished undoing many styles");
     }
     

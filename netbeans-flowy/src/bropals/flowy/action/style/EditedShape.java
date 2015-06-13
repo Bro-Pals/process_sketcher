@@ -20,6 +20,7 @@
 package bropals.flowy.action.style;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.Node;
 import bropals.flowy.data.Selectable;
 import bropals.flowy.style.Shape;
 import java.util.ArrayList;
@@ -40,6 +41,10 @@ public class EditedShape extends EditedStyle {
     @Override
     public void undo(FlowchartWindow instance) {
         System.out.println("Undo edted shape");
+        ArrayList<Node> nodes = getEditedNodes();
+        for (int i=0; i<getEditedNodes().size(); i++) {
+            nodes.get(i).getStyle().setShape(shapes.get(i));
+        }
     }
     
 }

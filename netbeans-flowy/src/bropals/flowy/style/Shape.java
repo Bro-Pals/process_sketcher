@@ -258,8 +258,8 @@ public enum Shape {
         
         //Text wrapping values. Don't edit them to use these default values
         int padding = 5;
-        int startEverythingX = camera.convertWorldToCanvasX(node.getX()) + padding; // canvas units
-        int startEverythingY = camera.convertWorldToCanvasY(node.getY()) + fm.getHeight() + padding; // canvas units
+        int startEverythingX = camera.convertWorldToCanvasX(node.getX() + padding ); // canvas units
+        int startEverythingY = camera.convertWorldToCanvasY(node.getY() + padding) + fm.getHeight(); // canvas units
         // the width each row can't get longer than (in canvas units)
         int width =  camera.convertWorldToCanvasLength(node.getWidth() - (padding * 2));
         
@@ -440,6 +440,9 @@ public enum Shape {
                 }
             }
 
+            // color of the text cursor
+            g.setColor(Color.BLACK);
+            
             int lineHeight = g.getFontMetrics().getHeight();
 
             int sumOfCharsPrevRows = 0;
@@ -453,8 +456,10 @@ public enum Shape {
                 if (sumOfCharsPrevRows + text.get(r).length() > cursorLocation) {
                    if (!drawnCursorYet && blinkCursor) {
                         // get the offset for where to draw the cursor
-                        int thisRowOffset = camera.convertWorldToCanvasLength((float)g.getFontMetrics().getStringBounds(
-                                (text.get(r).substring(0, cursorLocation - sumOfCharsPrevRows)), g).getWidth());
+                       /* int thisRowOffset = (int)((g.getFontMetrics().getStringBounds(
+                                (text.get(r).substring(0, cursorLocation - sumOfCharsPrevRows)), g)).getWidth());
+                               */
+                       int thisRowOffset = g.getFontMetrics().stringWidth(text.get(r).substring(0, cursorLocation - sumOfCharsPrevRows));
                         //draw the cursor
                         g2.fillRect((int)startEverythingX + thisRowOffset, 
                             (int)startEverythingY + (lineHeight * (r - 1)) - 2, 

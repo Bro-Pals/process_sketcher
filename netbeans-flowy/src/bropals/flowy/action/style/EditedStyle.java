@@ -74,4 +74,12 @@ public abstract class EditedStyle extends Action {
         }
         return nodes;
     }
+    
+    /**
+     * Get the list of all the selectables that were edited
+     * @return a list of all the selectables that were edited
+     */
+    public ArrayList<Selectable> getSelectables() {
+        return edited;
+    }
 }

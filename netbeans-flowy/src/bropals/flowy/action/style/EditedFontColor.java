@@ -40,6 +40,10 @@ public class EditedFontColor extends EditedStyle {
     @Override
     public void undo(FlowchartWindow instance) {
         System.out.println("Undo editing font color");
+        ArrayList<Selectable> things = getSelectables();
+        for (int i=0; i<things.size(); i++) {
+            things.get(i).getFontStyle().setFontColor(colors.get(i));
+        }
     }
     
 }

@@ -53,7 +53,7 @@ public class BorderColorListener extends AbstractFlowyListener implements Action
             if (!n.getStyle().getBorderColor().equals(colorToChangeTo)) {
                 changedSelectables.add(n);
                 oldValues.add(n.getStyle().getBorderColor());
-                n.getStyle().setFillColor(colorToChangeTo);
+                n.getStyle().setBorderColor(colorToChangeTo);
             }
         }
         

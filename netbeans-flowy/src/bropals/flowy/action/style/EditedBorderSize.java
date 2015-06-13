@@ -20,6 +20,7 @@
 package bropals.flowy.action.style;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.data.Node;
 import bropals.flowy.data.Selectable;
 import java.util.ArrayList;
 
@@ -39,6 +40,10 @@ public class EditedBorderSize extends EditedStyle {
     @Override
     public void undo(FlowchartWindow instance) {
         System.out.println("Undo edited border size");
+        ArrayList<Node> nodes = getEditedNodes();
+        for (int i=0; i<nodes.size(); i++) {
+            nodes.get(i).getStyle().setBorderSize(sizes.get(i));
+        }        
     }
     
 }
