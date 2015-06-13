@@ -208,7 +208,7 @@ public class StyleManager {
      */
     public void assignStyle(String style, Node node) {
         node.assignStyle(style);
-        node.setStyle(nodeStyles.get(style));
+        node.setStyle((NodeStyle)nodeStyles.get(style).clone());
     }
     
     /**
@@ -218,6 +218,24 @@ public class StyleManager {
      */
     public void assignStyle(String style, NodeLine nodeLine) {
         nodeLine.assignStyle(style);
-        nodeLine.setStyle(lineStyles.get(style));
+        nodeLine.setStyle((LineStyle)lineStyles.get(style).clone());
+    }
+    
+    /**
+     * Gets a node style by its name.
+     * @param name the name of the node style.
+     * @return the node style with the given name.
+     */
+    public NodeStyle getNodeStyle(String name) {
+        return nodeStyles.get(name);
+    }
+    
+    /**
+     * Gets a line style by its name.
+     * @param name the name of the node style.
+     * @return the line style with the given name.
+     */
+    public LineStyle getLineStyle(String name) {
+        return lineStyles.get(name);
     }
 }

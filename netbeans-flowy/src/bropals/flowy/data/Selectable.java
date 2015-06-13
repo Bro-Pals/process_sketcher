@@ -27,7 +27,7 @@ import bropals.flowy.style.FontStyle;
  * Represents an object that can be selected and edited.
  * @author Jonathon
  */
-public interface Selectable {
+public interface Selectable extends Linkable {
     /**
      * Gets the style that controls the font of the selectable.
      * @return 

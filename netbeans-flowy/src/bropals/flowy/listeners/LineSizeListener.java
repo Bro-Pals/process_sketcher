@@ -49,6 +49,8 @@ public class LineSizeListener extends AbstractFlowyListener implements ChangeLis
             ArrayList<Integer> oldValues = new ArrayList<>();
             for (NodeLine n : getSelectedNodeLines()) {
                 if (n.getStyle().getLineSize() == value) {
+                    n.unlink();
+                    getFlowchartWindow().deselectLinkedLineStyle();
                     changedSelectables.add(n);
                     oldValues.add(n.getStyle().getLineSize());
                     n.getStyle().setLineSize(value);

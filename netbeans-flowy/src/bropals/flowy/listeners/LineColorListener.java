@@ -52,6 +52,8 @@ public class LineColorListener extends AbstractFlowyListener implements ActionLi
         //Use the color chooser to change the color of the button
         for (NodeLine nl : getSelectedNodeLines()) {
             if (!nl.getStyle().getLineColor().equals(colorToChangeTo)) {
+                nl.unlink();
+                getFlowchartWindow().deselectLinkedLineStyle();
                 changedSelectables.add(nl);
                 oldValues.add(nl.getStyle().getLineColor());
                 nl.getStyle().setLineColor(colorToChangeTo);

@@ -43,22 +43,27 @@ public class ShapeListener extends AbstractFlowyListener implements ActionListen
     public void actionPerformed(ActionEvent e) {
         ArrayList<Selectable> changedSelectables = new ArrayList<>();
         ArrayList<Shape> oldValues = new ArrayList<>();
-        Shape shapeToChangeTo = Shape.fromString((String)getFlowchartWindow().getShapeComboBox().getSelectedItem());
-        
-        if (getFlowchartWindow().getShapeComboBox().getSelectedIndex() != -1) {
-            for (Node n : getSelectedNodes()) {
-                if (n.getStyle().getShape() != shapeToChangeTo) {
-                    changedSelectables.add(n);
-                    oldValues.add(n.getStyle().getShape());
-                    n.getStyle().setShape(shapeToChangeTo);
+        String shapeStr = (String)getFlowchartWindow().getShapeComboBox().getSelectedItem();
+        if (shapeStr != null) {
+            Shape shapeToChangeTo = Shape.fromString(shapeStr);
+
+            if (getFlowchartWindow().getShapeComboBox().getSelectedIndex() != -1) {
+                for (Node n : getSelectedNodes()) {
+                    if (n.getStyle().getShape() != shapeToChangeTo) {
+                        n.unlink();
+                        getFlowchartWindow().deselectLinkedNodeStyle();
+                        changedSelectables.add(n);
+                        oldValues.add(n.getStyle().getShape());
+                        n.getStyle().setShape(shapeToChangeTo);
+                    }
                 }
+                // record it to the history if anything changed
+                if (!changedSelectables.isEmpty()) {
+                    getFlowchartWindow().getEventManager().getHistoryManager().addToHistory(new EditedShape(changedSelectables, oldValues));
+                }
+
+                getFlowchartWindow().redrawView();
             }
-            // record it to the history if anything changed
-            if (!changedSelectables.isEmpty()) {
-                getFlowchartWindow().getEventManager().getHistoryManager().addToHistory(new EditedShape(changedSelectables, oldValues));
-            }
-        
-            getFlowchartWindow().redrawView();
         }
     }
     

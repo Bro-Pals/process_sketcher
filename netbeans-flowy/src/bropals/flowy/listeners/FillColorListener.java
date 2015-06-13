@@ -52,6 +52,8 @@ public class FillColorListener extends AbstractFlowyListener implements ActionLi
         
         for (Node n : getSelectedNodes()) {
             if (!n.getStyle().getFillColor().equals(colorToChangeTo)) {
+                n.unlink();
+                getFlowchartWindow().deselectLinkedNodeStyle();
                 changedSelectables.add(n);
                 oldValues.add(n.getStyle().getFillColor());
                 n.getStyle().setFillColor(colorToChangeTo);

@@ -44,6 +44,9 @@ public class FontListener extends AbstractFlowyListener implements ActionListene
         Font fontToChangeTo = (Font)getFlowchartWindow().getFontComboBox().getSelectedItem();
         for (Selectable s : getSelected()) {
             if (!s.getFontStyle().getFontType().equals(fontToChangeTo)) {
+                s.unlink();
+                getFlowchartWindow().deselectLinkedNodeStyle();
+                getFlowchartWindow().deselectLinkedLineStyle();
                 changedSelectables.add(s);
                 oldValues.add(s.getFontStyle().getFontType());
                 s.getFontStyle().setFontType(fontToChangeTo);
