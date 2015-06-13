@@ -34,8 +34,8 @@ public class EditedNodeLineText extends EditedText {
     
     public EditedNodeLineText(NodeLine lineEdited, String textOld, int partOfTheLine) {
         super(textOld);
-        line = lineEdited;
-        partOfLine = partOfTheLine;
+        this.line = lineEdited;
+        this.partOfLine = partOfTheLine;
     }
     
     @Override

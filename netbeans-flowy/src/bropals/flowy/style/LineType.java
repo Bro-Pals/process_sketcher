@@ -344,6 +344,8 @@ public enum LineType {
         if (blinkCursor && partCursorDrawing == cursorConditional) {
             if (text.length() > 0 && cursorLocation > text.length()) {
                 cursorLocation = text.length();
+            } else if (text.length() == 0) {
+                cursorLocation = 0;
             }
             cursorRenderX = camera.convertWorldToCanvasX((float) pp.getX())
                     + (int) (g.getFontMetrics().stringWidth(text.substring(0, cursorLocation)));

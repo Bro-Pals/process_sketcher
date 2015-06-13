@@ -19,10 +19,12 @@
  */
 package bropals.flowy;
 
+import bropals.flowy.action.style.EditedStyle;
 import bropals.flowy.data.Node;
 import bropals.flowy.data.NodeLine;
 import bropals.flowy.style.LineStyle;
 import bropals.flowy.style.NodeStyle;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import javax.swing.JOptionPane;
@@ -238,4 +240,6 @@ public class StyleManager {
     public LineStyle getLineStyle(String name) {
         return lineStyles.get(name);
     }
+    
+   
 }

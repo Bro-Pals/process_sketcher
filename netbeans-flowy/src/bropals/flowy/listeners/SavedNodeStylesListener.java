@@ -20,9 +20,13 @@
 package bropals.flowy.listeners;
 
 import bropals.flowy.FlowchartWindow;
+import bropals.flowy.action.style.EditedStyle;
 import bropals.flowy.data.Node;
+import bropals.flowy.data.Selectable;
+import bropals.flowy.style.NodeStyle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 /**
  * Listener for when an option is selected in the list of saved nodes.
@@ -37,9 +41,17 @@ public class SavedNodeStylesListener extends AbstractFlowyListener implements Ac
     @Override
     public void actionPerformed(ActionEvent e) {
         String styleName = (String)getFlowchartWindow().getSavedNodeStylesComboBox().getSelectedItem();
+        
         if (styleName != null) {
+             ArrayList<Selectable> selectablesChanged = new ArrayList<>();
+            selectablesChanged.addAll(getSelectedNodes());
+            NodeStyle styleToChangeTo = getFlowchartWindow().getStyleManager().getNodeStyle(styleName);
+            ArrayList<NodeStyle> oldStyles = new ArrayList<>();
+            
             for (Node n : getSelectedNodes()) {
-                getFlowchartWindow().getStyleManager().assignStyle(styleName, n);
+                if (!n.getStyle().equals(styleToChangeTo)) {
+                    getFlowchartWindow().getStyleManager().assignStyle(styleName, n);
+                }
             }
             getFlowchartWindow().redrawView();
         }

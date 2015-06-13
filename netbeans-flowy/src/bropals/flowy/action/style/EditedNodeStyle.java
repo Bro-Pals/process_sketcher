@@ -21,25 +21,29 @@ package bropals.flowy.action.style;
 
 import bropals.flowy.FlowchartWindow;
 import bropals.flowy.action.Action;
+import bropals.flowy.data.Selectable;
+import bropals.flowy.style.NodeStyle;
+import java.util.ArrayList;
 
 /**
  * An action that occurs when multiple style properties are changed in one action. 
  * Used when a saved style has been applied to a node or node line
  * @author Kevin
  */
-public class CompoundEditedStyle extends Action {
+public class EditedNodeStyle extends EditedStyle {
 
-    EditedStyle[] styleEdits;
+    ArrayList<NodeStyle> styles;
     
-    public CompoundEditedStyle(EditedStyle[] styleActions) {
-        styleEdits = styleActions;
+    public EditedNodeStyle(ArrayList<Selectable> changedThings, ArrayList<NodeStyle> oldStyles) {
+        super(changedThings);
+        styles = oldStyles;
     }
     
     @Override
     public void undo(FlowchartWindow instance) {
         System.out.println("Undoing many style in one action");
-        for (EditedStyle es : styleEdits) {
-            es.undo(instance);
+        for (int i=0; i<styles.size(); i++) {
+            getEditedNodes().get(i).setStyle(styles.get(i));
         }
         System.out.println("Finished undoing many styles");
     }

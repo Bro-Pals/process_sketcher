@@ -440,8 +440,6 @@ public enum Shape {
                 }
             }
 
-            // color of the text cursor
-            g.setColor(Color.BLACK);
             
             int lineHeight = g.getFontMetrics().getHeight();
 
@@ -461,10 +459,12 @@ public enum Shape {
                                */
                        int thisRowOffset = g.getFontMetrics().stringWidth(text.get(r).substring(0, cursorLocation - sumOfCharsPrevRows));
                         //draw the cursor
+                       g.setColor(Color.BLACK);
                         g2.fillRect((int)startEverythingX + thisRowOffset, 
                             (int)startEverythingY + (lineHeight * (r - 1)) - 2, 
                             3, lineHeight + 4);
                         drawnCursorYet = true;
+                        g.setColor(node.getStyle().getFontColor());
                     }
                 } else {
                     sumOfCharsPrevRows += text.get(r).length();
