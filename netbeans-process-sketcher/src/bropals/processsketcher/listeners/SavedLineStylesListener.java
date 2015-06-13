@@ -18,12 +18,13 @@
  * along with Process Sketcher.  If not, see <http://www.gnu.org/licenses/>.
  */
 package bropals.processsketcher.listeners;
-
 import bropals.processsketcher.FlowchartWindow;
 import bropals.processsketcher.data.NodeLine;
+import bropals.processsketcher.data.Selectable;
 import bropals.processsketcher.style.LineStyle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 /**
  * Listener for when an option is selected in the list of saved lines.
@@ -39,8 +40,22 @@ public class SavedLineStylesListener extends AbstractProcessSketcherListener imp
     public void actionPerformed(ActionEvent e) {
         String styleName = (String)getFlowchartWindow().getSavedLineStylesComboBox().getSelectedItem();
         if (styleName != null) {
-            for (NodeLine n : getSelectedNodeLines()) {
-                getFlowchartWindow().getStyleManager().assignStyle(styleName, n);
+
+            ArrayList<Selectable> selectablesChanged = new ArrayList<>();
+            selectablesChanged.addAll(getSelectedNodes());
+            LineStyle styleToChangeTo = getFlowchartWindow().getStyleManager().getLineStyle(styleName);
+            ArrayList<LineStyle> oldStyles = new ArrayList<>();
+            
+            for (NodeLine nl : getSelectedNodeLines()) {
+                if (!nl.getStyle().equals(styleToChangeTo)) {
+                    selectablesChanged.add(nl);
+                    oldStyles.add(nl.getStyle());
+                    getFlowchartWindow().getStyleManager().assignStyle(styleName, nl);
+                }
+            }
+            
+            if (!selectablesChanged.isEmpty()) {
+                getFlowchartWindow().getEventManager().getHistoryManager().addToHistory(new EditedNodeLineStyle(selectablesChanged, oldStyles));
             }
             getFlowchartWindow().redrawView();
         }

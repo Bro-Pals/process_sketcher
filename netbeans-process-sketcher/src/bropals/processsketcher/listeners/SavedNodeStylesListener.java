@@ -20,7 +20,7 @@
 package bropals.processsketcher.listeners;
 
 import bropals.processsketcher.FlowchartWindow;
-import bropals.processsketcher.action.style.EditedStyle;
+import bropals.processsketcher.action.style.EditedNodeStyle;
 import bropals.processsketcher.data.Node;
 import bropals.processsketcher.data.Selectable;
 import bropals.processsketcher.style.NodeStyle;
@@ -43,16 +43,23 @@ public class SavedNodeStylesListener extends AbstractProcessSketcherListener imp
         String styleName = (String)getFlowchartWindow().getSavedNodeStylesComboBox().getSelectedItem();
         
         if (styleName != null) {
-             ArrayList<Selectable> selectablesChanged = new ArrayList<>();
+            ArrayList<Selectable> selectablesChanged = new ArrayList<>();
             selectablesChanged.addAll(getSelectedNodes());
             NodeStyle styleToChangeTo = getFlowchartWindow().getStyleManager().getNodeStyle(styleName);
             ArrayList<NodeStyle> oldStyles = new ArrayList<>();
             
             for (Node n : getSelectedNodes()) {
                 if (!n.getStyle().equals(styleToChangeTo)) {
+                    selectablesChanged.add(n);
+                    oldStyles.add(n.getStyle());
                     getFlowchartWindow().getStyleManager().assignStyle(styleName, n);
                 }
             }
+            
+            if (!selectablesChanged.isEmpty()) {
+                getFlowchartWindow().getEventManager().getHistoryManager().addToHistory(new EditedNodeStyle(selectablesChanged, oldStyles));
+            }
+            
             getFlowchartWindow().redrawView();
         }
     }
