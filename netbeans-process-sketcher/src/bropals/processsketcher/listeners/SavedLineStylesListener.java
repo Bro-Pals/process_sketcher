@@ -18,6 +18,7 @@
  * along with Process Sketcher.  If not, see <http://www.gnu.org/licenses/>.
  */
 package bropals.processsketcher.listeners;
+import bropals.processsketcher.action.style.EditedNodeLineStyle;
 import bropals.processsketcher.FlowchartWindow;
 import bropals.processsketcher.data.NodeLine;
 import bropals.processsketcher.data.Selectable;
