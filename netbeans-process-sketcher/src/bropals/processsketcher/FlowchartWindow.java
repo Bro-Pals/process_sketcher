@@ -106,6 +106,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  * @author Jonathon
  */
 public class FlowchartWindow extends JFrame {
+    
+    public static final String FILE_EXTENSION = "prsf";
 
     /**
      * The distance between nodes on the same depth level.
@@ -240,8 +242,8 @@ public class FlowchartWindow extends JFrame {
         }
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fc.setMultiSelectionEnabled(false);
-        //Configure the file chooser so it can only act on .fwy files.
-        fc.setFileFilter(new FileNameExtensionFilter("Process Sketcher flowchart files (*.fwy)", "fwy"));
+        //Configure the file chooser so it can only act on .prsf files.
+        fc.setFileFilter(new FileNameExtensionFilter("Process Sketcher files (*." + FILE_EXTENSION + ")", FILE_EXTENSION));
         eventManager = new EventManager(this);
         buttonPanel = new JTabbedPane();
         buttonPanel.setPreferredSize(new Dimension(400, 125));
@@ -1480,8 +1482,8 @@ public class FlowchartWindow extends JFrame {
         int response = fc.showSaveDialog(this);
         if (response == JFileChooser.APPROVE_OPTION) {
             file = fc.getSelectedFile();
-            if (!file.getName().endsWith(".fwy")) {
-                file = new File(file.getAbsolutePath() + ".fwy");
+            if (!file.getName().endsWith("." + FILE_EXTENSION)) {
+                file = new File(file.getAbsolutePath() + "." + FILE_EXTENSION);
             }
             saveFlowchart();
         }
