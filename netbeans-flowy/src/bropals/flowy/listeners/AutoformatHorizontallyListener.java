@@ -35,6 +35,7 @@ public class AutoformatHorizontallyListener extends AbstractFlowyListener implem
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        getFlowchartWindow().autoformatHorizontally();
     }
     
 }

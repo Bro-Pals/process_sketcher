@@ -81,6 +81,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
@@ -105,6 +107,16 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class FlowchartWindow extends JFrame {
 
+    /**
+     * The distance between nodes on the same depth level.
+     */
+    private static final float AUTOFORMAT_INNER_SPACING = 50;
+    
+    /**
+     * The distance between different depth levels.
+     */
+    private static final float AUTOFORMAT_OUTER_SPACING = 70;
+    
     /**
      * The window manager for all windows.
      */
@@ -1506,5 +1518,206 @@ public class FlowchartWindow extends JFrame {
      */
     public void closeWindow() {
         flowchartWindowManager.tryCloseWindow(this);
+    }
+    
+    /**
+     * Get the node that all other nodes are branching off from.
+     * A node that is the parent node for all lines connected
+     * to it is defined as a root, and this function returns
+     * the first root node that it can find.
+     * @return the root node, or <code>null</code> if there is no root node.
+     */
+    private Node getRootNode() {
+        for (Node n : flowchart.getNodes()) {
+            if (!n.getLinesConnected().isEmpty()) {
+                boolean allParent = true;
+                for (NodeLine nl : n.getLinesConnected()) {
+                    if (!nl.getParent().equals(n)) {
+                        allParent = false;
+                    }
+                }
+                if (allParent) {
+                    return n;
+                }
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Organize the nodes in the flowchart in a list. Each index
+     * represents how "deep" in the flowchart the list of nodes
+     * in that index is. This function returns <code>null</code> if
+     * there is no root node.
+     * @return an organized list of nodes in the flowchart.
+     */
+    private ArrayList<ArrayList<Node>> organizeNodesInTree() {
+        Node root = getRootNode();
+        if (root != null) {
+            ArrayList<ArrayList<Node>> organized = new ArrayList<>();
+            traverseNodeTree(root, organized, 0);
+            return organized;
+        } else {
+            return null;
+        }
+    }
+    
+    /**
+     * Go further down the tree, building it from a given node.
+     * @param forNode the node to add to the list.
+     * @param list the organized list.
+     * @param depth the current depth.
+     */
+    private void traverseNodeTree(Node forNode, ArrayList<ArrayList<Node>> list, int depth) {
+        if (list.size() <= depth) {
+            list.add(new ArrayList<Node>());
+        }
+        if (!list.get(depth).contains(forNode)) {
+            list.get(depth).add(forNode);
+        }
+        for (NodeLine nl : forNode.getLinesConnected()) {
+            if (!nl.getChild().equals(forNode)) {
+                traverseNodeTree(nl.getChild(), list, depth+1);
+            }
+        }
+    }
+    
+    /**
+     * Gets a list of the width and height of the different depths
+     * for a the vertical format.
+     * @param organized the organized list of nodes.
+     * @return a list of the size of each depth.
+     */
+    private float[][] getDepthSizesForVertical(ArrayList<ArrayList<Node>> organized) {
+        float[][] depths = new float[organized.size()][2];
+        for (int i=0; i<depths.length; i++) {
+            float largestHeight = organized.get(i).get(0).getHeight();
+            float totalWidth = 0;
+            for (int j=1; j<organized.get(i).size(); j++) {
+                if (organized.get(i).get(j).getHeight() > largestHeight) {
+                    largestHeight = organized.get(i).get(j).getHeight();
+                }
+                totalWidth += organized.get(i).get(j).getWidth();
+            }
+            totalWidth += ((organized.get(i).size()-1) * AUTOFORMAT_INNER_SPACING );
+            depths[i][0] = totalWidth;
+            depths[i][1] = largestHeight;
+        }
+        return depths;
+    }
+    
+    /**
+     * Gets a list of the width and height of the different depths
+     * for a the horizontal format.
+     * @param organized the organized list of nodes.
+     * @return a list of the size of each depth.
+     */
+    private float[][] getDepthSizesForHorizontal(ArrayList<ArrayList<Node>> organized) {
+        float[][] depths = new float[organized.size()][2];
+        for (int i=0; i<depths.length; i++) {
+            float largestWidth = organized.get(i).get(0).getWidth();
+            float totalHeight = 0;
+            for (int j=1; j<organized.get(i).size(); j++) {
+                if (organized.get(i).get(j).getWidth() > largestWidth) {
+                    largestWidth = organized.get(i).get(j).getWidth();
+                }
+                totalHeight += organized.get(i).get(j).getHeight();
+            }
+            totalHeight += ((organized.get(i).size()-1) * AUTOFORMAT_INNER_SPACING );
+            depths[i][0] = largestWidth;
+            depths[i][1] = totalHeight;
+        }
+        return depths;
+    }
+    
+    /**
+     * Sort the list for autoformatting horizontally.
+     * @param list the list to sort.
+     */
+    private void sortListHorizontally(ArrayList<ArrayList<Node>> list) {
+        for (ArrayList<Node> subList : list) {
+            Collections.sort(subList, new Comparator<Node>() {
+                @Override
+                public int compare(Node node1, Node node2) {
+                    if (node1.getY() < node2.getY()) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                }
+            });
+        }
+    }
+    
+    /**
+     * Sort the list for autoformatting horizontally.
+     * @param list the list to sort.
+     */
+    private void sortListVertically(ArrayList<ArrayList<Node>> list) {
+        for (ArrayList<Node> subList : list) {
+            Collections.sort(subList, new Comparator<Node>() {
+                @Override
+                public int compare(Node node1, Node node2) {
+                    if (node1.getX() < node2.getX()) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                }
+            });
+        }
+    }
+    
+    /**
+     * Automatically formats the current flowchart with
+     * horizontal orientation. The first node will
+     * be on the far left, and the last node will be
+     * on the far right. This works only if there
+     * is one root node.
+     */
+    public void autoformatHorizontally() {
+        ArrayList<ArrayList<Node>> organized = organizeNodesInTree();
+        sortListHorizontally(organized);
+        if (organized != null) {
+            float[][] depthSizes = getDepthSizesForHorizontal(organized);
+            float x = 0;
+            for (int i=0; i<organized.size(); i++) {
+                x += (depthSizes[i][0]+AUTOFORMAT_OUTER_SPACING);
+                float y = -depthSizes[i][1]/2;
+                for (int j=0; j<organized.get(i).size(); j++) {
+                    Node n = organized.get(i).get(j);
+                    n.setX(x);
+                    n.setY(y);
+                    y += (n.getHeight()+AUTOFORMAT_INNER_SPACING);
+                }
+            }
+        }
+        redrawView();
+    }
+    
+    /**
+     * Automatically formats the current flowchart with
+     * vertical orientation. The first node will
+     * be on the top, and the last node will be
+     * on the bottom. This works only if there
+     * is one root node.
+     */
+    public void autoformatVertically() {
+        ArrayList<ArrayList<Node>> organized = organizeNodesInTree();
+        sortListVertically(organized);
+        if (organized != null) {
+            float[][] depthSizes = getDepthSizesForVertical(organized);
+            float y = 0;
+            for (int i=0; i<organized.size(); i++) {
+                y += (depthSizes[i][1]+AUTOFORMAT_OUTER_SPACING);
+                float x = -depthSizes[i][0]/2;
+                for (int j=0; j<organized.get(i).size(); j++) {
+                    Node n = organized.get(i).get(j);
+                    n.setX(x);
+                    n.setY(y);
+                    x += (n.getWidth()+AUTOFORMAT_INNER_SPACING);
+                }
+            }
+        }
     }
 }

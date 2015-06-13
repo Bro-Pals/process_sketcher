@@ -3,7 +3,7 @@
  * Copyright (C) 2015  Jonathon Prehn, Kevin Prehn
  * 
  * This file is a part of Flowy.
- *
+ * 
  * Flowy is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -17,25 +17,28 @@
  * You should have received a copy of the GNU General Public License
  * along with Flowy.  If not, see <http://www.gnu.org/licenses/>.
  */
-package bropals.flowy.listeners;
-
-import bropals.flowy.FlowchartWindow;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+package bropals.flowy.data;
 
 /**
- *
+ * Interface for styles that can be linked.
  * @author Jonathon
  */
-public class AutoformatVerticallyListener extends AbstractFlowyListener implements ActionListener {
-
-    public AutoformatVerticallyListener(FlowchartWindow window) {
-        super(window);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        getFlowchartWindow().autoformatVertically();
-    }
+public interface Linkable {
     
+    /**
+     * Checks to see if this object is linked to a style.
+     * @return if this object is linked.
+     */
+    public boolean isLinked();
+    
+    /**
+     * Assign a linked style to this object
+     * @param styleName the linked style name.
+     */
+    public void assignStyle(String styleName);
+    
+    /**
+     * Unlink this object from a linked style.
+     */
+    public void unlink();
 }
