@@ -26,8 +26,7 @@ import bropals.processsketcher.style.NodeStyle;
 import java.util.ArrayList;
 
 /**
- * An action that occurs when multiple style properties are changed in one action. 
- * Used when a saved style has been applied to a node or node line
+ * An action that occurs when a new node style is applied to a node
  * @author Kevin
  */
 public class EditedNodeStyle extends EditedStyle {
