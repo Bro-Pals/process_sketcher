@@ -106,19 +106,19 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  * @author Jonathon
  */
 public class FlowchartWindow extends JFrame {
-    
+
     public static final String FILE_EXTENSION = "prsf";
 
     /**
      * The distance between nodes on the same depth level.
      */
-    private static final float AUTOFORMAT_INNER_SPACING = 50;
-    
+    private float autoformatInnerSpacing = 50;
+
     /**
      * The distance between different depth levels.
      */
-    private static final float AUTOFORMAT_OUTER_SPACING = 70;
-    
+    private float autoformatOuterSpacing = 70;
+
     /**
      * The window manager for all windows.
      */
@@ -164,12 +164,12 @@ public class FlowchartWindow extends JFrame {
     private JPanel savedNodeStylesPanel;
     private JComboBox<String> savedNodeStyles;
     private JButton saveNodeStyle;
-    
+
     //Node style saving buttons
     private JPanel savedLineStylesPanel;
     private JComboBox<String> savedLineStyles;
     private JButton saveLineStyle;
-    
+
     //Font style buttons
     private JPanel fontStylePanel;
     private JSpinner fontSize;
@@ -532,38 +532,38 @@ public class FlowchartWindow extends JFrame {
 
         savedNodeStylesPanel = new JPanel();
         savedNodeStylesPanel.setLayout(new BoxLayout(savedNodeStylesPanel, BoxLayout.Y_AXIS));
-        
+
         savedNodeStyles = new JComboBox(styleManager.listNodeStyleNames());
         saveNodeStyle = new JButton(getIcon("saveNodeStyleIcon.png"));
-        
+
         savedNodeStylesPanel.add(savedNodeStyles);
         savedNodeStylesPanel.add(saveNodeStyle);
-        
+
         savedNodeStyles.addActionListener(new SavedNodeStylesListener(this));
         saveNodeStyle.addActionListener(new SaveNodeStylesListener(this));
-        
+
         savedNodeStyles.setToolTipText("Set the style of the currently selected node to a saved style");
         saveNodeStyle.setToolTipText("Save the style of the currently selected node for later use");
-        
+
         stylesTab.add(savedNodeStylesPanel);
-        
+
         savedLineStylesPanel = new JPanel();
         savedLineStylesPanel.setLayout(new BoxLayout(savedLineStylesPanel, BoxLayout.Y_AXIS));
-        
+
         savedLineStyles = new JComboBox(styleManager.listLineStyleNames());
         saveLineStyle = new JButton(getIcon("saveLineStyleIcon.png"));
-        
+
         savedLineStylesPanel.add(savedLineStyles);
         savedLineStylesPanel.add(saveLineStyle);
-        
+
         savedLineStyles.addActionListener(new SavedLineStylesListener(this));
         saveLineStyle.addActionListener(new SaveLineStylesListener(this));
-        
+
         savedLineStyles.setToolTipText("Set the style of the currently selected node line to a saved style");
         saveLineStyle.setToolTipText("Save the style of the currently selected node line for later use");
-        
+
         stylesTab.add(savedLineStylesPanel);
-        
+
         //Need to make different panels to separate the buttons
         fontStylePanel = new JPanel();
         fontStylePanel.setLayout(new GridLayout(2, 2));
@@ -639,12 +639,13 @@ public class FlowchartWindow extends JFrame {
         lineStylePanel.setVisible(false);
         savedLineStylesPanel.setVisible(false);
         fontStylePanel.setVisible(false);
-        
+
         buttonPanel.addTab("Styles", wrapInScrollPane(stylesTab));
     }
-    
+
     /**
      * Wraps a panel in a scroll pane.
+     *
      * @param panel the panel to wrap.
      * @return a scroll panel that contains the given panel.
      */
@@ -761,7 +762,7 @@ public class FlowchartWindow extends JFrame {
             }
             getFontStylePanel().setVisible(true);
             if (hasNode) {
-               setNodeRelatedPanelVisible(true);
+                setNodeRelatedPanelVisible(true);
             }
             if (hasLine) {
                 setLineRelatedPanelVisible(true);
@@ -770,69 +771,69 @@ public class FlowchartWindow extends JFrame {
     }
 
     /**
-     * Refreshes the styles tab GUI in the flowchart window using the 
-     * current selection.
+     * Refreshes the styles tab GUI in the flowchart window using the current
+     * selection.
      */
     public void refreshValuesOfStylesTabDueToUpdatedSelection() {
-       ArrayList<Selectable> selected = getEventManager().getSelectionManager().getSelected();
-       if (!selected.isEmpty()) {
-           Font font = getSameFont(selected);
-           int fontSize = getSameFontSize(selected);
-           Color fontColor = getSameFontColor(selected);
-           LineType lineType = getSameLineType(selected);
-           Color lineColor = getSameLineColor(selected);
-           int lineSize = getSameLineSize(selected);
-           Shape shape = getSameShape(selected);
-           int borderSize = getSameBorderSize(selected);
-           Color borderColor = getSameBorderColor(selected);
-           Color fillColor = getSameFillColor(selected);
-           String nodeStyleName = getSameNodeStyleName(selected);
-           String lineStyleName = getSameLineStyleName(selected);
-           setFontPanelStyles(font, fontColor, fontSize);
-           setNodePanelStyles(shape, borderColor, fillColor, borderSize);
-           setLinePanelStyles(lineType, lineColor, lineSize);
-           if (nodeStyleName != null) {
-               getSavedNodeStylesComboBox().setSelectedItem(nodeStyleName);
-           } else {
-               getSavedNodeStylesComboBox().setSelectedIndex(-1);
-           }
-           if (lineStyleName != null) {
-               getSavedLineStylesComboBox().setSelectedItem(lineStyleName);
-           } else {
-               getSavedLineStylesComboBox().setSelectedIndex(-1);
-           }
-       }
+        ArrayList<Selectable> selected = getEventManager().getSelectionManager().getSelected();
+        if (!selected.isEmpty()) {
+            Font font = getSameFont(selected);
+            int fontSize = getSameFontSize(selected);
+            Color fontColor = getSameFontColor(selected);
+            LineType lineType = getSameLineType(selected);
+            Color lineColor = getSameLineColor(selected);
+            int lineSize = getSameLineSize(selected);
+            Shape shape = getSameShape(selected);
+            int borderSize = getSameBorderSize(selected);
+            Color borderColor = getSameBorderColor(selected);
+            Color fillColor = getSameFillColor(selected);
+            String nodeStyleName = getSameNodeStyleName(selected);
+            String lineStyleName = getSameLineStyleName(selected);
+            setFontPanelStyles(font, fontColor, fontSize);
+            setNodePanelStyles(shape, borderColor, fillColor, borderSize);
+            setLinePanelStyles(lineType, lineColor, lineSize);
+            if (nodeStyleName != null) {
+                getSavedNodeStylesComboBox().setSelectedItem(nodeStyleName);
+            } else {
+                getSavedNodeStylesComboBox().setSelectedIndex(-1);
+            }
+            if (lineStyleName != null) {
+                getSavedLineStylesComboBox().setSelectedItem(lineStyleName);
+            } else {
+                getSavedLineStylesComboBox().setSelectedIndex(-1);
+            }
+        }
     }
 
     /**
-     * Gets the font name that is the same for all selectables in
-     * the given list, or <code>null</code> if they do not all have
-     * the same font.
+     * Gets the font name that is the same for all selectables in the given
+     * list, or <code>null</code> if they do not all have the same font.
+     *
      * @param selected the list of selected objects.
      * @return the font name that is common to all selectables, or
      * <code>null</code> if the font name is not common.
      */
     private Font getSameFont(ArrayList<Selectable> selected) {
         Font font = selected.get(0).getFontStyle().getFontType();
-        for (int i=1; i<selected.size(); i++) {
+        for (int i = 1; i < selected.size(); i++) {
             if (!selected.get(i).getFontStyle().getFontType().getFontName().equals(font.getFontName())) {
                 return null;
             }
         }
         return font;
     }
-    
+
     /**
-     * Gets the font size that is the same for all selectables in
-     * the given list, or <code>-1</code> if they do not all have
-     * the same font size.
+     * Gets the font size that is the same for all selectables in the given
+     * list, or <code>-1</code> if they do not all have the same font size.
+     *
      * @param selected the list of selected objects.
      * @return the font size that is common to all selectables, or
      * <code>-1</code> if the font size is not common.
      */
     private int getSameFontSize(ArrayList<Selectable> selected) {
         int size = selected.get(0).getFontStyle().getFontSize();
-        for (int i=1; i<selected.size(); i++) {
+        for (int i = 1; i < selected.size(); i++) {
             if (size != selected.get(i).getFontStyle().getFontSize()) {
                 //The border size is not common
                 return -1;
@@ -840,29 +841,29 @@ public class FlowchartWindow extends JFrame {
         }
         return size;
     }
-    
+
     /**
-     * Gets the font color that is the same for all selectables in
-     * the given list, or <code>null</code> if they do not all have
-     * the same font color.
+     * Gets the font color that is the same for all selectables in the given
+     * list, or <code>null</code> if they do not all have the same font color.
+     *
      * @param selected the list of selected objects.
      * @return the font color that is common to all selectables, or
      * <code>null</code> if the font color is not common.
      */
     private Color getSameFontColor(ArrayList<Selectable> selected) {
         Color color = selected.get(0).getFontStyle().getFontColor();
-        for (int i=1; i<selected.size(); i++) {
+        for (int i = 1; i < selected.size(); i++) {
             if (!selected.get(i).getFontStyle().getFontColor().equals(color)) {
                 return null;
             }
         }
         return color;
     }
-    
+
     /**
-     * Gets the line type that is the same for all selectables in
-     * the given list, or <code>null</code> if they do not all have
-     * the same line type.
+     * Gets the line type that is the same for all selectables in the given
+     * list, or <code>null</code> if they do not all have the same line type.
+     *
      * @param selected the list of selected objects.
      * @return the line type that is common to all selectables, or
      * <code>null</code> if the line type is not common.
@@ -873,10 +874,10 @@ public class FlowchartWindow extends JFrame {
             //No nodes in this selection anyway
             return null;
         }
-        LineType type = ((NodeLine)selected.get(firstNodeLine)).getStyle().getType();
-        for (int i=firstNodeLine+1; i<selected.size(); i++) {
+        LineType type = ((NodeLine) selected.get(firstNodeLine)).getStyle().getType();
+        for (int i = firstNodeLine + 1; i < selected.size(); i++) {
             if (selected.get(i) instanceof NodeLine) {
-                if (type != ((NodeLine)selected.get(i)).getStyle().getType()) {
+                if (type != ((NodeLine) selected.get(i)).getStyle().getType()) {
                     //The border size is not common
                     return null;
                 }
@@ -884,11 +885,11 @@ public class FlowchartWindow extends JFrame {
         }
         return type;
     }
-    
+
     /**
-     * Gets the line color that is the same for all selectables in
-     * the given list, or <code>null</code> if they do not all have
-     * the same line color.
+     * Gets the line color that is the same for all selectables in the given
+     * list, or <code>null</code> if they do not all have the same line color.
+     *
      * @param selected the list of selected objects.
      * @return the line color that is common to all selectables, or
      * <code>null</code> if the line color is not common.
@@ -899,10 +900,10 @@ public class FlowchartWindow extends JFrame {
             //No nodes in this selection anyway
             return null;
         }
-        Color color = ((NodeLine)selected.get(firstNodeLine)).getStyle().getLineColor();
-        for (int i=firstNodeLine+1; i<selected.size(); i++) {
+        Color color = ((NodeLine) selected.get(firstNodeLine)).getStyle().getLineColor();
+        for (int i = firstNodeLine + 1; i < selected.size(); i++) {
             if (selected.get(i) instanceof NodeLine) {
-                if (color != ((NodeLine)selected.get(i)).getStyle().getLineColor()) {
+                if (color != ((NodeLine) selected.get(i)).getStyle().getLineColor()) {
                     //The border size is not common
                     return null;
                 }
@@ -910,11 +911,11 @@ public class FlowchartWindow extends JFrame {
         }
         return color;
     }
-    
+
     /**
-     * Gets the line size that is the same for all selectables in
-     * the given list, or <code>-1</code> if they do not all have
-     * the same line size.
+     * Gets the line size that is the same for all selectables in the given
+     * list, or <code>-1</code> if they do not all have the same line size.
+     *
      * @param selected the list of selected objects.
      * @return the line size that is common to all selectables, or
      * <code>-1</code> if the line size is not common.
@@ -925,10 +926,10 @@ public class FlowchartWindow extends JFrame {
             //No nodes in this selection anyway
             return -1;
         }
-        int size = ((NodeLine)selected.get(firstNodeLine)).getStyle().getLineSize();
-        for (int i=firstNodeLine+1; i<selected.size(); i++) {
+        int size = ((NodeLine) selected.get(firstNodeLine)).getStyle().getLineSize();
+        for (int i = firstNodeLine + 1; i < selected.size(); i++) {
             if (selected.get(i) instanceof NodeLine) {
-                if (size != ((NodeLine)selected.get(i)).getStyle().getLineSize()) {
+                if (size != ((NodeLine) selected.get(i)).getStyle().getLineSize()) {
                     //The border size is not common
                     return -1;
                 }
@@ -936,11 +937,12 @@ public class FlowchartWindow extends JFrame {
         }
         return size;
     }
-    
+
     /**
      * Gets the linked line style name that is the same for all selectables in
-     * the given list, or <code>null</code> if they do not all have
-     * the same linked line style name.
+     * the given list, or <code>null</code> if they do not all have the same
+     * linked line style name.
+     *
      * @param selected the list of selected objects.
      * @return the linked line style name that is common to all selectables, or
      * <code>null</code> if the linked line style name is not common.
@@ -951,10 +953,10 @@ public class FlowchartWindow extends JFrame {
             //No nodes in this selection anyway
             return null;
         }
-        String name = ((NodeLine)selected.get(firstNodeLine)).getLinkedStyle();
-        for (int i=firstNodeLine+1; i<selected.size(); i++) {
+        String name = ((NodeLine) selected.get(firstNodeLine)).getLinkedStyle();
+        for (int i = firstNodeLine + 1; i < selected.size(); i++) {
             if (selected.get(i) instanceof NodeLine) {
-                if (!name.equals(((NodeLine)selected.get(i)).getLinkedStyle())) {
+                if (!name.equals(((NodeLine) selected.get(i)).getLinkedStyle())) {
                     //The border size is not common
                     return null;
                 }
@@ -962,14 +964,14 @@ public class FlowchartWindow extends JFrame {
         }
         return name;
     }
-    
+
     /**
-     * Gets the shape that is the same for all selectables in
-     * the given list, or <code>null</code> if they do not all have
-     * the same shape.
+     * Gets the shape that is the same for all selectables in the given list, or
+     * <code>null</code> if they do not all have the same shape.
+     *
      * @param selected the list of selected objects.
-     * @return the shape that is common to all selectables, or
-     * <code>null</code> if the shape is not common.
+     * @return the shape that is common to all selectables, or <code>null</code>
+     * if the shape is not common.
      */
     private Shape getSameShape(ArrayList<Selectable> selected) {
         int firstNode = indexOfFirstNode(selected);
@@ -977,10 +979,10 @@ public class FlowchartWindow extends JFrame {
             //No nodes in this selection anyway
             return null;
         }
-        Shape shape = ((Node)selected.get(firstNode)).getStyle().getShape();
-        for (int i=firstNode+1; i<selected.size(); i++) {
+        Shape shape = ((Node) selected.get(firstNode)).getStyle().getShape();
+        for (int i = firstNode + 1; i < selected.size(); i++) {
             if (selected.get(i) instanceof Node) {
-                if (shape != ((Node)selected.get(i)).getStyle().getShape()) {
+                if (shape != ((Node) selected.get(i)).getStyle().getShape()) {
                     //The border size is not common
                     return null;
                 }
@@ -988,11 +990,11 @@ public class FlowchartWindow extends JFrame {
         }
         return shape;
     }
-    
+
     /**
-     * Gets the fill color that is the same for all selectables in
-     * the given list, or <code>null</code> if they do not all have
-     * the same fill color.
+     * Gets the fill color that is the same for all selectables in the given
+     * list, or <code>null</code> if they do not all have the same fill color.
+     *
      * @param selected the list of selected objects.
      * @return the fill color that is common to all selectables, or
      * <code>null</code> if the fill color is not common.
@@ -1003,10 +1005,10 @@ public class FlowchartWindow extends JFrame {
             //No nodes in this selection anyway
             return null;
         }
-        Color color = ((Node)selected.get(firstNode)).getStyle().getFillColor();
-        for (int i=firstNode+1; i<selected.size(); i++) {
+        Color color = ((Node) selected.get(firstNode)).getStyle().getFillColor();
+        for (int i = firstNode + 1; i < selected.size(); i++) {
             if (selected.get(i) instanceof Node) {
-                if (color != ((Node)selected.get(i)).getStyle().getFillColor()) {
+                if (color != ((Node) selected.get(i)).getStyle().getFillColor()) {
                     //The border size is not common
                     return null;
                 }
@@ -1014,11 +1016,11 @@ public class FlowchartWindow extends JFrame {
         }
         return color;
     }
-    
+
     /**
-     * Gets the border color that is the same for all selectables in
-     * the given list, or <code>null</code> if they do not all have
-     * the same border color.
+     * Gets the border color that is the same for all selectables in the given
+     * list, or <code>null</code> if they do not all have the same border color.
+     *
      * @param selected the list of selected objects.
      * @return the border color that is common to all selectables, or
      * <code>null</code> if the border color is not common.
@@ -1029,10 +1031,10 @@ public class FlowchartWindow extends JFrame {
             //No nodes in this selection anyway
             return null;
         }
-        Color color = ((Node)selected.get(firstNode)).getStyle().getBorderColor();
-        for (int i=firstNode+1; i<selected.size(); i++) {
+        Color color = ((Node) selected.get(firstNode)).getStyle().getBorderColor();
+        for (int i = firstNode + 1; i < selected.size(); i++) {
             if (selected.get(i) instanceof Node) {
-                if (color != ((Node)selected.get(i)).getStyle().getBorderColor()) {
+                if (color != ((Node) selected.get(i)).getStyle().getBorderColor()) {
                     //The border size is not common
                     return null;
                 }
@@ -1040,11 +1042,11 @@ public class FlowchartWindow extends JFrame {
         }
         return color;
     }
-    
+
     /**
-     * Gets the border size that is the same for all selectables in
-     * the given list, or <code>-1</code> if they do not all have
-     * the same border size.
+     * Gets the border size that is the same for all selectables in the given
+     * list, or <code>-1</code> if they do not all have the same border size.
+     *
      * @param selected the list of selected objects.
      * @return the border size that is common to all selectables, or
      * <code>-1</code> if the border size is not common.
@@ -1055,10 +1057,10 @@ public class FlowchartWindow extends JFrame {
             //No nodes in this selection anyway
             return -1;
         }
-        int size = ((Node)selected.get(firstNode)).getStyle().getBorderSize();
-        for (int i=firstNode+1; i<selected.size(); i++) {
+        int size = ((Node) selected.get(firstNode)).getStyle().getBorderSize();
+        for (int i = firstNode + 1; i < selected.size(); i++) {
             if (selected.get(i) instanceof Node) {
-                if (size != ((Node)selected.get(i)).getStyle().getBorderSize()) {
+                if (size != ((Node) selected.get(i)).getStyle().getBorderSize()) {
                     //The border size is not common
                     return -1;
                 }
@@ -1066,11 +1068,12 @@ public class FlowchartWindow extends JFrame {
         }
         return size;
     }
-    
+
     /**
      * Gets the linked node style name that is the same for all selectables in
-     * the given list, or <code>null</code> if they do not all have
-     * the same linked node style name.
+     * the given list, or <code>null</code> if they do not all have the same
+     * linked node style name.
+     *
      * @param selected the list of selected objects.
      * @return the linked node style name that is common to all selectables, or
      * <code>null</code> if the linked node style name is not common.
@@ -1081,10 +1084,10 @@ public class FlowchartWindow extends JFrame {
             //No nodes in this selection anyway
             return null;
         }
-        String name = ((Node)selected.get(firstNode)).getLinkedStyle();
-        for (int i=firstNode+1; i<selected.size(); i++) {
+        String name = ((Node) selected.get(firstNode)).getLinkedStyle();
+        for (int i = firstNode + 1; i < selected.size(); i++) {
             if (selected.get(i) instanceof Node) {
-                if (!name.equals(((Node)selected.get(i)).getLinkedStyle())) {
+                if (!name.equals(((Node) selected.get(i)).getLinkedStyle())) {
                     //The border size is not common
                     return null;
                 }
@@ -1092,37 +1095,39 @@ public class FlowchartWindow extends JFrame {
         }
         return name;
     }
-    
+
     /**
-     * Gets the index of the first selectable that is a node. If there
-     * is no node, then this returns <code>-1</code>.
+     * Gets the index of the first selectable that is a node. If there is no
+     * node, then this returns <code>-1</code>.
+     *
      * @param selected the list of selectables.
      * @return the index of the first selectable that is a node.
      */
     private int indexOfFirstNode(ArrayList<Selectable> selected) {
-        for (int i=0; i<selected.size(); i++) {
+        for (int i = 0; i < selected.size(); i++) {
             if (selected.get(i) instanceof Node) {
                 return i;
             }
         }
         return -1;
     }
-    
+
     /**
-     * Gets the index of the first selectable that is a node line. If there
-     * is no node line, then this returns <code>-1</code>.
+     * Gets the index of the first selectable that is a node line. If there is
+     * no node line, then this returns <code>-1</code>.
+     *
      * @param selected the list of selectables.
      * @return the index of the first selectable that is a node line.
      */
     private int indexOfFirstNodeLine(ArrayList<Selectable> selected) {
-        for (int i=0; i<selected.size(); i++) {
+        for (int i = 0; i < selected.size(); i++) {
             if (selected.get(i) instanceof NodeLine) {
                 return i;
             }
         }
         return -1;
     }
-    
+
     /**
      * Inits the list of possible Shapes for a node.
      *
@@ -1261,22 +1266,24 @@ public class FlowchartWindow extends JFrame {
 
     /**
      * Sets the visibility of the node related panels.
+     *
      * @param visible the visibility of the node related panel.
      */
     public void setNodeRelatedPanelVisible(boolean visible) {
         nodeStylePanel.setVisible(visible);
         savedNodeStylesPanel.setVisible(visible);
     }
-    
+
     /**
      * Sets the visibility of the line related panels.
+     *
      * @param visible the visibility of the line related panel.
      */
     public void setLineRelatedPanelVisible(boolean visible) {
         lineStylePanel.setVisible(visible);
         savedLineStylesPanel.setVisible(visible);
     }
-    
+
     /**
      * Get the font combo box component
      *
@@ -1369,40 +1376,42 @@ public class FlowchartWindow extends JFrame {
 
     /**
      * Gets the saved node styles combo box.
+     *
      * @return the saved node styles combo box.
      */
     public JComboBox getSavedNodeStylesComboBox() {
         return savedNodeStyles;
     }
-    
+
     /**
      * Gets the saved line styles combo box.
+     *
      * @return the saved line styles combo box.
      */
     public JComboBox getSavedLineStylesComboBox() {
         return savedLineStyles;
     }
-    
+
     /**
      * Sets the saved line styles box to no selection.
      */
     public void deselectLinkedLineStyle() {
         savedLineStyles.setSelectedIndex(-1);
     }
-    
-     /**
+
+    /**
      * Sets the saved line styles box to no selection.
      */
     public void deselectLinkedNodeStyle() {
         savedNodeStyles.setSelectedIndex(-1);
     }
-    
+
     /**
      * Refresh the GUI list of line styles to match the style manager's list.
      */
     public void refreshLineStyleList() {
-        String selected = (String)savedLineStyles.getSelectedItem();
-        DefaultComboBoxModel<String> box = (DefaultComboBoxModel<String>)savedLineStyles.getModel();
+        String selected = (String) savedLineStyles.getSelectedItem();
+        DefaultComboBoxModel<String> box = (DefaultComboBoxModel<String>) savedLineStyles.getModel();
         box.removeAllElements();
         String[] lineStyles = getStyleManager().listLineStyleNames();
         for (String name : lineStyles) {
@@ -1410,13 +1419,13 @@ public class FlowchartWindow extends JFrame {
         }
         savedLineStyles.setSelectedItem(selected);
     }
-    
+
     /**
      * Refresh the GUI list of node styles to match the style manager's list.
      */
     public void refreshNodeStyleList() {
-        String selected = (String)savedNodeStyles.getSelectedItem();
-        DefaultComboBoxModel<String> box = (DefaultComboBoxModel<String>)savedNodeStyles.getModel();
+        String selected = (String) savedNodeStyles.getSelectedItem();
+        DefaultComboBoxModel<String> box = (DefaultComboBoxModel<String>) savedNodeStyles.getModel();
         box.removeAllElements();
         String[] nodeStyles = getStyleManager().listNodeStyleNames();
         for (String name : nodeStyles) {
@@ -1424,7 +1433,7 @@ public class FlowchartWindow extends JFrame {
         }
         savedNodeStyles.setSelectedItem(selected);
     }
-    
+
     /**
      * Saves this FlowchartWindow's current flowchart to a destination stream.
      * This function flushes and closes the OutputStream.
@@ -1521,12 +1530,12 @@ public class FlowchartWindow extends JFrame {
     public void closeWindow() {
         flowchartWindowManager.tryCloseWindow(this);
     }
-    
+
     /**
-     * Get the node that all other nodes are branching off from.
-     * A node that is the parent node for all lines connected
-     * to it is defined as a root, and this function returns
-     * the first root node that it can find.
+     * Get the node that all other nodes are branching off from. A node that is
+     * the parent node for all lines connected to it is defined as a root, and
+     * this function returns the first root node that it can find.
+     *
      * @return the root node, or <code>null</code> if there is no root node.
      */
     private Node getRootNode() {
@@ -1545,12 +1554,12 @@ public class FlowchartWindow extends JFrame {
         }
         return null;
     }
-    
+
     /**
-     * Organize the nodes in the flowchart in a list. Each index
-     * represents how "deep" in the flowchart the list of nodes
-     * in that index is. This function returns <code>null</code> if
-     * there is no root node.
+     * Organize the nodes in the flowchart in a list. Each index represents how
+     * "deep" in the flowchart the list of nodes in that index is. This function
+     * returns <code>null</code> if there is no root node.
+     *
      * @return an organized list of nodes in the flowchart.
      */
     private ArrayList<ArrayList<Node>> organizeNodesInTree() {
@@ -1563,9 +1572,10 @@ public class FlowchartWindow extends JFrame {
             return null;
         }
     }
-    
+
     /**
      * Go further down the tree, building it from a given node.
+     *
      * @param forNode the node to add to the list.
      * @param list the organized list.
      * @param depth the current depth.
@@ -1579,147 +1589,179 @@ public class FlowchartWindow extends JFrame {
         }
         for (NodeLine nl : forNode.getLinesConnected()) {
             if (!nl.getChild().equals(forNode)) {
-                traverseNodeTree(nl.getChild(), list, depth+1);
+                traverseNodeTree(nl.getChild(), list, depth + 1);
             }
         }
     }
-    
+
     /**
-     * Gets a list of the width and height of the different depths
-     * for a the vertical format.
+     * Gets a list of the width and height of the different depths for a the
+     * vertical format.
+     *
      * @param organized the organized list of nodes.
      * @return a list of the size of each depth.
      */
     private float[][] getDepthSizesForVertical(ArrayList<ArrayList<Node>> organized) {
         float[][] depths = new float[organized.size()][2];
-        for (int i=0; i<depths.length; i++) {
+        for (int i = 0; i < depths.length; i++) {
             float largestHeight = organized.get(i).get(0).getHeight();
             float totalWidth = 0;
-            for (int j=1; j<organized.get(i).size(); j++) {
+            for (int j = 0; j < organized.get(i).size(); j++) {
                 if (organized.get(i).get(j).getHeight() > largestHeight) {
                     largestHeight = organized.get(i).get(j).getHeight();
                 }
                 totalWidth += organized.get(i).get(j).getWidth();
             }
-            totalWidth += ((organized.get(i).size()-1) * AUTOFORMAT_INNER_SPACING );
+            totalWidth += ((organized.get(i).size() - 1) * autoformatInnerSpacing);
             depths[i][0] = totalWidth;
             depths[i][1] = largestHeight;
         }
         return depths;
     }
-    
+
     /**
-     * Gets a list of the width and height of the different depths
-     * for a the horizontal format.
+     * Gets a list of the width and height of the different depths for a the
+     * horizontal format.
+     *
      * @param organized the organized list of nodes.
      * @return a list of the size of each depth.
      */
     private float[][] getDepthSizesForHorizontal(ArrayList<ArrayList<Node>> organized) {
         float[][] depths = new float[organized.size()][2];
-        for (int i=0; i<depths.length; i++) {
+        for (int i = 0; i < depths.length; i++) {
             float largestWidth = organized.get(i).get(0).getWidth();
             float totalHeight = 0;
-            for (int j=1; j<organized.get(i).size(); j++) {
+            for (int j = 0; j < organized.get(i).size(); j++) {
                 if (organized.get(i).get(j).getWidth() > largestWidth) {
                     largestWidth = organized.get(i).get(j).getWidth();
                 }
                 totalHeight += organized.get(i).get(j).getHeight();
             }
-            totalHeight += ((organized.get(i).size()-1) * AUTOFORMAT_INNER_SPACING );
+            totalHeight += ((organized.get(i).size() - 1) * autoformatInnerSpacing);
             depths[i][0] = largestWidth;
             depths[i][1] = totalHeight;
         }
         return depths;
     }
-    
+
     /**
      * Sort the list for autoformatting horizontally.
+     *
      * @param list the list to sort.
      */
-    private void sortListHorizontally(ArrayList<ArrayList<Node>> list) {
-        for (ArrayList<Node> subList : list) {
-            Collections.sort(subList, new Comparator<Node>() {
-                @Override
-                public int compare(Node node1, Node node2) {
-                    if (node1.getY() < node2.getY()) {
-                        return 1;
-                    } else {
-                        return -1;
-                    }
-                }
-            });
+    private void sortListForAutoformatting(ArrayList<ArrayList<Node>> list) {
+        AutoformatSorter sorter = new AutoformatSorter();
+        for (int i = 1; i < list.size(); i++) {
+            sorter.setLists(list.get(i), list.get(i-1));
+            Collections.sort(list.get(i), sorter);
         }
     }
-    
+
     /**
-     * Sort the list for autoformatting horizontally.
-     * @param list the list to sort.
-     */
-    private void sortListVertically(ArrayList<ArrayList<Node>> list) {
-        for (ArrayList<Node> subList : list) {
-            Collections.sort(subList, new Comparator<Node>() {
-                @Override
-                public int compare(Node node1, Node node2) {
-                    if (node1.getX() < node2.getX()) {
-                        return 1;
-                    } else {
-                        return -1;
-                    }
-                }
-            });
-        }
-    }
-    
-    /**
-     * Automatically formats the current flowchart with
-     * horizontal orientation. The first node will
-     * be on the far left, and the last node will be
-     * on the far right. This works only if there
-     * is one root node.
+     * Automatically formats the current flowchart with horizontal orientation.
+     * The first node will be on the far left, and the last node will be on the
+     * far right. This works only if there is one root node.
      */
     public void autoformatHorizontally() {
         ArrayList<ArrayList<Node>> organized = organizeNodesInTree();
-        sortListHorizontally(organized);
+        sortListForAutoformatting(organized);
         if (organized != null) {
             float[][] depthSizes = getDepthSizesForHorizontal(organized);
+            float maxHeight = depthSizes[0][1];
+            for (int i = 1; i < depthSizes.length; i++) {
+                if (depthSizes[i][1] > maxHeight) {
+                    maxHeight = depthSizes[i][1];
+                }
+            }
             float x = 0;
-            for (int i=0; i<organized.size(); i++) {
-                x += (depthSizes[i][0]+AUTOFORMAT_OUTER_SPACING);
-                float y = -depthSizes[i][1]/2;
-                for (int j=0; j<organized.get(i).size(); j++) {
+            for (int i = 0; i < organized.size(); i++) {
+                x += (depthSizes[i][0] + autoformatOuterSpacing);
+                float y = -depthSizes[i][1] / 2;
+                for (int j = 0; j < organized.get(i).size(); j++) {
                     Node n = organized.get(i).get(j);
                     n.setX(x);
                     n.setY(y);
-                    y += (n.getHeight()+AUTOFORMAT_INNER_SPACING);
+                    y += (n.getHeight() + autoformatInnerSpacing);
                 }
             }
         }
         redrawView();
     }
-    
+
     /**
-     * Automatically formats the current flowchart with
-     * vertical orientation. The first node will
-     * be on the top, and the last node will be
-     * on the bottom. This works only if there
-     * is one root node.
+     * Automatically formats the current flowchart with vertical orientation.
+     * The first node will be on the top, and the last node will be on the
+     * bottom. This works only if there is one root node.
      */
     public void autoformatVertically() {
         ArrayList<ArrayList<Node>> organized = organizeNodesInTree();
-        sortListVertically(organized);
+        sortListForAutoformatting(organized);
         if (organized != null) {
             float[][] depthSizes = getDepthSizesForVertical(organized);
+            float maxWidth = depthSizes[0][0];
+            for (int i = 1; i < depthSizes.length; i++) {
+                if (depthSizes[i][0] > maxWidth) {
+                    maxWidth = depthSizes[i][1];
+                }
+            }
             float y = 0;
-            for (int i=0; i<organized.size(); i++) {
-                y += (depthSizes[i][1]+AUTOFORMAT_OUTER_SPACING);
-                float x = -depthSizes[i][0]/2;
-                for (int j=0; j<organized.get(i).size(); j++) {
+            for (int i = 0; i < organized.size(); i++) {
+                y += (depthSizes[i][1] + autoformatOuterSpacing);
+                float x = -depthSizes[i][0] / 2;
+                for (int j = 0; j < organized.get(i).size(); j++) {
                     Node n = organized.get(i).get(j);
                     n.setX(x);
                     n.setY(y);
-                    x += (n.getWidth()+AUTOFORMAT_INNER_SPACING);
+                    x += (n.getWidth() + autoformatInnerSpacing);
                 }
             }
+        }
+
+    }
+
+    /**
+     * An object that auto formats a lists for the autoformatting function.
+     */
+    class AutoformatSorter implements Comparator<Node> {
+
+        private ArrayList<Node> current;
+        private ArrayList<Node> previous;
+
+        @Override
+        public int compare(Node node1, Node node2) {
+            /*
+             First node is less than the second node
+             if its first parent appears before the first parent
+             of the second node.
+
+             First node is the same as the second node if its first
+             parent appears at the same time as the second node.
+
+             First node is greater than the second node if its first
+             parent appears after the first parent of the second node.
+             */
+            int firstParent1 = node1.getFirstOccuranceOfParent(previous);
+            int firstParent2 = node2.getFirstOccuranceOfParent(previous);
+            if (firstParent1 < firstParent2) {
+                return -1;
+            } else if (firstParent1 > firstParent2) {
+                return 1;
+            } else if (firstParent1 == firstParent2) {
+                return 0;
+            }
+            //Impossible to get to this
+            return 0;
+        }
+
+        /**
+         * Sets the values of the lists.
+         *
+         * @param current the current list.
+         * @param previous the previous list.
+         */
+        public void setLists(ArrayList<Node> current, ArrayList<Node> previous) {
+            this.current = current;
+            this.previous = previous;
         }
     }
 }

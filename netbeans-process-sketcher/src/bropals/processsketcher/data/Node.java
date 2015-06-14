@@ -19,12 +19,10 @@
  */
 package bropals.processsketcher.data;
 
-import bropals.processsketcher.Camera;
 import bropals.processsketcher.EventManager;
 import bropals.processsketcher.FlowchartWindow;
 import bropals.processsketcher.style.FontStyle;
 import bropals.processsketcher.style.NodeStyle;
-import java.awt.Graphics;
 import java.util.ArrayList;
 
 /**
@@ -292,5 +290,74 @@ public class Node implements Selectable, BinaryData {
             style.fromBinary(arr, pos + 16 + BinaryUtil.bytesForString(innerText), window);
         }
     }
+    
+    /**
+     * Gets the index of the first node that is a parent of this node
+     * in the given list. This returns <code>-1</code> if there is no
+     * node in the list that is also a parent of this node.
+     * @param list the list of nodes to search
+     * @return the index of the first node that is also a parent of this node.
+     */
+    public int getFirstOccuranceOfParent(ArrayList<Node> list) {
+        ArrayList<Node> parents = getParentNodes();
+        for (int i=0; i<list.size(); i++) {
+            for (Node parent : parents) {
+                if (list.get(i).equals(parent)) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+    
+    /**
+     * Gets the index of the first node that is a child of this node
+     * in the given list. This returns <code>-1</code> if there is no
+     * node in the list that is also a child of this node.
+     * @param list the list of nodes to search
+     * @return the index of the first node that is also a child of this node.
+     */
+    public int getFirstOccuranceOfChild(ArrayList<Node> list) {
+        ArrayList<Node> children = getChildNodes();
+        for (int i=0; i<list.size(); i++) {
+            for (Node child : children) {
+                if (list.get(i).equals(child)) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
 
+    /**
+     * Gets the list of nodes that are being pointed to
+     * by this node.
+     * @return the list of nodes that are being pointed to
+     * by this node.
+     */
+    public ArrayList<Node> getChildNodes() {
+        ArrayList<Node> nodes = new ArrayList<>();
+        for (NodeLine nl : getLinesConnected()) {
+            if (!nl.getChild().equals(this)) {
+                nodes.add(nl.getChild());
+            }
+        }
+        return nodes;
+    }
+    
+    /**
+     * Gets the list of nodes that are pointing to
+     * this node.
+     * @return the list of nodes that are pointing to
+     * this node.
+     */
+    public ArrayList<Node> getParentNodes() {
+        ArrayList<Node> nodes = new ArrayList<>();
+        for (NodeLine nl : getLinesConnected()) {
+            if (!nl.getParent().equals(this)) {
+                nodes.add(nl.getParent());
+            }
+        }
+        return nodes;
+    }
 }
