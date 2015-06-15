@@ -231,6 +231,7 @@ public class FlowchartWindow extends JFrame {
      * a file.
      */
     public FlowchartWindow(FlowchartWindowManager manager, InputStream stream, File location) {
+        setIconImage(ProcessSketcher.mainIconSmaller);
         styleManager = new StyleManager();
         if (stream != null) {
             flowchart = Flowchart.readFlowchartData(stream, this);
@@ -1796,5 +1797,6 @@ public class FlowchartWindow extends JFrame {
     */
     public void showPrintPreview(int marginLeft, int marginRight, int marginTop, int marginBottom, int width, int height, PrinterJob job) {
         PrintPreviewDialog ppd = new PrintPreviewDialog(marginLeft, marginRight, marginTop, marginBottom, width, height, flowchart.toImage(this), job, this);
+        ppd.setIconImage(ProcessSketcher.mainIconSmaller);
     }
 }

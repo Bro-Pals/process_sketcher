@@ -157,8 +157,8 @@ public class PrintPreviewDialog extends JDialog implements Printable {
     @Override
     public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
         if (pageIndex<split.length) {
-            drawPage(graphics, (int)pageFormat.getImageableX(),
-                     (int)pageFormat.getImageableY(), pageIndex);
+            drawPage(graphics, 0,
+                     0, pageIndex);
             return PAGE_EXISTS;
         } else {
             return NO_SUCH_PAGE;

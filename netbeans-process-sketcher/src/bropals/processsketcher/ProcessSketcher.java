@@ -35,6 +35,8 @@ public class ProcessSketcher {
 
     public static Font[] allFonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
     
+    public static BufferedImage mainIconSmaller;
+    
     /**
      * @param args the command line arguments
      */
@@ -70,7 +72,11 @@ public class ProcessSketcher {
             }
             splash.close();
         }
-        
+        try {
+             mainIconSmaller = (BufferedImage)ImageIO.read(ProcessSketcher.class.getResourceAsStream("/bropals/processsketcher/icons/mainWindowIcon.png"));
+        } catch (IOException ex) {
+            System.err.println("Could not load main window icon image");
+        }
         FlowchartWindowManager fwm = new FlowchartWindowManager();
     }
     
