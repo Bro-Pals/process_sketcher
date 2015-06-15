@@ -192,7 +192,7 @@ public class SelectionManager {
         }
 
         // it must be a minimum of 10 pixels away
-        double nearestDistance = 10 * (instance.getCamera().getZoom());
+        double nearestDistance = instance.getCamera().getZoom() * 10;
         // if no nodes were found, find the nearest line.
         for (NodeLine nl : instance.getFlowchart().getNodeLines()) {
             // drag so we can get the points of the line
@@ -211,7 +211,29 @@ public class SelectionManager {
                     - (p2.getY() * p1.getX())) / Math.sqrt(Math.pow(p2.getY() - p1.getY(), 2)
                             + Math.pow(p2.getX() - p1.getX(), 2));
 
-            if (distance < nearestDistance) {
+            float lowerX = 0;
+            float higherX = 0;
+            float lowerY = 0;
+            float higherY = 0;
+            
+            if (p1.getX() < p2.getX()) {
+                lowerX = (float)p1.getX();
+                higherX = (float)p2.getX();
+            } else {
+                lowerX = (float)p2.getX();
+                higherX = (float)p1.getX();
+            }
+            
+            if (p1.getY() < p2.getY()) {
+                lowerY = (float)p1.getY();
+                higherY = (float)p2.getY();
+            } else {
+                lowerY = (float)p2.getY();
+                higherY = (float)p1.getY();
+            }
+            
+            if (distance < nearestDistance && p.getX() > lowerX && p.getX() < higherX
+                    && p.getY() > lowerY && p.getY() < higherY) {
                 nearestDistance = distance;
                 thing = nl;
             }
