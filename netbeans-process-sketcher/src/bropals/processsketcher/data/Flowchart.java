@@ -296,10 +296,10 @@ public class Flowchart implements BinaryData {
      * @return the X location of the whole flowchart.
      */
     public int getX() {
-        float minX = nodes.get(0).getX();
+        float minX = nodes.get(0).getX()-nodes.get(0).getStyle().getBorderSize();
         for (int i=1; i<nodes.size(); i++) {
-            if (minX > nodes.get(i).getX()) {
-                minX = nodes.get(i).getX();
+            if (minX > nodes.get(i).getX()-nodes.get(i).getStyle().getBorderSize()) {
+                minX = nodes.get(i).getX()-nodes.get(i).getStyle().getBorderSize()*2;
             }
         }
         return (int)minX;
@@ -310,10 +310,10 @@ public class Flowchart implements BinaryData {
      * @return the Y location of the whole flowchart.
      */
     public int getY() {
-        float minY = nodes.get(0).getY();
+        float minY = nodes.get(0).getY()-nodes.get(0).getStyle().getBorderSize();
         for (int i=1; i<nodes.size(); i++) {
-            if (minY > nodes.get(i).getY()) {
-                minY = nodes.get(i).getY();
+            if (minY > nodes.get(i).getY()-nodes.get(i).getStyle().getBorderSize()) {
+                minY = nodes.get(i).getY()-nodes.get(i).getStyle().getBorderSize();
             }
         }
         return (int)minY;
@@ -325,13 +325,13 @@ public class Flowchart implements BinaryData {
      */
     public int getWidth() {
         int minX = getX();
-        float maxX = nodes.get(0).getX()+nodes.get(0).getWidth();
+        float maxX = nodes.get(0).getX()+nodes.get(0).getWidth()+(nodes.get(0).getStyle().getBorderSize()*2);
         for (int i=1; i<nodes.size(); i++) {
-            if (maxX < nodes.get(i).getX()+nodes.get(i).getWidth()) {
-                maxX = nodes.get(i).getX()+nodes.get(i).getWidth();
+            if (maxX < nodes.get(i).getX()+nodes.get(i).getWidth()+(nodes.get(i).getStyle().getBorderSize()*2)) {
+                maxX = nodes.get(i).getX()+nodes.get(i).getWidth()+(nodes.get(i).getStyle().getBorderSize()*2);
             }
         }
-        return ((int)maxX)-minX;
+        return ((int)maxX)-minX+1;
     }
     
     /**
@@ -339,14 +339,14 @@ public class Flowchart implements BinaryData {
      * @return the world coordinate width.
      */
     public int getHeight() {
-        int minY = getX();
-        float maxY = nodes.get(0).getY()+nodes.get(0).getHeight();
+        int minY = getY();
+        float maxY = nodes.get(0).getY()+nodes.get(0).getHeight()+(nodes.get(0).getStyle().getBorderSize()*2);
         for (int i=1; i<nodes.size(); i++) {
-            if (maxY < nodes.get(i).getY()+nodes.get(i).getHeight()) {
-                maxY = nodes.get(i).getY()+nodes.get(i).getHeight();
+            if (maxY < nodes.get(i).getY()+nodes.get(i).getHeight()+(nodes.get(i).getStyle().getBorderSize()*2)) {
+                maxY = nodes.get(i).getY()+nodes.get(i).getHeight()+(nodes.get(i).getStyle().getBorderSize()*2);
             }
         }
-        return ((int)maxY)-minY;
+        return ((int)maxY)-minY+1;
     }
     
     /**

@@ -311,7 +311,7 @@ public class FlowchartWindow extends JFrame {
             n.getStyle().getShape().renderShape(n, camera, g,
                     n == eventManager.getSelectionManager().getLastSelected() && eventManager.getTextTypeManager().isCursorShowing(),
                     eventManager.getTextTypeManager().getLocationOfTypeCursor(), view.getBackground());
-            if (eventManager.isSelected(n)) {
+            if (eventManager.isSelected(n) && showSelection) {
                 // draw the box around the node if it's being selected
                 g.setColor(selectionColor);
                 float offset = camera.convertWorldToCanvasLength(3); // for the selection box

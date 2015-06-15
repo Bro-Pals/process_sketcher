@@ -146,7 +146,7 @@ public class Node implements Selectable, BinaryData {
      * @return the width of this node, in world coordinates.
      */
     public float getWidth() {
-        return width + getStyle().getBorderSize();
+        return width;
     }
 
     /**
@@ -166,7 +166,7 @@ public class Node implements Selectable, BinaryData {
      * @return the height of this node, in world coordinates.
      */
     public float getHeight() {
-        return height + getStyle().getBorderSize();
+        return height;
     }
 
     /**
