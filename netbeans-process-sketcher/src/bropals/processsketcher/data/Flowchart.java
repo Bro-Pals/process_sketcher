@@ -19,10 +19,18 @@
  */
 package bropals.processsketcher.data;
 
+import bropals.processsketcher.Camera;
 import bropals.processsketcher.FlowchartWindow;
 import bropals.processsketcher.StyleManager;
 import bropals.processsketcher.style.LineStyle;
 import bropals.processsketcher.style.NodeStyle;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.image.BufferedImage;
+import java.awt.print.PageFormat;
+import java.awt.print.Printable;
+import java.awt.print.PrinterException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -40,6 +48,10 @@ public class Flowchart implements BinaryData {
      * A reference to the style manager
      */
     private StyleManager styleManager;
+    /**
+     * Reference to the flowchart window.
+     */
+    private FlowchartWindow instance;
     
     /**
      * Create the default flowchart.
@@ -261,4 +273,114 @@ public class Flowchart implements BinaryData {
         }
     }
     
+    @Override
+    public Object clone() {
+        Flowchart f = new Flowchart(false);
+        for (Node node : nodes) {
+            f.getNodes().add((Node)node.clone());
+        }
+        return f;
+    }
+
+    /**
+     * Gets the top left corner of the whole flowchart.
+     * This point is in world coordinates.
+     * @return the top left corner point of the flowchart.
+     */
+    public Point getTopLeft() {
+        return new Point(getX(), getY());
+    }
+    
+    /**
+     * Gets the X location of the whole flowchart.
+     * @return the X location of the whole flowchart.
+     */
+    public int getX() {
+        float minX = nodes.get(0).getX();
+        for (int i=1; i<nodes.size(); i++) {
+            if (minX > nodes.get(i).getX()) {
+                minX = nodes.get(i).getX();
+            }
+        }
+        return (int)minX;
+    }
+    
+    /**
+     * Gets the Y location of the whole flowchart.
+     * @return the Y location of the whole flowchart.
+     */
+    public int getY() {
+        float minY = nodes.get(0).getY();
+        for (int i=1; i<nodes.size(); i++) {
+            if (minY > nodes.get(i).getY()) {
+                minY = nodes.get(i).getY();
+            }
+        }
+        return (int)minY;
+    }
+    
+    /**
+     * Gets the world coordinate width of the whole chart.
+     * @return the world coordinate width.
+     */
+    public int getWidth() {
+        int minX = getX();
+        float maxX = nodes.get(0).getX()+nodes.get(0).getWidth();
+        for (int i=1; i<nodes.size(); i++) {
+            if (maxX < nodes.get(i).getX()+nodes.get(i).getWidth()) {
+                maxX = nodes.get(i).getX()+nodes.get(i).getWidth();
+            }
+        }
+        return ((int)maxX)-minX;
+    }
+    
+    /**
+     * Gets the world coordinate height of the whole chart.
+     * @return the world coordinate width.
+     */
+    public int getHeight() {
+        int minY = getX();
+        float maxY = nodes.get(0).getY()+nodes.get(0).getHeight();
+        for (int i=1; i<nodes.size(); i++) {
+            if (maxY < nodes.get(i).getY()+nodes.get(i).getHeight()) {
+                maxY = nodes.get(i).getY()+nodes.get(i).getHeight();
+            }
+        }
+        return ((int)maxY)-minY;
+    }
+    
+    /**
+     * Converts this flowchart into an image.
+     * @param window the flowchart window.
+     * @return the image of this flowchart.
+     */
+    public BufferedImage toImage(FlowchartWindow window) {
+        Camera save = new Camera();
+        save.setZoom(window.getCamera().getZoom());
+        save.setWorldLocationX(window.getCamera().getWorldLocationX());
+        save.setWorldLocationY(window.getCamera().getWorldLocationY());
+        window.getCamera().setZoom(1);
+        window.getCamera().setWorldLocationX(getX()-10);
+        window.getCamera().setWorldLocationY(getY()-10);
+        
+        BufferedImage image = new BufferedImage(getWidth()+20, getHeight()+20, BufferedImage.TYPE_INT_RGB);
+        Graphics g = image.getGraphics();
+        g.setColor(window.getView().getBackground());
+        g.fillRect(0, 0, image.getWidth(), image.getHeight());
+        window.paintFlowchart(g, false);
+        g.dispose();
+        
+        window.getCamera().setZoom(save.getZoom());
+        window.getCamera().setWorldLocationX(save.getWorldLocationX());
+        window.getCamera().setWorldLocationY(save.getWorldLocationY());
+        return image;
+    }
+    
+    /**
+     * Gives this flowchart a reference of the flowchart window.
+     * @param window the window
+     */
+    public void passInstance(FlowchartWindow window) {
+        instance = window;
+    }
 }

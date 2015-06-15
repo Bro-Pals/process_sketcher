@@ -75,6 +75,8 @@ import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.awt.print.PrinterJob;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -83,6 +85,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
@@ -93,6 +96,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
@@ -207,7 +211,7 @@ public class FlowchartWindow extends JFrame {
     private JButton exportChartToImage;
     private JButton autoformatHorizontally;
     private JButton autoformatVertically;
-
+    
     /**
      * Creates a new FlowchartWindow with an empty flowchart.
      *
@@ -242,8 +246,6 @@ public class FlowchartWindow extends JFrame {
         }
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fc.setMultiSelectionEnabled(false);
-        //Configure the file chooser so it can only act on .prsf files.
-        fc.setFileFilter(new FileNameExtensionFilter("Process Sketcher files (*." + FILE_EXTENSION + ")", FILE_EXTENSION));
         eventManager = new EventManager(this);
         buttonPanel = new JTabbedPane();
         buttonPanel.setPreferredSize(new Dimension(400, 125));
@@ -251,7 +253,7 @@ public class FlowchartWindow extends JFrame {
         view = new JComponent() {
             @Override
             public void paintComponent(Graphics g) {
-                paintView(g);
+                paintFlowchart(g, true);
             }
         };
         formatTabs();
@@ -296,8 +298,9 @@ public class FlowchartWindow extends JFrame {
      * The paint function for the flowchart editor view.
      *
      * @param g the graphics context to draw with.
+     * @param showSelection if the selected object should have a box around it.
      */
-    public void paintView(Graphics g) {
+    public void paintFlowchart(Graphics g, boolean showSelection) {
         // draw the background
         g.setColor(view.getBackground());
         g.fillRect(0, 0, view.getWidth(), view.getHeight());
@@ -321,7 +324,7 @@ public class FlowchartWindow extends JFrame {
                 Point[] linePoints = nl.getStyle().getType().renderLine(nl, camera, g,
                         nl == eventManager.getSelectionManager().getLastSelected() && eventManager.getTextTypeManager().isCursorShowing(),
                         eventManager.getTextTypeManager().getLocationOfTypeCursor(), eventManager.getTextTypeManager().getLinePartTyping());
-                if (eventManager.isSelected(nl)) {
+                if (eventManager.isSelected(nl) && showSelection) {
                     g.setColor(selectionColor);
                     float offset = camera.convertWorldToCanvasLength(3);
                     g.drawLine((int) (linePoints[0].getX() + offset),
@@ -352,9 +355,10 @@ public class FlowchartWindow extends JFrame {
             if (offsetY < 0) {
                 startY = startY + offsetY;
             }
-
-            g.setColor(Color.BLUE);
-            g.drawRect(startX, startY, Math.abs(offsetX), Math.abs(offsetY));
+            if (showSelection) {
+                g.setColor(Color.BLUE);
+                g.drawRect(startX, startY, Math.abs(offsetX), Math.abs(offsetY));
+            }
         }
     }
 
@@ -1488,6 +1492,8 @@ public class FlowchartWindow extends JFrame {
      * Opens a file chooser so the user can save as the current flowchart.
      */
     public void saveAsFlowchart() {
+        //Configure the file chooser so it can only act on .prsf files.
+        fc.setFileFilter(new FileNameExtensionFilter("Process Sketcher files (*." + FILE_EXTENSION + ")", FILE_EXTENSION));
         int response = fc.showSaveDialog(this);
         if (response == JFileChooser.APPROVE_OPTION) {
             file = fc.getSelectedFile();
@@ -1502,6 +1508,8 @@ public class FlowchartWindow extends JFrame {
      * Opens a file chooser so the user can open the current flowchart.
      */
     public void openFlowchart() {
+        //Configure the file chooser so it can only act on .prsf files.
+        fc.setFileFilter(new FileNameExtensionFilter("Process Sketcher files (*." + FILE_EXTENSION + ")", FILE_EXTENSION));
         int response = fc.showOpenDialog(this);
         if (response == JFileChooser.APPROVE_OPTION) {
             file = fc.getSelectedFile();
@@ -1763,5 +1771,55 @@ public class FlowchartWindow extends JFrame {
             this.current = current;
             this.previous = previous;
         }
+    }
+    
+    /**
+     * Gets the name of the file that this flowchart window is.
+     * @return the name of this flowchart.
+     */
+    public String getFlowchartName() {
+        return getTitle().substring("Process Sketcher | ".length());
+    }
+    
+    /**
+     * Exports the flowchart to an image.
+     */
+    public void exportToImage() {
+        //Configure the file chooser so it can only act on .prsf files.
+        fc.setFileFilter(new FileNameExtensionFilter("Portable Network Graphics image (*.png)", "png"));
+        
+        int response = fc.showSaveDialog(this);
+        if (response == JFileChooser.APPROVE_OPTION) {
+            try {
+                BufferedImage image = flowchart.toImage(this);
+                OutputStream os = Files.newOutputStream(fc.getSelectedFile().toPath());
+                boolean status = ImageIO.write(image, "png", os);
+                if (!status) {
+                    System.err.println("Can't write this image because there"
+                            + " is no writer for it.");
+                }
+                os.flush();
+                os.close();
+                if (status) {
+                    System.out.println("Wrote image " + fc.getSelectedFile());
+                }
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(this, "Unable to export image to file: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+    
+   /**
+    * Shows a print preview dialog.
+    * @param marginLeft left margin, in 1/72 of an inch.
+    * @param marginRight right margin, in 1/72 of an inch.
+    * @param marginTop top margin, in 1/72 of an inch.
+    * @param marginBottom bottom margin, in 1/72 of an inch
+    * @param width the page width
+    * @param height the page height
+    * @param job the printer job.
+    */
+    public void showPrintPreview(int marginLeft, int marginRight, int marginTop, int marginBottom, int width, int height, PrinterJob job) {
+        PrintPreviewDialog ppd = new PrintPreviewDialog(marginLeft, marginRight, marginTop, marginBottom, width, height, flowchart.toImage(this), job, this);
     }
 }

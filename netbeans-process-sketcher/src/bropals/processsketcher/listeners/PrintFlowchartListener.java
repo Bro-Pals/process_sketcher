@@ -22,6 +22,11 @@ package bropals.processsketcher.listeners;
 import bropals.processsketcher.FlowchartWindow;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.print.PageFormat;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
+import javax.print.PrintService;
+import javax.swing.JOptionPane;
 
 /**
  * The listener for the print flowchart button.
@@ -35,6 +40,27 @@ public class PrintFlowchartListener extends AbstractProcessSketcherListener impl
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        if (PrinterJob.lookupPrintServices().length > 0) {
+            PrinterJob job = PrinterJob.getPrinterJob();
+            job.setJobName("Process Sketcher: " + getFlowchartWindow().getFlowchartName());
+            getFlowchartWindow().getFlowchart().passInstance(getFlowchartWindow());
+            PageFormat instance = new PageFormat();
+            PageFormat old = instance;
+            
+            if ( (instance = job.pageDialog(old)) != old) {
+                getFlowchartWindow().showPrintPreview(
+                    (int)(instance.getImageableX()),
+                    (int)(instance.getWidth()-instance.getImageableX()-instance.getImageableWidth()),
+                    (int)(instance.getImageableY()),
+                    (int)(instance.getHeight()-instance.getImageableY()-instance.getImageableHeight()),
+                    (int)(instance.getImageableWidth()),
+                    (int)(instance.getImageableHeight()),
+                    job
+                );
+            }
+        } else {
+            JOptionPane.showMessageDialog(getFlowchartWindow(), "There are no printers on this computer.", "Can't print", JOptionPane.ERROR_MESSAGE);
+        }
     }
     
 }

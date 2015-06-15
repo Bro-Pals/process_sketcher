@@ -23,6 +23,8 @@ import java.awt.Point;
 
 /**
  * Holds the view transformation.
+ * When zoom = 1, and the X and Y position of the camera is both 0, then
+ * canvas coordinates = world coordinates.
  * @author Jonathon
  */
 public class Camera {

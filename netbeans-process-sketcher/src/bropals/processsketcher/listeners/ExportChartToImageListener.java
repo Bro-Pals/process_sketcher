@@ -35,6 +35,7 @@ public class ExportChartToImageListener extends AbstractProcessSketcherListener 
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        getFlowchartWindow().exportToImage();
     }
     
 }
