@@ -954,6 +954,10 @@ public class FlowchartWindow extends JFrame {
             return null;
         }
         String name = ((NodeLine) selected.get(firstNodeLine)).getLinkedStyle();
+        //return null if there is no name
+        if (name == null) {
+            return null;
+        }
         for (int i = firstNodeLine + 1; i < selected.size(); i++) {
             if (selected.get(i) instanceof NodeLine) {
                 if (!name.equals(((NodeLine) selected.get(i)).getLinkedStyle())) {
@@ -1085,9 +1089,14 @@ public class FlowchartWindow extends JFrame {
             return null;
         }
         String name = ((Node) selected.get(firstNode)).getLinkedStyle();
+        // return null if there is no linked style name
+        if (name == null) {
+            return null;
+        }
+        
         for (int i = firstNode + 1; i < selected.size(); i++) {
             if (selected.get(i) instanceof Node) {
-                if (!name.equals(((Node) selected.get(i)).getLinkedStyle())) {
+                if (!name.equals(((Node)selected.get(i)).getLinkedStyle())) {
                     //The border size is not common
                     return null;
                 }
