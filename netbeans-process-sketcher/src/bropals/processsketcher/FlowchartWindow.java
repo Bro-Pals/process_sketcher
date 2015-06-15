@@ -1767,7 +1767,7 @@ public class FlowchartWindow extends JFrame {
         int response = fc.showSaveDialog(this);
         if (response == JFileChooser.APPROVE_OPTION) {
             try {
-                BufferedImage image = flowchart.toImage(this);
+                BufferedImage image = flowchart.toImage(this, 10);
                 OutputStream os = Files.newOutputStream(fc.getSelectedFile().toPath());
                 boolean status = ImageIO.write(image, "png", os);
                 if (!status) {
@@ -1796,7 +1796,7 @@ public class FlowchartWindow extends JFrame {
     * @param job the printer job.
     */
     public void showPrintPreview(int marginLeft, int marginRight, int marginTop, int marginBottom, int width, int height, PrinterJob job) {
-        PrintPreviewDialog ppd = new PrintPreviewDialog(marginLeft, marginRight, marginTop, marginBottom, width, height, flowchart.toImage(this), job, this);
+        PrintPreviewDialog ppd = new PrintPreviewDialog(marginLeft, marginRight, marginTop, marginBottom, width, height, flowchart.toImage(this, 0), job, this);
         ppd.setIconImage(ProcessSketcher.mainIconSmaller);
     }
 }

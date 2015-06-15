@@ -352,18 +352,19 @@ public class Flowchart implements BinaryData {
     /**
      * Converts this flowchart into an image.
      * @param window the flowchart window.
+     * @param padding the padding for this image
      * @return the image of this flowchart.
      */
-    public BufferedImage toImage(FlowchartWindow window) {
+    public BufferedImage toImage(FlowchartWindow window, int padding) {
         Camera save = new Camera();
         save.setZoom(window.getCamera().getZoom());
         save.setWorldLocationX(window.getCamera().getWorldLocationX());
         save.setWorldLocationY(window.getCamera().getWorldLocationY());
         window.getCamera().setZoom(1);
-        window.getCamera().setWorldLocationX(getX()-10);
-        window.getCamera().setWorldLocationY(getY()-10);
+        window.getCamera().setWorldLocationX(getX()-padding);
+        window.getCamera().setWorldLocationY(getY()-padding);
         
-        BufferedImage image = new BufferedImage(getWidth()+20, getHeight()+20, BufferedImage.TYPE_INT_RGB);
+        BufferedImage image = new BufferedImage(getWidth()+(padding*2), getHeight()+(padding*2), BufferedImage.TYPE_INT_RGB);
         Graphics g = image.getGraphics();
         g.setColor(window.getView().getBackground());
         g.fillRect(0, 0, image.getWidth(), image.getHeight());
