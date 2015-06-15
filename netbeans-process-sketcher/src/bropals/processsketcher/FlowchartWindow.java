@@ -1556,212 +1556,180 @@ public class FlowchartWindow extends JFrame {
     }
 
     /**
-     * Organize the nodes in the flowchart in a list. Each index represents how
-     * "deep" in the flowchart the list of nodes in that index is. This function
-     * returns <code>null</code> if there is no root node.
-     *
-     * @return an organized list of nodes in the flowchart.
-     */
-    private ArrayList<ArrayList<Node>> organizeNodesInTree() {
-        Node root = getRootNode();
-        if (root != null) {
-            ArrayList<ArrayList<Node>> organized = new ArrayList<>();
-            traverseNodeTree(root, organized, 0);
-            return organized;
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Go further down the tree, building it from a given node.
-     *
-     * @param forNode the node to add to the list.
-     * @param list the organized list.
-     * @param depth the current depth.
-     */
-    private void traverseNodeTree(Node forNode, ArrayList<ArrayList<Node>> list, int depth) {
-        if (list.size() <= depth) {
-            list.add(new ArrayList<Node>());
-        }
-        if (!list.get(depth).contains(forNode)) {
-            list.get(depth).add(forNode);
-        }
-        for (NodeLine nl : forNode.getLinesConnected()) {
-            if (!nl.getChild().equals(forNode)) {
-                traverseNodeTree(nl.getChild(), list, depth + 1);
-            }
-        }
-    }
-
-    /**
-     * Gets a list of the width and height of the different depths for a the
-     * vertical format.
-     *
-     * @param organized the organized list of nodes.
-     * @return a list of the size of each depth.
-     */
-    private float[][] getDepthSizesForVertical(ArrayList<ArrayList<Node>> organized) {
-        float[][] depths = new float[organized.size()][2];
-        for (int i = 0; i < depths.length; i++) {
-            float largestHeight = organized.get(i).get(0).getHeight();
-            float totalWidth = 0;
-            for (int j = 0; j < organized.get(i).size(); j++) {
-                if (organized.get(i).get(j).getHeight() > largestHeight) {
-                    largestHeight = organized.get(i).get(j).getHeight();
-                }
-                totalWidth += organized.get(i).get(j).getWidth();
-            }
-            totalWidth += ((organized.get(i).size() - 1) * autoformatInnerSpacing);
-            depths[i][0] = totalWidth;
-            depths[i][1] = largestHeight;
-        }
-        return depths;
-    }
-
-    /**
-     * Gets a list of the width and height of the different depths for a the
-     * horizontal format.
-     *
-     * @param organized the organized list of nodes.
-     * @return a list of the size of each depth.
-     */
-    private float[][] getDepthSizesForHorizontal(ArrayList<ArrayList<Node>> organized) {
-        float[][] depths = new float[organized.size()][2];
-        for (int i = 0; i < depths.length; i++) {
-            float largestWidth = organized.get(i).get(0).getWidth();
-            float totalHeight = 0;
-            for (int j = 0; j < organized.get(i).size(); j++) {
-                if (organized.get(i).get(j).getWidth() > largestWidth) {
-                    largestWidth = organized.get(i).get(j).getWidth();
-                }
-                totalHeight += organized.get(i).get(j).getHeight();
-            }
-            totalHeight += ((organized.get(i).size() - 1) * autoformatInnerSpacing);
-            depths[i][0] = largestWidth;
-            depths[i][1] = totalHeight;
-        }
-        return depths;
-    }
-
-    /**
-     * Sort the list for autoformatting horizontally.
-     *
-     * @param list the list to sort.
-     */
-    private void sortListForAutoformatting(ArrayList<ArrayList<Node>> list) {
-        AutoformatSorter sorter = new AutoformatSorter();
-        for (int i = 1; i < list.size(); i++) {
-            sorter.setLists(list.get(i), list.get(i-1));
-            Collections.sort(list.get(i), sorter);
-        }
-    }
-
-    /**
-     * Automatically formats the current flowchart with horizontal orientation.
-     * The first node will be on the far left, and the last node will be on the
-     * far right. This works only if there is one root node.
-     */
-    public void autoformatHorizontally() {
-        ArrayList<ArrayList<Node>> organized = organizeNodesInTree();
-        sortListForAutoformatting(organized);
-        if (organized != null) {
-            float[][] depthSizes = getDepthSizesForHorizontal(organized);
-            float maxHeight = depthSizes[0][1];
-            for (int i = 1; i < depthSizes.length; i++) {
-                if (depthSizes[i][1] > maxHeight) {
-                    maxHeight = depthSizes[i][1];
-                }
-            }
-            float x = 0;
-            for (int i = 0; i < organized.size(); i++) {
-                x += (depthSizes[i][0] + autoformatOuterSpacing);
-                float y = -depthSizes[i][1] / 2;
-                for (int j = 0; j < organized.get(i).size(); j++) {
-                    Node n = organized.get(i).get(j);
-                    n.setX(x);
-                    n.setY(y);
-                    y += (n.getHeight() + autoformatInnerSpacing);
-                }
-            }
-        }
-        redrawView();
-    }
-
-    /**
-     * Automatically formats the current flowchart with vertical orientation.
-     * The first node will be on the top, and the last node will be on the
-     * bottom. This works only if there is one root node.
+     * Automatically sorts the flowchart in this window vertically.
      */
     public void autoformatVertically() {
-        ArrayList<ArrayList<Node>> organized = organizeNodesInTree();
-        sortListForAutoformatting(organized);
-        if (organized != null) {
-            float[][] depthSizes = getDepthSizesForVertical(organized);
-            float maxWidth = depthSizes[0][0];
-            for (int i = 1; i < depthSizes.length; i++) {
-                if (depthSizes[i][0] > maxWidth) {
-                    maxWidth = depthSizes[i][1];
-                }
-            }
-            float y = 0;
-            for (int i = 0; i < organized.size(); i++) {
-                y += (depthSizes[i][1] + autoformatOuterSpacing);
-                float x = -depthSizes[i][0] / 2;
-                for (int j = 0; j < organized.get(i).size(); j++) {
-                    Node n = organized.get(i).get(j);
-                    n.setX(x);
-                    n.setY(y);
-                    x += (n.getWidth() + autoformatInnerSpacing);
-                }
-            }
-        }
-
+        Node rootNode = getRootNode();
+        ArrayList<Node> sorted = new ArrayList<>();
+        // move the root node to the orgin
+        sorted.add(rootNode);
+        rootNode.setX(0);
+        rootNode.setY(0);
+        positionNodesVertically(rootNode, 
+                rootNode.getChildNodes(), 
+                sorted, 50, 150); 
+        redrawView();
     }
-
+    
     /**
-     * An object that auto formats a lists for the autoformatting function.
+     * A recursive method that auto-formats the flowchart vertically
+     * @param parent The parent node to start positioning everything from
+     * @param nodes The children nodes
+     * @param sorted An array to keep track of the nodes that were already sorted
+     * @param paddingX padding for the x axis
+     * @param paddingY padding for the y axis
      */
-    class AutoformatSorter implements Comparator<Node> {
+    public void positionNodesVertically(Node parent, ArrayList<Node> nodes, ArrayList<Node> sorted, float paddingX, float paddingY) {
+        float currentX = parent.getX();
+        for (int i=0; i<nodes.size(); i++) {
+            // position the node
+            nodes.get(i).setX(currentX);
+            currentX += nodes.get(i).getWidth() + paddingX;
+            
+            nodes.get(i).setY(parent.getY() + parent.getHeight() + paddingY);
+            
+            sorted.add(nodes.get(i));
+            
+            ArrayList<Node> children =  nodes.get(i).getChildNodes();
+            if (!children.isEmpty()) {
+                positionNodesVertically( nodes.get(i), children, sorted,paddingX, paddingY);
+                // find the smallest and the largest Y of the newly sorted list
+                Node smallestX = children.get(0);
+                for (int j=1; j<children.size(); j++) {
+                    if (children.get(j).getX() < smallestX.getX()) {
+                        smallestX = children.get(j);
+                    }
+                }
+                Node largestX = children.get(0);
+                for (int j=1; j<children.size(); j++) {
+                    if (children.get(j).getX() + children.get(j).getWidth() >
+                            largestX.getX() + largestX.getWidth()) {
+                        largestX = children.get(j);
+                    }
+                }
+                
+                // shift all previously positioned nodes by the height of the newly sorted children
+                float shiftAmount = -(largestX.getX() + largestX.getWidth() - smallestX.getX());
+                // shift all the sorted nodes up
+                for (Node n : sorted) {
+                    n.setX(n.getX() + (shiftAmount/2));
+                }
 
-        private ArrayList<Node> current;
-        private ArrayList<Node> previous;
-
-        @Override
-        public int compare(Node node1, Node node2) {
-            /*
-             First node is less than the second node
-             if its first parent appears before the first parent
-             of the second node.
-
-             First node is the same as the second node if its first
-             parent appears at the same time as the second node.
-
-             First node is greater than the second node if its first
-             parent appears after the first parent of the second node.
-             */
-            int firstParent1 = node1.getFirstOccuranceOfParent(previous);
-            int firstParent2 = node2.getFirstOccuranceOfParent(previous);
-            if (firstParent1 < firstParent2) {
-                return -1;
-            } else if (firstParent1 > firstParent2) {
-                return 1;
-            } else if (firstParent1 == firstParent2) {
-                return 0;
+                 // shift the base point for the unsorted nodes down
+                currentX = nodes.get(i).getX() + nodes.get(i).getWidth() - (shiftAmount/2) + paddingX;
             }
-            //Impossible to get to this
-            return 0;
         }
+        // center the parent to the children when you're done
+        float averageXPos = 0;
+        for (Node n : nodes) {
+            averageXPos += n.getX();
+        }
+        averageXPos = averageXPos / nodes.size();
+        parent.setX(averageXPos);
+    }
+    
+    /**
+     * Automatically sorts the flowchart in this window horizontally.
+     */
+    public void autoformatHorizontally() {
+        Node rootNode = getRootNode();
+        ArrayList<Node> sorted = new ArrayList<>();
+         // move the root node to the orgin
+        sorted.add(rootNode);
+        rootNode.setX(0);
+        rootNode.setY(0);
+        positionNodesHorizontally(rootNode, 
+                rootNode.getChildNodes(), 
+                sorted, 50, 150);
+        redrawView();
+    }
+    
+    /**
+     * A recursive method that auto-formats the flowchart horizontally
+     * @param parent The parent node to start positioning everything from
+     * @param nodes The children nodes
+     * @param sorted An array to keep track of the nodes that were already sorted
+     * @param paddingX padding for the x axis
+     * @param paddingY padding for the y axis
+     */
+    public void positionNodesHorizontally(Node parent, ArrayList<Node> nodes, ArrayList<Node> sorted, float paddingY, float paddingX) {
+        float currentY = parent.getY();
+        for (int i=0; i<nodes.size(); i++) {
+            // position the node
+            nodes.get(i).setY(currentY);
+            currentY += nodes.get(i).getHeight() + paddingY;
+            
+            nodes.get(i).setX(parent.getX() + parent.getWidth() + paddingX);
+            
+            sorted.add(nodes.get(i));
+            
+            ArrayList<Node> children =  nodes.get(i).getChildNodes();
+            if (!children.isEmpty()) {
+                positionNodesHorizontally( nodes.get(i), children, sorted,paddingY, paddingX);
+                // find the smallest and the largest Y of the newly sorted list
+                Node smallestY = children.get(0);
+                for (int j=1; j<children.size(); j++) {
+                    if (children.get(j).getY() < smallestY.getY()) {
+                        smallestY = children.get(j);
+                    }
+                }
+                Node largestY = children.get(0);
+                for (int j=1; j<children.size(); j++) {
+                    if (children.get(j).getY() + children.get(j).getHeight() >
+                            largestY.getY() + largestY.getHeight()) {
+                        largestY = children.get(j);
+                    }
+                }
+                
+                // shift all previously positioned nodes by the height of the newly sorted children
+                float shiftAmount = -(largestY.getY() + largestY.getHeight() - smallestY.getY());
+                // shift all the sorted nodes up
+                for (Node n : sorted) {
+                    n.setY(n.getY() + (shiftAmount/2));
+                }
 
-        /**
-         * Sets the values of the lists.
-         *
-         * @param current the current list.
-         * @param previous the previous list.
-         */
-        public void setLists(ArrayList<Node> current, ArrayList<Node> previous) {
-            this.current = current;
-            this.previous = previous;
+                 // shift the base point for the unsorted nodes down
+                currentY = nodes.get(i).getY() + nodes.get(i).getHeight() - (shiftAmount/2) + paddingY;
+            }
+        }
+        // center the parent to the children when you're done
+        float averageYPos = 0;
+        for (Node n : nodes) {
+            averageYPos += n.getY();
+        }
+        averageYPos = averageYPos / nodes.size();
+        parent.setY(averageYPos);
+    }
+    
+    
+    /**
+     * Shift all of the given nodes and their children recursively on the Y axis.
+     * @param nodes The nodes and their children to shift.
+     * @param amount The amount to shift it by.
+     */
+    public void shiftNodesVertically(ArrayList<Node> nodes, float amount) {
+        if (nodes.isEmpty()) {
+            return;
+        }
+        for (Node n : nodes) {
+            n.setY(n.getY() + amount);
+            shiftNodesVertically(n.getChildNodes(), amount);
         }
     }
+    
+     /**
+     * Shift all of the given nodes and their children recursively on the X axis.
+     * @param nodes The nodes and their children to shift.
+     * @param amount The amount to shift it by.
+     */
+    public void shiftNodesHorizontally(ArrayList<Node> nodes, float amount) {
+        if (nodes.isEmpty()) {
+            return;
+        }
+        for (Node n : nodes) {
+            n.setX(n.getX() + amount);
+            shiftNodesHorizontally(n.getChildNodes(), amount);
+        }
+    }
+
 }
