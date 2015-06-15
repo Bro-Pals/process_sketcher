@@ -66,6 +66,7 @@ public class FlowchartWindowManager implements WindowListener {
         windows = new ArrayList<>();
         fc = new JFileChooser();
         welcomeWindow = new JFrame("Welcome to Process Sketcher");
+        welcomeWindow.setIconImage(ProcessSketcher.mainIconSmaller);
         welcomeWindow.setLayout(new FlowLayout());
         welcomeWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         JButton newFlowchart = new JButton("New Flowchart");
