@@ -27,6 +27,7 @@ import bropals.processsketcher.FlowchartWindow;
  */
 public class AutoFormatted extends Action {
 
+    
     @Override
     public void undo(FlowchartWindow instance) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
