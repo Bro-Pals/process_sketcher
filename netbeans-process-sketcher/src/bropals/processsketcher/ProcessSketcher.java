@@ -19,9 +19,13 @@
  */
 package bropals.processsketcher;
 
-import bropals.processsketcher.data.BinaryUtil;
 import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
+import java.awt.SplashScreen;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 /**
  * The main class.
@@ -35,6 +39,38 @@ public class ProcessSketcher {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        BufferedImage image = null;
+        try {
+            image = (BufferedImage)ImageIO.read(ProcessSketcher.class.getResourceAsStream("/splash.png"));
+        } catch (IOException ex) {
+            System.err.println("Could not load splash image");
+        }
+        SplashScreen splash = SplashScreen.getSplashScreen();
+        if (splash != null) {
+            Graphics2D g = splash.createGraphics();
+            g.fillRect(4, 132, 392, 134);
+            splash.update();
+            if (image != null) {
+                for (int i=0; i<49; i++) {
+                    g.drawImage(image, 0, 0, null);
+                    g.fillRect(4+(i*8), 132, 392-(i*8), 164);
+                    try {
+                        Thread.sleep(30);  
+                    } catch(Exception e) {
+                        return;
+                    }
+                    splash.update();
+                }
+            }
+            g.dispose();
+            try {
+                Thread.sleep(50);  
+            } catch(Exception e) {
+                return;
+            }
+            splash.close();
+        }
+        
         FlowchartWindowManager fwm = new FlowchartWindowManager();
     }
     

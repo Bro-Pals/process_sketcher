@@ -1,2 +1,2 @@
 # Process Sketcher
-A simple flowchart making software
+A simple flowchart making application
