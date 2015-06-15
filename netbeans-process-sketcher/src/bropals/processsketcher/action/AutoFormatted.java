@@ -20,6 +20,9 @@
 package bropals.processsketcher.action;
 
 import bropals.processsketcher.FlowchartWindow;
+import bropals.processsketcher.data.Node;
+import java.awt.Point;
+import java.util.ArrayList;
 
 /**
  * An action that occurs when you auto-format the flowchart
@@ -27,10 +30,21 @@ import bropals.processsketcher.FlowchartWindow;
  */
 public class AutoFormatted extends Action {
 
+    private ArrayList<Node> nodes;
+    private ArrayList<Point> positions;
+    
+    public AutoFormatted(ArrayList<Node> nodesMoved, ArrayList<Point> oldPositions) {
+        nodes = nodesMoved;
+        positions = oldPositions;
+    }
     
     @Override
     public void undo(FlowchartWindow instance) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        System.out.println("Undo autoformatting");
+        for (int i=0; i<nodes.size(); i++) {
+            nodes.get(i).setX((float)positions.get(i).getX());
+            nodes.get(i).setY((float)positions.get(i).getY());
+        }
     }
     
 }
