@@ -661,6 +661,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     NodeLine line = new NodeLine(node, createdNode);
                     createdNode.getLinesConnected().add(line);
                     node.getLinesConnected().add(line);
+                    createdNode.setInnerText("");
                     dragManager.setNewlyMadeNode(createdNode);
                     dragManager.setRightMouseDown(true);
                     window.redrawView();
