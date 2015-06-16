@@ -25,42 +25,7 @@ import bropals.processsketcher.data.Node;
 import bropals.processsketcher.data.NodeLine;
 import bropals.processsketcher.data.Selectable;
 import static bropals.processsketcher.icons.IconManager.getIcon;
-import bropals.processsketcher.listeners.AutoformatHorizontallyListener;
-import bropals.processsketcher.listeners.AutoformatVerticallyListener;
-import bropals.processsketcher.listeners.BorderColorListener;
-import bropals.processsketcher.listeners.BorderSizeListener;
-import bropals.processsketcher.listeners.CameraControls;
-import bropals.processsketcher.listeners.CloseFlowchartListener;
-import bropals.processsketcher.listeners.CopyListener;
-import bropals.processsketcher.listeners.CreateShapeListener;
-import bropals.processsketcher.listeners.CutListener;
-import bropals.processsketcher.listeners.ExportChartToImageListener;
-import bropals.processsketcher.listeners.ExportChartToPDFListener;
-import bropals.processsketcher.listeners.FillColorListener;
-import bropals.processsketcher.listeners.FitToViewListener;
-import bropals.processsketcher.listeners.FontColorListener;
-import bropals.processsketcher.listeners.FontListener;
-import bropals.processsketcher.listeners.FontSizeListener;
-import bropals.processsketcher.listeners.LineColorListener;
-import bropals.processsketcher.listeners.LineSizeListener;
-import bropals.processsketcher.listeners.LineStyleListener;
-import bropals.processsketcher.listeners.NewFlowchartListener;
-import bropals.processsketcher.listeners.OpenFlowchartListener;
-import bropals.processsketcher.listeners.PasteListener;
-import bropals.processsketcher.listeners.PrintFlowchartListener;
-import bropals.processsketcher.listeners.ResetViewListener;
-import bropals.processsketcher.listeners.SaveAsFlowchartListener;
-import bropals.processsketcher.listeners.SaveFlowchartListener;
-import bropals.processsketcher.listeners.SaveLineStylesListener;
-import bropals.processsketcher.listeners.SaveNodeStylesListener;
-import bropals.processsketcher.listeners.SavedLineStylesListener;
-import bropals.processsketcher.listeners.SavedNodeStylesListener;
-import bropals.processsketcher.listeners.SelectNextNodeListener;
-import bropals.processsketcher.listeners.SelectPreviousNodeListener;
-import bropals.processsketcher.listeners.ShapeListener;
-import bropals.processsketcher.listeners.UndoListener;
-import bropals.processsketcher.listeners.ZoomInListener;
-import bropals.processsketcher.listeners.ZoomOutListener;
+import bropals.processsketcher.listeners.*;
 import bropals.processsketcher.style.LineType;
 import bropals.processsketcher.style.Shape;
 import bropals.processsketcher.util.BooleanBlinker;
@@ -83,8 +48,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
@@ -112,16 +75,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class FlowchartWindow extends JFrame {
 
     public static final String FILE_EXTENSION = "prsf";
-
-    /**
-     * The distance between nodes on the same depth level.
-     */
-    private float autoformatInnerSpacing = 50;
-
-    /**
-     * The distance between different depth levels.
-     */
-    private float autoformatOuterSpacing = 70;
 
     /**
      * The window manager for all windows.
@@ -207,7 +160,6 @@ public class FlowchartWindow extends JFrame {
     private JButton openFlowchart;
     private JButton closeFlowchart;
     private JButton printFlowchart;
-    private JButton exportChartToPDF;
     private JButton exportChartToImage;
     private JButton autoformatHorizontally;
     private JButton autoformatVertically;
@@ -430,7 +382,6 @@ public class FlowchartWindow extends JFrame {
         openFlowchart = new JButton(getIcon("openFlowchartIcon.png"));
         closeFlowchart = new JButton(getIcon("closeFlowchartIcon.png"));
         printFlowchart = new JButton(getIcon("printFlowchartIcon.png"));
-        exportChartToPDF = new JButton(getIcon("exportChartToPDFIcon.png"));
         exportChartToImage = new JButton(getIcon("exportChartToImageIcon.png"));
 
         newFlowchart.addActionListener(new NewFlowchartListener(this));
@@ -439,7 +390,6 @@ public class FlowchartWindow extends JFrame {
         openFlowchart.addActionListener(new OpenFlowchartListener(this));
         closeFlowchart.addActionListener(new CloseFlowchartListener(this));
         printFlowchart.addActionListener(new PrintFlowchartListener(this));
-        exportChartToPDF.addActionListener(new ExportChartToPDFListener(this));
         exportChartToImage.addActionListener(new ExportChartToImageListener(this));
 
         newFlowchart.setToolTipText("Create a new flowchart");
@@ -448,7 +398,6 @@ public class FlowchartWindow extends JFrame {
         openFlowchart.setToolTipText("Open a flowchart from disk");
         closeFlowchart.setToolTipText("Closes this flowchart");
         printFlowchart.setToolTipText("Print this flowchart");
-        exportChartToPDF.setToolTipText("Export this flowchart as a PDF");
         exportChartToImage.setToolTipText("Export this flowchart as an image");
 
         fileTab.add(newFlowchart);
@@ -457,7 +406,6 @@ public class FlowchartWindow extends JFrame {
         fileTab.add(openFlowchart);
         fileTab.add(closeFlowchart);
         fileTab.add(printFlowchart);
-        fileTab.add(exportChartToPDF);
         fileTab.add(exportChartToImage);
 
         buttonPanel.addTab("File", wrapInScrollPane(fileTab));

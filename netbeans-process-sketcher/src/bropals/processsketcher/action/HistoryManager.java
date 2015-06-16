@@ -91,14 +91,22 @@ public class HistoryManager {
      * @param a The action to add
      */
     public void addToHistory(Action a) {
-        // if text is still being added to history, combine them
-        if (a instanceof EditedText) {
-            Action lastAction = getLastAction();
-            if (!(lastAction != null && ((a instanceof EditedNodeText && 
+        // if text is still being added to history, combine the actions
+        Action lastAction = getLastAction();
+        if (lastAction != null &&  a instanceof EditedText && lastAction instanceof EditedText) {
+            if ((a instanceof EditedNodeText && 
                     lastAction instanceof EditedNodeText) ||
                     (a instanceof EditedNodeLineText && 
                     lastAction instanceof EditedNodeLineText &&
-                    ((EditedNodeLineText)lastAction).sharesLinePartTyping((EditedNodeLineText)a)) )) ) {
+                    (((EditedNodeLineText)lastAction).getPartOfLine() == ((EditedNodeLineText)a).getPartOfLine()) ) ) {
+                System.out.println("Not adding a duplicate action with text editing");
+                if (a instanceof EditedNodeLineText) {
+                    System.out.println(((EditedNodeLineText)lastAction).getPartOfLine() + " == " + ((EditedNodeLineText)a).getPartOfLine());
+                }
+            } else {
+                // if the top of the history stack is the same kind of action, add the new action to the stack
+                //((EditedText)a).setOldText(((EditedText)lastAction).getOldText());
+                
                 actions.add(a);
             }
         } else {

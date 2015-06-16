@@ -26,6 +26,7 @@ import java.awt.SplashScreen;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import javax.swing.UIManager;
 
 /**
  * The main class.
@@ -41,6 +42,12 @@ public class ProcessSketcher {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch(Exception e) {
+            System.out.println("Could not apply system look and feel: " + e);
+        }
+        
         BufferedImage image = null;
         try {
             image = (BufferedImage)ImageIO.read(ProcessSketcher.class.getResourceAsStream("/splash.png"));
