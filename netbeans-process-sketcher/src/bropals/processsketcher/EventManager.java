@@ -527,8 +527,10 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     }
                     textTypeManager.incrementLocationOfTypeCursor();
                 }
-                
-                historyManager.addToHistory(new EditedNodeLineText(editLine, oldText, textTypeManager.getLinePartTyping()));
+                System.out.println("Old Text: " + oldText + " Line part: " + textTypeManager.getLinePartTyping());
+                if ((int)e.getKeyChar() != KeyEvent.VK_ENTER) {
+                    historyManager.addToHistory(new EditedNodeLineText(editLine, oldText, textTypeManager.getLinePartTyping()));
+                }
             }
         }
 
