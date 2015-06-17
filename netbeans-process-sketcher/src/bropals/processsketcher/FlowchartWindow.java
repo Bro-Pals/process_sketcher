@@ -392,13 +392,13 @@ public class FlowchartWindow extends JFrame {
         printFlowchart.addActionListener(new PrintFlowchartListener(this));
         exportChartToImage.addActionListener(new ExportChartToImageListener(this));
 
-        newFlowchart.setToolTipText("Create a new flowchart");
-        saveFlowchart.setToolTipText("Saves this flowchart to disk");
-        saveAsFlowchart.setToolTipText("Saves this flowchart to disk as");
-        openFlowchart.setToolTipText("Open a flowchart from disk");
-        closeFlowchart.setToolTipText("Closes this flowchart");
-        printFlowchart.setToolTipText("Print this flowchart");
-        exportChartToImage.setToolTipText("Export this flowchart as an image");
+        newFlowchart.setToolTipText("Create a new flowchart (Ctrl+N)");
+        saveFlowchart.setToolTipText("Saves this flowchart to disk (Ctrl+S)");
+        saveAsFlowchart.setToolTipText("Saves this flowchart to disk as (Ctrl+Shift+S)");
+        openFlowchart.setToolTipText("Open a flowchart from disk (Ctrl+O)");
+        closeFlowchart.setToolTipText("Closes this flowchart (Ctrl+Q)");
+        printFlowchart.setToolTipText("Print this flowchart (Ctrl+P)");
+        exportChartToImage.setToolTipText("Export this flowchart as an image (Ctrl+I)");
 
         fileTab.add(newFlowchart);
         fileTab.add(saveFlowchart);
@@ -443,13 +443,13 @@ public class FlowchartWindow extends JFrame {
         autoformatHorizontally.addActionListener(new AutoformatHorizontallyListener(this));
         autoformatVertically.addActionListener(new AutoformatVerticallyListener(this));
 
-        copy.setToolTipText("Copies the selection to the clipboard");
-        cut.setToolTipText("Cuts the selection to the clipboard");
-        paste.setToolTipText("Pastes the clipboard's contents");
-        undo.setToolTipText("Undo the last action taken");
-        createShape.setToolTipText("Create a new node");
-        selectNextNode.setToolTipText("Select the next node in this process");
-        selectPreviousNode.setToolTipText("Select the previous node in this process");
+        copy.setToolTipText("Copies the selection to the clipboard (Ctrl+C)");
+        cut.setToolTipText("Cuts the selection to the clipboard (Ctrl+X)");
+        paste.setToolTipText("Pastes the clipboard's contents (Ctrl+V)");
+        undo.setToolTipText("Undo the last action taken (Ctrl+Z)");
+        createShape.setToolTipText("Create a new node (Ctrl+H)");
+        selectNextNode.setToolTipText("Select the next node in this processv (Tab)");
+        selectPreviousNode.setToolTipText("Select the previous node in this process (Shift+Tab)");
         autoformatHorizontally.setToolTipText("Formats the flowchart horizontally");
         autoformatVertically.setToolTipText("Formats the flowchart vertically");
 
@@ -470,8 +470,8 @@ public class FlowchartWindow extends JFrame {
 
         zoomIn.setToolTipText("Zooms the camera in");
         zoomOut.setToolTipText("Zooms the camera out");
-        resetView.setToolTipText("Reset the camera view");
-        fitToView.setToolTipText("Fits the entire flowchart in the view of the camera");
+        resetView.setToolTipText("Reset the camera view (Ctrl+R)");
+        fitToView.setToolTipText("Fits the entire flowchart in the view of the camera (Ctrl+F)");
 
         viewTab.add(zoomIn);
         viewTab.add(zoomOut);
@@ -570,9 +570,9 @@ public class FlowchartWindow extends JFrame {
         borderSize = new JSpinner();
 
         nodeStylePanel.add(shape);
-        nodeStylePanel.add(borderColor);
-        nodeStylePanel.add(fillColor);
         nodeStylePanel.add(borderSize);
+        nodeStylePanel.add(fillColor);
+        nodeStylePanel.add(borderColor);
 
         shape.addActionListener(new ShapeListener(this));
         borderColor.addActionListener(new BorderColorListener(this));
@@ -1528,12 +1528,14 @@ public class FlowchartWindow extends JFrame {
         Node rootNode = getRootNode();
         ArrayList<Node> sorted = new ArrayList<>();
         // move the root node to the orgin
+        if (rootNode != null) {
         sorted.add(rootNode);
-        rootNode.setX(0);
-        rootNode.setY(0);
-        positionNodesVertically(rootNode, 
-                rootNode.getChildNodes(), 
-                sorted, 50, 150); 
+            rootNode.setX(0);
+            rootNode.setY(0);
+            positionNodesVertically(rootNode, 
+                    rootNode.getChildNodes(), 
+                    sorted, 50, 150); 
+        }
         redrawView();
     }
     
@@ -1601,12 +1603,14 @@ public class FlowchartWindow extends JFrame {
         Node rootNode = getRootNode();
         ArrayList<Node> sorted = new ArrayList<>();
          // move the root node to the orgin
-        sorted.add(rootNode);
-        rootNode.setX(0);
-        rootNode.setY(0);
-        positionNodesHorizontally(rootNode, 
-                rootNode.getChildNodes(), 
-                sorted, 50, 150);
+        if (rootNode != null) {
+            sorted.add(rootNode);
+            rootNode.setX(0);
+            rootNode.setY(0);
+            positionNodesHorizontally(rootNode, 
+                    rootNode.getChildNodes(), 
+                    sorted, 50, 150);
+        }
         redrawView();
     }
     

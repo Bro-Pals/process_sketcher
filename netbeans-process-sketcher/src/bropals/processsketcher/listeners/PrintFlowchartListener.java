@@ -40,27 +40,7 @@ public class PrintFlowchartListener extends AbstractProcessSketcherListener impl
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (PrinterJob.lookupPrintServices().length > 0) {
-            PrinterJob job = PrinterJob.getPrinterJob();
-            job.setJobName("Process Sketcher: " + getFlowchartWindow().getFlowchartName());
-            getFlowchartWindow().getFlowchart().passInstance(getFlowchartWindow());
-            PageFormat instance = new PageFormat();
-            PageFormat old = instance;
-            
-            if ( (instance = job.pageDialog(old)) != old) {
-                getFlowchartWindow().showPrintPreview(
-                    (int)(instance.getImageableX()),
-                    (int)(instance.getWidth()-instance.getImageableX()-instance.getImageableWidth()),
-                    (int)(instance.getImageableY()),
-                    (int)(instance.getHeight()-instance.getImageableY()-instance.getImageableHeight()),
-                    (int)(instance.getImageableWidth()),
-                    (int)(instance.getImageableHeight()),
-                    job
-                );
-            }
-        } else {
-            JOptionPane.showMessageDialog(getFlowchartWindow(), "There are no printers on this computer.", "Can't print", JOptionPane.ERROR_MESSAGE);
-        }
+        getFlowchartWindow().getEventManager().printFlowchart();
     }
     
 }

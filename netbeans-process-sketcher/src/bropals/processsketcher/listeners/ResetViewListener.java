@@ -35,8 +35,7 @@ public class ResetViewListener extends AbstractProcessSketcherListener implement
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        getFlowchartWindow().getCamera().resetView();
-        getFlowchartWindow().redrawView();
+        getFlowchartWindow().getEventManager().resetView();
     }
     
 }

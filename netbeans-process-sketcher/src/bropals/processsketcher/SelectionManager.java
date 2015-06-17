@@ -185,7 +185,8 @@ public class SelectionManager {
     public Selectable getSelectableUnderPoint(Point.Float p) {
         Selectable thing = null; // initially nothing
         
-        for (Node n : instance.getFlowchart().getNodes()) {
+        for (int i=instance.getFlowchart().getNodes().size()-1; i>=0; i--) {
+            Node n = instance.getFlowchart().getNodes().get(i);
             if (p.getX() > n.getX() && p.getX() < n.getX() + n.getWidth()
                     && p.getY() > n.getY() && p.getY() < n.getY() + n.getHeight()) {
                 return n;

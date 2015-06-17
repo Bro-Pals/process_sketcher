@@ -47,7 +47,10 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.print.PageFormat;
+import java.awt.print.PrinterJob;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 
 /**
  * Gets events from the view and StyleManager and handles them.
@@ -404,6 +407,144 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         return (original.substring(0, cursorLocation) + character + original.substring(cursorLocation));
     }
     
+    /**
+     * Open a print dialog for printing the flowchart
+     */
+    public void printFlowchart() {
+        if (PrinterJob.lookupPrintServices().length > 0) {
+            PrinterJob job = PrinterJob.getPrinterJob();
+            job.setJobName("Process Sketcher: " +window.getFlowchartName());
+            window.getFlowchart().passInstance(window);
+            PageFormat instance = new PageFormat();
+            PageFormat old = instance;
+            
+            if ( (instance = job.pageDialog(old)) != old) {
+                window.showPrintPreview(
+                    (int)(instance.getImageableX()),
+                    (int)(instance.getWidth()-instance.getImageableX()-instance.getImageableWidth()),
+                    (int)(instance.getImageableY()),
+                    (int)(instance.getHeight()-instance.getImageableY()-instance.getImageableHeight()),
+                    (int)(instance.getImageableWidth()),
+                    (int)(instance.getImageableHeight()),
+                    job
+                );
+            }
+        } else {
+            JOptionPane.showMessageDialog(window, "There are no printers on this computer.", "Can't print", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    /**
+     * Reset the camera view back to the orgin with 100% zoom
+     */
+    public void resetView() {
+        window.getCamera().resetView();
+        window.redrawView();
+    }
+    
+    /**
+     * Transform the camera so the entire flowchart fits in view of the window
+     */
+    public void fitFlowchartToView() {
+        ArrayList<Node> nodes = window.getFlowchart().getNodes();
+        // find the bounds of the entire flowchart in world units
+        float smallestX = nodes.get(0).getX(); // world units
+        float smallestY = nodes.get(0).getY(); // world units
+        float largestX = nodes.get(0).getX() + nodes.get(0).getWidth(); // world units
+        float largestY = nodes.get(0).getY() + nodes.get(0).getHeight(); // world units
+        
+        // search through all the nodes, finding the smallest and largest bounds...
+        for (int i=1; i<nodes.size(); i++) {
+            if (nodes.get(i).getX() < smallestX) {
+                smallestX = nodes.get(i).getX();
+            }
+            
+            if (nodes.get(i).getY() < smallestY) {
+                smallestY = nodes.get(i).getY();
+            }
+            
+            if (nodes.get(i).getX() + nodes.get(i).getWidth() > largestX) {
+                largestX = nodes.get(i).getX() + nodes.get(i).getWidth();
+            }
+            
+            if (nodes.get(i).getY() + nodes.get(i).getHeight() > largestY) {
+                largestY = nodes.get(i).getY() + nodes.get(i).getHeight();
+            }
+        }
+        
+        float padding = 30; // world units of padding
+        // add the padding to the bounds
+        smallestX = smallestX - padding;
+        smallestY = smallestY - padding;
+        largestX = largestX + padding;
+        largestY = largestY + padding;
+        
+        int sizeToFitTo = 0;
+        int translateX = 0;
+        int translateY = 0;
+        if (window.getView().getWidth() > window.getView().getHeight()) {
+            sizeToFitTo = window.getView().getHeight();
+            translateX = (sizeToFitTo - window.getView().getWidth())/2;
+        } else {
+            sizeToFitTo = window.getView().getWidth();
+            translateY = (sizeToFitTo - window.getView().getHeight())/2;
+        }
+        
+        window.getCamera().setWorldLocationX(smallestX);
+        window.getCamera().setWorldLocationY(smallestY);
+        if (largestX - smallestX > largestY - smallestY) {
+            window.getCamera().setZoom((largestX - smallestX + (padding * 3)) / sizeToFitTo);
+        } else {
+            window.getCamera().setZoom((largestY - smallestY + (padding * 3)) / sizeToFitTo);
+        }
+
+        // if translate X is still 0... center the flowchart to the window on the x axis
+        if (translateX == 0) {
+            translateX =  (int)((largestX - smallestX) / window.getCamera().getZoom()) - sizeToFitTo;
+            translateX = translateX / 2;
+        } else {
+            translateY = (int)((largestY - smallestY) / window.getCamera().getZoom()) - sizeToFitTo;
+            translateY = translateY / 2;
+        }
+        
+        window.getCamera().setCanvasLocationX(
+                window.getCamera().getCanvasLocationX() + 
+                        (translateX));
+        
+        window.getCamera().setCanvasLocationY(
+                window.getCamera().getCanvasLocationY() +
+                        (translateY));
+        
+        System.out.println("New zoom: " + window.getCamera().getZoom());
+        
+        window.redrawView();
+    }
+    
+    /**
+     * Make a new default node that isn't connected to anything and place it to the center of the view.
+     */
+    public void createNode() {
+        // add a shape, placing it in the center of the screen
+        Node node = new Node(0, 0);
+        window.getFlowchart().getNodes().add(node);
+        
+        // get the center of the screen in world coordinates
+        float centerX = window.getCamera().convertCanvasToWorldX(
+                window.getView().getWidth()/2);
+        float centerY = window.getCamera().convertCanvasToWorldY(
+                window.getView().getHeight()/2);
+        
+        // position the node to the center
+        node.setX(centerX - (node.getWidth()/2));
+        node.setY(centerY - (node.getHeight()/2));
+        
+        // track it in the history
+        window.getEventManager().getHistoryManager().addToHistory(new CreatedNode(node));
+        
+        // redraw the view
+        window.redrawView();
+    }
+    
     @Override
     public void keyTyped(KeyEvent e) {
 
@@ -546,6 +687,11 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
             case KeyEvent.VK_DELETE:
                 deleteSelected();
                 break;
+            case KeyEvent.VK_P:
+                if (e.isControlDown()) {
+                    printFlowchart();
+                }
+                break;
             case KeyEvent.VK_Z:
                 historyManager.undoLastAction();
                 break;
@@ -578,6 +724,39 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 }
                 window.redrawView();
                 break;
+            case KeyEvent.VK_S:
+                if (e.isControlDown() && e.isShiftDown()) {
+                    window.saveAsFlowchart();
+                } else if (e.isControlDown()) {
+                    window.saveFlowchart();
+                }
+                break;
+            case KeyEvent.VK_O:
+                if (e.isControlDown()) {
+                    window.openFlowchart();
+                }
+                break;
+            case KeyEvent.VK_I:
+                if (e.isControlDown()) {
+                    window.exportToImage();
+                }
+            case KeyEvent.VK_F:
+                if (e.isControlDown()) {
+                    fitFlowchartToView();
+                }
+                break;
+            case KeyEvent.VK_R:
+                if (e.isControlDown()) {
+                    resetView();
+                }
+            case KeyEvent.VK_H:
+                if (e.isControlDown()) {
+                    createNode();
+                }
+            case KeyEvent.VK_Q:
+                if (e.isControlDown()) {
+                    window.closeWindow();
+                }
             case KeyEvent.VK_LEFT:
                 textTypeManager.decrementLocationOfTypeCursor();
                 window.redrawView();
