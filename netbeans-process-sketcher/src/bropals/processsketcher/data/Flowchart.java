@@ -24,13 +24,11 @@ import bropals.processsketcher.FlowchartWindow;
 import bropals.processsketcher.StyleManager;
 import bropals.processsketcher.style.LineStyle;
 import bropals.processsketcher.style.NodeStyle;
-import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.awt.print.PageFormat;
-import java.awt.print.Printable;
-import java.awt.print.PrinterException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -356,7 +354,7 @@ public class Flowchart implements BinaryData {
      * @param dpi the dots per inch of the image
      * @return the image of this flowchart.
      */
-    public BufferedImage toImage(FlowchartWindow window, int padding, float dpi) {
+    public BufferedImage toImage(FlowchartWindow window, int padding) {
         Camera save = new Camera();
         save.setZoom(window.getCamera().getZoom());
         save.setWorldLocationX(window.getCamera().getWorldLocationX());
@@ -365,8 +363,12 @@ public class Flowchart implements BinaryData {
         window.getCamera().setWorldLocationX(getX()-padding);
         window.getCamera().setWorldLocationY(getY()-padding);
         
-        BufferedImage image = new BufferedImage(getWidth()+(padding*2), getHeight()+(padding*2), BufferedImage.TYPE_INT_RGB);
-        Graphics g = image.getGraphics();
+        BufferedImage image = null;
+        image = new BufferedImage(getWidth()+(padding*2), getHeight()+(padding*2), BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = (Graphics2D)image.getGraphics();
+        g.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_DISABLE);
+        g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
         g.setColor(window.getView().getBackground());
         g.fillRect(0, 0, image.getWidth(), image.getHeight());
         window.paintFlowchart(g, false);

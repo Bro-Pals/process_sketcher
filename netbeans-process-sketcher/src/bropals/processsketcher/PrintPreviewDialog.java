@@ -129,8 +129,8 @@ public class PrintPreviewDialog extends JDialog implements Printable {
      * Prepares the flowchart for being displayed and printed.
      * @param imageDPI the DPI of the printed image.
      */
-    private void preparePrintImages(float imageDPI) {
-        BufferedImage flowchartImage = flowchart.toImage(window, marginTop, imageDPI);
+    private void preparePrintImages() {
+        BufferedImage flowchartImage = flowchart.toImage(window, marginTop);
         int pagesWide = (int)Math.ceil((double)flowchartImage.getWidth() / (double)pageWidth);
         int pagesHigh = (int)Math.ceil((double)flowchartImage.getHeight() / (double)pageHeight);
         split = new BufferedImage[pagesWide * pagesHigh];
@@ -161,7 +161,7 @@ public class PrintPreviewDialog extends JDialog implements Printable {
      */
     public void drawPrintPreview(Graphics g, int width, int height) {
         if (split == null) {
-            preparePrintImages(72);
+            preparePrintImages();
         }
         Graphics2D g2d = (Graphics2D) g;
         g.setColor(new Color(153, 153, 255));
@@ -209,6 +209,8 @@ public class PrintPreviewDialog extends JDialog implements Printable {
         if (pageIndex < split.length) {
             Graphics2D g2d = (Graphics2D)graphics;
             g2d.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_DISABLE);
+            g2d.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
             drawPage(graphics, 0,
                     0, pageIndex);
             return PAGE_EXISTS;
@@ -229,12 +231,7 @@ public class PrintPreviewDialog extends JDialog implements Printable {
         public void actionPerformed(ActionEvent e) {
             if (job.printDialog()) {
                 try {
-                    float dpi = 72;
-                    PrinterResolution[] resolutions = (PrinterResolution[])job.getPrintService().getSupportedAttributeValues(PrinterResolution.class, null, null);
-                    if (resolutions.length > 0) {
-                        dpi = resolutions[0].DPI*0.01f;
-                    }
-                    preparePrintImages(dpi);
+                    preparePrintImages();
                     job.setPrintable(ppd);
                     //Add pages to ignore
                     ignoring = new ArrayList<>();

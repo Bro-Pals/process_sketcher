@@ -1731,7 +1731,7 @@ public class FlowchartWindow extends JFrame {
         int response = fc.showSaveDialog(this);
         if (response == JFileChooser.APPROVE_OPTION) {
             try {
-                BufferedImage image = flowchart.toImage(this, 10, 72);
+                BufferedImage image = flowchart.toImage(this, 10);
                 OutputStream os = Files.newOutputStream(fc.getSelectedFile().toPath());
                 boolean status = ImageIO.write(image, "png", os);
                 if (!status) {
