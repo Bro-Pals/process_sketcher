@@ -19,13 +19,16 @@
  */
 package bropals.processsketcher;
 
+import bropals.processsketcher.data.Flowchart;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -33,12 +36,16 @@ import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
+import java.util.ArrayList;
+import java.util.regex.Pattern;
+import javax.print.attribute.standard.PrinterResolution;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 
 /**
  * Displays a print preview.
@@ -53,10 +60,17 @@ public class PrintPreviewDialog extends JDialog implements Printable {
     private int marginBottom;
     private int pageWidth;
     private int pageHeight;
-    private BufferedImage flowchartImage;
+    private Flowchart flowchart;
     private BufferedImage[] split;
     private PrinterJob job;
-
+    private FlowchartWindow window;
+    private JComponent view;
+    private PageFormat format;
+    private JCheckBox margins;
+    private JCheckBox pageCount;
+    private JTextField ignore;
+    private ArrayList<Integer> ignoring;
+    
     /**
      * Displays a print preview. All pages have 1 inch margins.
      *
@@ -65,12 +79,13 @@ public class PrintPreviewDialog extends JDialog implements Printable {
      * @param marginTop top margin, in 1/72 of an inch.
      * @param pageWidth the width of each page, in 1/72 of an inch.
      * @param pageHeight the height of each page, in 1/72 of an inch.
-     * @param flowchartImage the image to print preview of the flowchart
+     * @param flowchart the flowchart to print
      * @param marginBottom bottom margin, in 1/72 of an inch
      * @param job the printer job.
      * @param owner the flowchart window
+     * @param format the page format to use
      */
-    public PrintPreviewDialog(int marginLeft, int marginRight, int marginTop, int marginBottom, int pageWidth, int pageHeight, BufferedImage flowchartImage, PrinterJob job, JFrame owner) {
+    public PrintPreviewDialog(int marginLeft, int marginRight, int marginTop, int marginBottom, int pageWidth, int pageHeight, Flowchart flowchart, PrinterJob job, FlowchartWindow owner, PageFormat format) {
         super(owner);
         this.marginLeft = marginLeft;
         this.marginRight = marginRight;
@@ -78,44 +93,63 @@ public class PrintPreviewDialog extends JDialog implements Printable {
         this.marginBottom = marginBottom;
         this.pageWidth = pageWidth;
         this.pageHeight = pageHeight;
-        this.flowchartImage = flowchartImage;
+        this.flowchart = flowchart;
         this.job = job;
-        int pagesWide = ((flowchartImage.getWidth() / pageWidth) + 1);
-        int pagesHigh = ((flowchartImage.getHeight() / pageHeight) + 1);
-        split = new BufferedImage[pagesWide*pagesHigh];
-        for (int y=0; y<pagesHigh; y++) {
-            for (int x=0; x<pagesWide; x++) {
-                int width = pageWidth;
-                int height = pageHeight;
-                if (y == pagesHigh-1) {
-                    height = flowchartImage.getHeight() - (y*pageHeight);
-                }
-                if (x == pagesWide-1) {
-                    width = flowchartImage.getWidth() - (x*pageWidth);
-                }
-                split[(y*pagesWide)+x] = flowchartImage.getSubimage(
-                        x*pageWidth, y*pageHeight, width, height);
-            }
-        }
-        JComponent view = new JComponent() {
+        this.format = format;
+        window = owner;
+        view = new JComponent() {
             @Override
             public void paintComponent(Graphics g) {
                 drawPrintPreview(g, getWidth(), getHeight());
             }
         };
-        view.setPreferredSize(new Dimension(pageWidth+marginLeft+marginRight+50, pageHeight+marginTop+marginBottom+(pagesHigh*(pageHeight+marginLeft+marginBottom+25))));
         JScrollPane pane = new JScrollPane(view);
-        pane.setPreferredSize(new Dimension((int)view.getPreferredSize().width+80, 500));
+        pane.setPreferredSize(new Dimension(pageWidth + marginLeft + marginRight + 100, pageHeight + marginBottom + marginTop + 100));
         add(pane, BorderLayout.CENTER);
         JPanel panel = new JPanel(new FlowLayout());
         JButton print = new JButton("Print flowchart");
         print.addActionListener(new PrintButtonListener(this));
+        margins = new JCheckBox("Draw Margins");
+        margins.addActionListener(new RedrawViewListener());
+        pageCount = new JCheckBox("Draw page count");
+        pageCount.addActionListener(new RedrawViewListener());
+        ignore = new JTextField("Space separated list of pages to ignore");
         panel.add(print);
+        panel.add(margins);
+        panel.add(pageCount);
+        panel.add(ignore);
         add(panel, BorderLayout.NORTH);
         pack();
         setTitle("Print Preview");
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         setVisible(true);
+    }
+
+    /**
+     * Prepares the flowchart for being displayed and printed.
+     * @param imageDPI the DPI of the printed image.
+     */
+    private void preparePrintImages(float imageDPI) {
+        BufferedImage flowchartImage = flowchart.toImage(window, marginTop, imageDPI);
+        int pagesWide = (int)Math.ceil((double)flowchartImage.getWidth() / (double)pageWidth);
+        int pagesHigh = (int)Math.ceil((double)flowchartImage.getHeight() / (double)pageHeight);
+        split = new BufferedImage[pagesWide * pagesHigh];
+        //System.out.println("Page count: " + split.length + " (Pages wide: " + pagesWide + ", Pages high: " + pagesHigh + ")");
+        for (int y = 0; y < pagesHigh; y++) {
+            for (int x = 0; x < pagesWide; x++) {
+                int width = pageWidth;
+                int height = pageHeight;
+                if (y == pagesHigh - 1) {
+                    height = flowchartImage.getHeight() - (y * pageHeight);
+                }
+                if (x == pagesWide - 1) {
+                    width = flowchartImage.getWidth() - (x * pageWidth);
+                }
+                split[(y * pagesWide) + x] = flowchartImage.getSubimage(
+                        x * pageWidth, y * pageHeight, width, height);
+            }
+        }
+        view.setPreferredSize(new Dimension(pageWidth + marginLeft + marginRight + 50, split.length * (pageHeight + marginLeft + marginBottom + 25)));
     }
 
     /**
@@ -126,39 +160,57 @@ public class PrintPreviewDialog extends JDialog implements Printable {
      * @param height the component height
      */
     public void drawPrintPreview(Graphics g, int width, int height) {
-        Graphics2D g2d = (Graphics2D)g;
+        if (split == null) {
+            preparePrintImages(72);
+        }
+        Graphics2D g2d = (Graphics2D) g;
         g.setColor(new Color(153, 153, 255));
         g.fillRect(0, 0, width, height);
         int y = 0;
-        for (int i=0; i<split.length; i++) {
+        for (int i = 0; i < split.length; i++) {
             g.setColor(Color.WHITE);
-            g.fillRect(25, y+25, marginLeft+pageWidth+marginRight, marginTop+pageHeight+marginBottom);
+            g.fillRect(25, y + 25, marginLeft + pageWidth + marginRight, marginTop + pageHeight + marginBottom);
             g.setColor(Color.BLACK);
-            g.drawRect(25, y+25, marginLeft+pageWidth+marginRight, marginTop+pageHeight+marginBottom);
-            drawPage(g, 25, y+25, i);
-            g2d.setStroke(new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{ 12 }, 20));
-            g.drawRect(25+marginLeft, y+25+marginTop, pageWidth, pageHeight);
-            g2d.setStroke(new BasicStroke(1));
-            y += (50+pageHeight+marginTop+marginBottom);
+            g.drawRect(25, y + 25, marginLeft + pageWidth + marginRight, marginTop + pageHeight + marginBottom);
+            drawPage(g, 25, y + 25, i);
+            y += (50 + pageHeight + marginTop + marginBottom);
         }
     }
 
     /**
      * Draws a page with the given graphics
+     *
      * @param g the graphics context
      * @param x the page x loc
      * @param y the page y loc
      * @param pageCount which page it is
      */
     public void drawPage(Graphics g, int x, int y, int pageCount) {
-        g.drawImage(split[pageCount], x+marginLeft, y+marginTop, null);   
+        Graphics2D g2d = (Graphics2D)g;
+        g.drawImage(split[pageCount], x + marginLeft, y + marginTop, null);
+        if (margins.isSelected()) {
+            g2d.setStroke(new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{12}, 20));
+            g.drawRect(x + marginLeft, y + marginTop, pageWidth, pageHeight);
+            g2d.setStroke(new BasicStroke(1));
+        }
+        if (this.pageCount.isSelected()) {
+            g.setFont(new Font(Font.SERIF, Font.PLAIN, 12));
+            g.drawString("" + (pageCount+1), 
+                    x + marginLeft + 5,
+                    y + marginTop + g.getFontMetrics().getHeight() + 5);
+        }
     }
-    
+
     @Override
     public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
-        if (pageIndex<split.length) {
+        while (ignoring.contains(pageIndex) && pageIndex < split.length) {
+            pageIndex++;
+        }
+        if (pageIndex < split.length) {
+            Graphics2D g2d = (Graphics2D)graphics;
+            g2d.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_DISABLE);
             drawPage(graphics, 0,
-                     0, pageIndex);
+                    0, pageIndex);
             return PAGE_EXISTS;
         } else {
             return NO_SUCH_PAGE;
@@ -168,16 +220,33 @@ public class PrintPreviewDialog extends JDialog implements Printable {
     class PrintButtonListener implements ActionListener {
 
         private PrintPreviewDialog ppd;
-        
+
         public PrintButtonListener(PrintPreviewDialog ppd) {
             this.ppd = ppd;
         }
-        
+
         @Override
         public void actionPerformed(ActionEvent e) {
-            job.setPrintable(ppd);
             if (job.printDialog()) {
                 try {
+                    float dpi = 72;
+                    PrinterResolution[] resolutions = (PrinterResolution[])job.getPrintService().getSupportedAttributeValues(PrinterResolution.class, null, null);
+                    if (resolutions.length > 0) {
+                        dpi = resolutions[0].DPI*0.01f;
+                    }
+                    preparePrintImages(dpi);
+                    job.setPrintable(ppd);
+                    //Add pages to ignore
+                    ignoring = new ArrayList<>();
+                    String[] split = ignore.getText().split(Pattern.quote(" "));
+                    for (int i=0; i<split.length; i++) {
+                        try {
+                            int toIgnore = Integer.parseInt(split[i])-1;
+                            ignoring.add(toIgnore);
+                        } catch(NumberFormatException nfe) {
+                            //Just leave it
+                        }
+                    }
                     job.print();
                     dispose();
                 } catch (PrinterException pe) {
@@ -186,5 +255,12 @@ public class PrintPreviewDialog extends JDialog implements Printable {
             }
         }
 
+    }
+    
+    class RedrawViewListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            view.repaint();
+        }
     }
 }
