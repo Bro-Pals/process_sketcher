@@ -438,7 +438,8 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     (int)(instance.getHeight()-instance.getImageableY()-instance.getImageableHeight()),
                     (int)(instance.getImageableWidth()),
                     (int)(instance.getImageableHeight()),
-                    job
+                    job,
+                    instance
                 );
             }
         } else {

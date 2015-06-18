@@ -41,6 +41,7 @@ import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.awt.print.PageFormat;
 import java.awt.print.PrinterJob;
 import java.io.File;
 import java.io.IOException;
@@ -260,7 +261,7 @@ public class FlowchartWindow extends JFrame {
         Color selectionColor = Color.RED;
         for (Node n : flowchart.getNodes()) {
             n.getStyle().getShape().renderShape(n, camera, g,
-                    n == eventManager.getSelectionManager().getLastSelected() && eventManager.getTextTypeManager().isCursorShowing(),
+                    showSelection && (n == eventManager.getSelectionManager().getLastSelected() && eventManager.getTextTypeManager().isCursorShowing()),
                     eventManager.getTextTypeManager().getLocationOfTypeCursor(), view.getBackground());
             if (eventManager.isSelected(n) && showSelection) {
                 // draw the box around the node if it's being selected
@@ -1730,7 +1731,7 @@ public class FlowchartWindow extends JFrame {
         int response = fc.showSaveDialog(this);
         if (response == JFileChooser.APPROVE_OPTION) {
             try {
-                BufferedImage image = flowchart.toImage(this, 10);
+                BufferedImage image = flowchart.toImage(this, 10, 72);
                 OutputStream os = Files.newOutputStream(fc.getSelectedFile().toPath());
                 boolean status = ImageIO.write(image, "png", os);
                 if (!status) {
@@ -1757,9 +1758,10 @@ public class FlowchartWindow extends JFrame {
     * @param width the page width
     * @param height the page height
     * @param job the printer job.
+    * @param format the page format to use.
     */
-    public void showPrintPreview(int marginLeft, int marginRight, int marginTop, int marginBottom, int width, int height, PrinterJob job) {
-        PrintPreviewDialog ppd = new PrintPreviewDialog(marginLeft, marginRight, marginTop, marginBottom, width, height, flowchart.toImage(this, 0), job, this);
+    public void showPrintPreview(int marginLeft, int marginRight, int marginTop, int marginBottom, int width, int height, PrinterJob job, PageFormat format) {
+        PrintPreviewDialog ppd = new PrintPreviewDialog(marginLeft, marginRight, marginTop, marginBottom, width, height, flowchart, job, this, format);
         ppd.setIconImage(ProcessSketcher.mainIconSmaller);
     }
 }
