@@ -20,35 +20,22 @@
 package bropals.processsketcher.listeners;
 
 import bropals.processsketcher.FlowchartWindow;
-import bropals.processsketcher.action.AutoFormatted;
-import bropals.processsketcher.data.Node;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 /**
  *
  * @author Jonathon
  */
-public class AutoformatHorizontallyListener extends AbstractProcessSketcherListener implements ActionListener {
+public class AutoformatListener extends AbstractProcessSketcherListener implements ActionListener {
 
-    public AutoformatHorizontallyListener(FlowchartWindow window) {
+    public AutoformatListener(FlowchartWindow window) {
         super(window);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        ArrayList<Node> nodesChanged = new ArrayList<>();
-        nodesChanged.addAll(getFlowchartWindow().getFlowchart().getNodes());
-        
-        ArrayList<Point> positions = new ArrayList<>();
-        for (int i=0; i<nodesChanged.size(); i++) {
-            positions.add(new Point((int)nodesChanged.get(i).getX(), (int)nodesChanged.get(i).getY()));
-        }
-        getFlowchartWindow().getEventManager().getHistoryManager().addToHistory(new AutoFormatted(nodesChanged, positions));
-        
-        getFlowchartWindow().autoformatHorizontally();
+        getFlowchartWindow().getEventManager().showAutoFormatDialogBox();
     }
     
 }

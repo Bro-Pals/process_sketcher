@@ -40,8 +40,11 @@ import bropals.processsketcher.data.Selectable;
 import bropals.processsketcher.style.NodeStyle;
 import bropals.processsketcher.style.Shape;
 import bropals.processsketcher.util.BooleanBlinkListener;
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -50,7 +53,16 @@ import java.awt.event.MouseMotionListener;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterJob;
 import java.util.ArrayList;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
 
 /**
  * Gets events from the view and StyleManager and handles them.
@@ -514,9 +526,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         window.getCamera().setCanvasLocationY(
                 window.getCamera().getCanvasLocationY() +
                         (translateY));
-        
-        System.out.println("New zoom: " + window.getCamera().getZoom());
-        
+                
         window.redrawView();
     }
     
@@ -543,6 +553,103 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         
         // redraw the view
         window.redrawView();
+    }
+    
+    public void showAutoFormatDialogBox() {
+        // make sure to get rid of the J button calling this method
+        final JDialog dialog = new JDialog(window, "Autoformat Flowchart");
+        dialog.setLocationRelativeTo(window);
+        dialog.setSize(400, 300);
+        dialog.setResizable(true);
+        
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
+        topPanel.setAlignmentX(JPanel.CENTER_ALIGNMENT);
+        dialog.add(topPanel);
+        
+        JLabel buttonsLabel = new JLabel("Choose Orientation");
+        topPanel.add(buttonsLabel);
+        
+        final JRadioButton horizontalButton = new JRadioButton("Horizontal");
+        final JRadioButton verticalButton = new JRadioButton("Vertical");
+        ButtonGroup group = new ButtonGroup();
+        group.add(horizontalButton);
+        group.add(verticalButton);
+        topPanel.add(horizontalButton);
+        topPanel.add(verticalButton);
+        horizontalButton.setSelected(true); // initial value
+        
+        JPanel lowerPanel = new JPanel();
+        lowerPanel.setPreferredSize(new Dimension(200, 300));
+        lowerPanel.setLayout(new BoxLayout(lowerPanel, BoxLayout.Y_AXIS));
+        lowerPanel.setAlignmentX(JPanel.CENTER_ALIGNMENT);
+        dialog.add(lowerPanel, BorderLayout.EAST);
+        
+        JLabel paddingXLabel = new JLabel("Horizontal Offset");
+        paddingXLabel.setSize(200, 50);
+        lowerPanel.add(paddingXLabel);
+        final JSpinner paddingXSpinner = new JSpinner();
+        paddingXSpinner.setValue(100);
+        paddingXSpinner.setSize(100, 30);
+        paddingXSpinner.setMaximumSize(new Dimension(120, 50));
+        lowerPanel.add(paddingXSpinner);
+        
+        JLabel paddingYLabel = new JLabel("Vertical Offset");
+        paddingYLabel.setSize(200, 50);
+        lowerPanel.add(paddingYLabel);
+        final JSpinner paddingYSpinner = new JSpinner();
+        paddingYSpinner.setValue(100);
+        paddingYSpinner.setSize(100, 30);
+        paddingYSpinner.setMaximumSize(new Dimension(120, 50));
+        lowerPanel.add(paddingYSpinner);
+        
+        JPanel bottomLabel = new JPanel();
+        dialog.add(bottomLabel, BorderLayout.SOUTH);
+        
+        JButton cancelButton = new JButton("Cancel");
+        cancelButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // close the dialog box without doing anything
+                dialog.dispose();
+            }
+            
+        });
+        
+        bottomLabel.add(cancelButton);
+        
+        JButton okButton = new JButton("OK");
+        okButton.setSize(100, 60);
+        okButton.addActionListener(new ActionListener(){
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // track formatting to the history
+                ArrayList<Node> nodesChanged = new ArrayList<>();
+                nodesChanged.addAll(window.getFlowchart().getNodes());
+                ArrayList<Point> positions = new ArrayList<>();
+                for (int i=0; i<nodesChanged.size(); i++) {
+                    positions.add(new Point((int)nodesChanged.get(i).getX(), (int)nodesChanged.get(i).getY()));
+                }
+                getHistoryManager().addToHistory(new AutoFormatted(nodesChanged, positions));
+                
+                // format based on the options
+                if (horizontalButton.isSelected()) {
+                    window.autoformatHorizontally((int)paddingXSpinner.getValue(), (int)paddingYSpinner.getValue());
+                } else {
+                    window.autoformatVertically((int)paddingXSpinner.getValue(), (int)paddingYSpinner.getValue());
+                }
+                // remove dialog
+                dialog.dispose();
+            }
+            
+        });
+        bottomLabel.add(okButton);
+        
+        dialog.setVisible(true);
+        dialog.revalidate();
+        
     }
     
     @Override
@@ -668,7 +775,6 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                     }
                     textTypeManager.incrementLocationOfTypeCursor();
                 }
-                System.out.println("Old Text: " + oldText + " Line part: " + textTypeManager.getLinePartTyping());
                 if ((int)e.getKeyChar() != KeyEvent.VK_ENTER) {
                     historyManager.addToHistory(new EditedNodeLineText(editLine, oldText, textTypeManager.getLinePartTyping()));
                 }

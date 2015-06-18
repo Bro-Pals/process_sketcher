@@ -161,8 +161,7 @@ public class FlowchartWindow extends JFrame {
     private JButton closeFlowchart;
     private JButton printFlowchart;
     private JButton exportChartToImage;
-    private JButton autoformatHorizontally;
-    private JButton autoformatVertically;
+    private JButton autoformat;
     
     /**
      * Creates a new FlowchartWindow with an empty flowchart.
@@ -420,8 +419,7 @@ public class FlowchartWindow extends JFrame {
         createShape = new JButton(getIcon("createShapeIcon.png"));
         selectNextNode = new JButton(getIcon("selectNextNodeIcon.png"));
         selectPreviousNode = new JButton(getIcon("selectPreviousNodeIcon.png"));
-        autoformatHorizontally = new JButton(getIcon("autoformatHorizontallyIcon.png"));
-        autoformatVertically = new JButton(getIcon("autoformatVerticallyIcon.png"));
+        autoformat = new JButton(getIcon("autoformatIcon.png"));
 
         editTab.add(copy);
         editTab.add(cut);
@@ -430,8 +428,7 @@ public class FlowchartWindow extends JFrame {
         editTab.add(createShape);
         editTab.add(selectNextNode);
         editTab.add(selectPreviousNode);
-        editTab.add(autoformatHorizontally);
-        editTab.add(autoformatVertically);
+        editTab.add(autoformat);
 
         copy.addActionListener(new CopyListener(this));
         cut.addActionListener(new CutListener(this));
@@ -440,8 +437,7 @@ public class FlowchartWindow extends JFrame {
         createShape.addActionListener(new CreateShapeListener(this));
         selectNextNode.addActionListener(new SelectNextNodeListener(this));
         selectPreviousNode.addActionListener(new SelectPreviousNodeListener(this));
-        autoformatHorizontally.addActionListener(new AutoformatHorizontallyListener(this));
-        autoformatVertically.addActionListener(new AutoformatVerticallyListener(this));
+        autoformat.addActionListener(new AutoformatListener(this));
 
         copy.setToolTipText("Copies the selection to the clipboard (Ctrl+C)");
         cut.setToolTipText("Cuts the selection to the clipboard (Ctrl+X)");
@@ -450,8 +446,7 @@ public class FlowchartWindow extends JFrame {
         createShape.setToolTipText("Create a new node (Ctrl+H)");
         selectNextNode.setToolTipText("Select the next node in this processv (Tab)");
         selectPreviousNode.setToolTipText("Select the previous node in this process (Shift+Tab)");
-        autoformatHorizontally.setToolTipText("Formats the flowchart horizontally");
-        autoformatVertically.setToolTipText("Formats the flowchart vertically");
+        autoformat.setToolTipText("Formats the flowchart");
 
         buttonPanel.addTab("Edit", wrapInScrollPane(editTab));
 
@@ -1523,8 +1518,16 @@ public class FlowchartWindow extends JFrame {
 
     /**
      * Automatically sorts the flowchart in this window vertically.
+     * @param paddingX The horizontal offset for formatting. It should be a positive number.
+     * @param paddingY The vertical offset for formatting. It should be a positive number.
      */
-    public void autoformatVertically() {
+    public void autoformatVertically(int paddingX, int paddingY) {
+        if (paddingX < 0) {
+            paddingX = 1;
+        }
+        if (paddingY < 0) {
+            paddingY = 1;
+        }
         Node rootNode = getRootNode();
         ArrayList<Node> sorted = new ArrayList<>();
         // move the root node to the orgin
@@ -1534,7 +1537,7 @@ public class FlowchartWindow extends JFrame {
             rootNode.setY(0);
             positionNodesVertically(rootNode, 
                     rootNode.getChildNodes(), 
-                    sorted, 50, 150); 
+                    sorted, paddingX, paddingY); 
         }
         redrawView();
     }
@@ -1598,8 +1601,16 @@ public class FlowchartWindow extends JFrame {
     
     /**
      * Automatically sorts the flowchart in this window horizontally.
+     * @param paddingX The horizontal offset for formatting. It should be a positive number.
+     * @param paddingY The vertical offset for formatting. It should be a positive number.
      */
-    public void autoformatHorizontally() {
+    public void autoformatHorizontally(int paddingX, int paddingY) {
+        if (paddingX < 0) {
+            paddingX = 1;
+        }
+        if (paddingY < 0) {
+            paddingY = 1;
+        }
         Node rootNode = getRootNode();
         ArrayList<Node> sorted = new ArrayList<>();
          // move the root node to the orgin
@@ -1609,7 +1620,7 @@ public class FlowchartWindow extends JFrame {
             rootNode.setY(0);
             positionNodesHorizontally(rootNode, 
                     rootNode.getChildNodes(), 
-                    sorted, 50, 150);
+                    sorted, paddingY, paddingX);
         }
         redrawView();
     }
