@@ -846,6 +846,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 if (e.isControlDown()) {
                     window.exportToImage();
                 }
+                break;
             case KeyEvent.VK_F:
                 if (e.isControlDown()) {
                     fitFlowchartToView();
@@ -855,14 +856,17 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
                 if (e.isControlDown()) {
                     resetView();
                 }
+                break;
             case KeyEvent.VK_H:
                 if (e.isControlDown()) {
                     createNode();
                 }
+                break;
             case KeyEvent.VK_Q:
                 if (e.isControlDown()) {
                     window.closeWindow();
                 }
+                break;
             case KeyEvent.VK_LEFT:
                 textTypeManager.decrementLocationOfTypeCursor();
                 window.redrawView();
