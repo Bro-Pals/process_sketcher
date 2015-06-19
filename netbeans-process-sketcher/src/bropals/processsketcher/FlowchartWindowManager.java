@@ -19,7 +19,8 @@
  */
 package bropals.processsketcher;
 
-import bropals.processsketcher.data.Flowchart;
+import bropals.processsketcher.icons.IconManager;
+import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,7 +34,9 @@ import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 /**
  * Keeps track of and manages all open FlowchartWindows.
@@ -67,15 +70,18 @@ public class FlowchartWindowManager implements WindowListener {
         fc = new JFileChooser();
         welcomeWindow = new JFrame("Welcome to Process Sketcher");
         welcomeWindow.setIconImage(ProcessSketcher.mainIconSmaller);
-        welcomeWindow.setLayout(new FlowLayout());
+        welcomeWindow.setLayout(new BorderLayout());
         welcomeWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        JButton newFlowchart = new JButton("New Flowchart");
-        welcomeWindow.add(newFlowchart);
+        JButton newFlowchart = new JButton(IconManager.getIcon("newFlowchartIcon.png"));
         newFlowchart.addActionListener(new NewFlowchartListener());
-        JButton openFlowchart = new JButton("Open Flowchart");
-        welcomeWindow.add(openFlowchart);
+        JButton openFlowchart = new JButton(IconManager.getIcon("openFlowchartIcon.png"));
+        JPanel formatter = new JPanel(new FlowLayout());
+        formatter.add(newFlowchart);
+        formatter.add(openFlowchart);
+        welcomeWindow.add(formatter, BorderLayout.SOUTH);
+        welcomeWindow.add(new JLabel(IconManager.getIcon("welcomeIcon.png")), BorderLayout.CENTER);
         openFlowchart.addActionListener(new OpenFlowchartListener());
-        welcomeWindow.setSize(400, 300);
+        welcomeWindow.pack();
         welcomeWindow.setLocationRelativeTo(null);
         welcomeWindow.setVisible(true);
     }

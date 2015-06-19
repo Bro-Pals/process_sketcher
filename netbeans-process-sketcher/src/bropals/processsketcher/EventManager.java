@@ -560,7 +560,6 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         // make sure to get rid of the J button calling this method
         final JDialog dialog = new JDialog(window, "Autoformat Flowchart");
         dialog.setLocationRelativeTo(window);
-        dialog.setSize(400, 300);
         dialog.setResizable(true);
         
         JPanel topPanel = new JPanel();
@@ -647,7 +646,7 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
             
         });
         bottomLabel.add(okButton);
-        
+        dialog.pack();
         dialog.setVisible(true);
         dialog.revalidate();
         

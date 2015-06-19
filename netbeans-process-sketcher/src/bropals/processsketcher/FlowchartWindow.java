@@ -445,7 +445,7 @@ public class FlowchartWindow extends JFrame {
         paste.setToolTipText("Pastes the clipboard's contents (Ctrl+V)");
         undo.setToolTipText("Undo the last action taken (Ctrl+Z)");
         createShape.setToolTipText("Create a new node (Ctrl+H)");
-        selectNextNode.setToolTipText("Select the next node in this processv (Tab)");
+        selectNextNode.setToolTipText("Select the next node in this process (Tab)");
         selectPreviousNode.setToolTipText("Select the previous node in this process (Shift+Tab)");
         autoformat.setToolTipText("Formats the flowchart");
 
