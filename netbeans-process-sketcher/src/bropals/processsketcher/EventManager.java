@@ -556,6 +556,9 @@ public class EventManager implements KeyListener, MouseListener, MouseMotionList
         window.redrawView();
     }
     
+    /**
+     * Show the dialog box for autoformatting
+     */
     public void showAutoFormatDialogBox() {
         // make sure to get rid of the J button calling this method
         final JDialog dialog = new JDialog(window, "Autoformat Flowchart");

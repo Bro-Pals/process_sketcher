@@ -70,6 +70,7 @@ public class PrintPreviewDialog extends JDialog implements Printable {
     private JCheckBox pageCount;
     private JTextField ignore;
     private ArrayList<Integer> ignoring;
+    private boolean fitToPage;
     
     /**
      * Displays a print preview. All pages have 1 inch margins.
@@ -96,6 +97,7 @@ public class PrintPreviewDialog extends JDialog implements Printable {
         this.flowchart = flowchart;
         this.job = job;
         this.format = format;
+        this.fitToPage = true; // add contructor for it later
         window = owner;
         view = new JComponent() {
             @Override
@@ -131,8 +133,39 @@ public class PrintPreviewDialog extends JDialog implements Printable {
      */
     private void preparePrintImages() {
         BufferedImage flowchartImage = flowchart.toImage(window, marginTop);
-        int pagesWide = (int)Math.ceil((double)flowchartImage.getWidth() / (double)pageWidth);
-        int pagesHigh = (int)Math.ceil((double)flowchartImage.getHeight() / (double)pageHeight);
+        int pagesWide = 1;
+        int pagesHigh = 1;
+        if (fitToPage) {
+            BufferedImage scaledImage = null;
+            // scale the image to fit the page
+            float scaleRatio = 1.0f;
+            // if the page is landscape
+            //if (pageWidth > pageHeight) {
+                // if the image height is larger, scale according to the height
+                if (flowchartImage.getHeight() >= flowchartImage.getWidth()) {
+                    scaleRatio = (float)pageHeight / (float)flowchartImage.getHeight();
+                } else {
+                    // if the width is larger, scale according to the width
+                    scaleRatio = (float)pageWidth / (float)flowchartImage.getWidth();
+                }
+            /*} else { // if the page is portrait
+                // if the image height is smaller, scale according to the width
+                if (flowchartImage.getHeight() <= flowchartImage.getWidth()) {
+                    scaleRatio = (float)pageHeight / (float)flowchartImage.getHeight();
+                } else {
+                    // if the width is smaller, scale according to the width
+                    scaleRatio = (float)pageWidth / (float)flowchartImage.getWidth();
+                }
+            }*/
+            scaledImage = new BufferedImage((int)(scaleRatio * flowchartImage.getWidth()), 
+                    (int)(scaleRatio * flowchartImage.getHeight()), BufferedImage.OPAQUE);
+            scaledImage.getGraphics().drawImage(flowchartImage, 0, 0, 
+                    scaledImage.getWidth(), scaledImage.getHeight(), null);
+            flowchartImage = scaledImage;
+        } else {
+            pagesWide = (int)Math.ceil((double)flowchartImage.getWidth() / (double)pageWidth);
+            pagesHigh = (int)Math.ceil((double)flowchartImage.getHeight() / (double)pageHeight);
+        }
         split = new BufferedImage[pagesWide * pagesHigh];
         //System.out.println("Page count: " + split.length + " (Pages wide: " + pagesWide + ", Pages high: " + pagesHigh + ")");
         for (int y = 0; y < pagesHigh; y++) {
