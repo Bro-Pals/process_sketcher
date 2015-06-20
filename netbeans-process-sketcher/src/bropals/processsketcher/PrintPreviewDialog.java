@@ -68,9 +68,9 @@ public class PrintPreviewDialog extends JDialog implements Printable {
     private PageFormat format;
     private JCheckBox margins;
     private JCheckBox pageCount;
+    private JCheckBox fitToPage;
     private JTextField ignore;
     private ArrayList<Integer> ignoring;
-    private boolean fitToPage;
     
     /**
      * Displays a print preview. All pages have 1 inch margins.
@@ -97,7 +97,6 @@ public class PrintPreviewDialog extends JDialog implements Printable {
         this.flowchart = flowchart;
         this.job = job;
         this.format = format;
-        this.fitToPage = true; // add contructor for it later
         window = owner;
         view = new JComponent() {
             @Override
@@ -115,10 +114,14 @@ public class PrintPreviewDialog extends JDialog implements Printable {
         margins.addActionListener(new RedrawViewListener());
         pageCount = new JCheckBox("Draw page count");
         pageCount.addActionListener(new RedrawViewListener());
+        fitToPage = new JCheckBox("Fit to page");
+        fitToPage.addActionListener(new RedrawViewListener());
+        fitToPage.setSelected(true);
         ignore = new JTextField("Space separated list of pages to ignore");
         panel.add(print);
         panel.add(margins);
         panel.add(pageCount);
+        panel.add(fitToPage);
         panel.add(ignore);
         add(panel, BorderLayout.NORTH);
         pack();
@@ -135,7 +138,7 @@ public class PrintPreviewDialog extends JDialog implements Printable {
         BufferedImage flowchartImage = flowchart.toImage(window, marginTop);
         int pagesWide = 1;
         int pagesHigh = 1;
-        if (fitToPage) {
+        if (fitToPage.isSelected()) {
             BufferedImage scaledImage = null;
             // scale the image to fit the page
             float scaleRatio = 1.0f;
@@ -193,9 +196,9 @@ public class PrintPreviewDialog extends JDialog implements Printable {
      * @param height the component height
      */
     public void drawPrintPreview(Graphics g, int width, int height) {
-        if (split == null) {
+//        if (!fitToPage.isSelected() && split == null) {
             preparePrintImages();
-        }
+//        }
         Graphics2D g2d = (Graphics2D) g;
         g.setColor(new Color(153, 153, 255));
         g.fillRect(0, 0, width, height);
@@ -290,6 +293,7 @@ public class PrintPreviewDialog extends JDialog implements Printable {
     class RedrawViewListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
+            System.out.println("Redraw");
             view.repaint();
         }
     }
