@@ -31,8 +31,17 @@ public class TextTypeManager {
      * in the order 0 -> 1 -> 2 -> 0 ...
      */
     private int linePartTyping;
+    /**
+     * A constant for the tail of a node line.
+     */
     public static final int TAIL = 1;
+    /**
+     * A constant for the center of a node line.
+     */
     public static final int CENTER = 0;
+    /**
+     * A constant for the head of a node line.
+     */
     public static final int HEAD = 2;
     
     /**

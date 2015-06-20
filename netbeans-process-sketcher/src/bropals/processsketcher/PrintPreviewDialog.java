@@ -143,23 +143,13 @@ public class PrintPreviewDialog extends JDialog implements Printable {
             // scale the image to fit the page
             float scaleRatio = 1.0f;
             // if the page is landscape
-            //if (pageWidth > pageHeight) {
                 // if the image height is larger, scale according to the height
-                if (flowchartImage.getHeight() >= flowchartImage.getWidth()) {
-                    scaleRatio = (float)pageHeight / (float)flowchartImage.getHeight();
-                } else {
-                    // if the width is larger, scale according to the width
-                    scaleRatio = (float)pageWidth / (float)flowchartImage.getWidth();
-                }
-            /*} else { // if the page is portrait
-                // if the image height is smaller, scale according to the width
-                if (flowchartImage.getHeight() <= flowchartImage.getWidth()) {
-                    scaleRatio = (float)pageHeight / (float)flowchartImage.getHeight();
-                } else {
-                    // if the width is smaller, scale according to the width
-                    scaleRatio = (float)pageWidth / (float)flowchartImage.getWidth();
-                }
-            }*/
+            if (flowchartImage.getHeight() >= flowchartImage.getWidth()) {
+                scaleRatio = (float)pageHeight / (float)flowchartImage.getHeight();
+            } else {
+                // if the width is larger, scale according to the width
+                scaleRatio = (float)pageWidth / (float)flowchartImage.getWidth();
+            }
             scaledImage = new BufferedImage((int)(scaleRatio * flowchartImage.getWidth()), 
                     (int)(scaleRatio * flowchartImage.getHeight()), BufferedImage.OPAQUE);
             scaledImage.getGraphics().drawImage(flowchartImage, 0, 0, 
@@ -196,9 +186,7 @@ public class PrintPreviewDialog extends JDialog implements Printable {
      * @param height the component height
      */
     public void drawPrintPreview(Graphics g, int width, int height) {
-//        if (!fitToPage.isSelected() && split == null) {
-            preparePrintImages();
-//        }
+        preparePrintImages();
         Graphics2D g2d = (Graphics2D) g;
         g.setColor(new Color(153, 153, 255));
         g.fillRect(0, 0, width, height);
