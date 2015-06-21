@@ -160,7 +160,7 @@ public class PrintPreviewDialog extends JDialog implements Printable {
             pagesHigh = (int)Math.ceil((double)flowchartImage.getHeight() / (double)pageHeight);
         }
         split = new BufferedImage[pagesWide * pagesHigh];
-        //System.out.println("Page count: " + split.length + " (Pages wide: " + pagesWide + ", Pages high: " + pagesHigh + ")");
+        ////System.out.println("Page count: " + split.length + " (Pages wide: " + pagesWide + ", Pages high: " + pagesHigh + ")");
         for (int y = 0; y < pagesHigh; y++) {
             for (int x = 0; x < pagesWide; x++) {
                 int width = pageWidth;
@@ -281,7 +281,7 @@ public class PrintPreviewDialog extends JDialog implements Printable {
     class RedrawViewListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            System.out.println("Redraw");
+            //System.out.println("Redraw");
             view.repaint();
         }
     }

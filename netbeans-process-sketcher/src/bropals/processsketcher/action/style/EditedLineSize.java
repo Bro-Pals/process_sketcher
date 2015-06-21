@@ -39,7 +39,7 @@ public class EditedLineSize extends EditedStyle {
 
     @Override
     public void undo(FlowchartWindow instance) {
-        System.out.println("Undo editing line size");
+        //System.out.println("Undo editing line size");
         ArrayList<NodeLine> lines = getEditedNodeLines();
         for (int i=0; i<lines.size(); i++) {
             lines.get(i).getStyle().setLineSize(sizes.get(i));

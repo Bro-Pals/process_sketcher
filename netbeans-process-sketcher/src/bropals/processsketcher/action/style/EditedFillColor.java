@@ -40,7 +40,7 @@ public class EditedFillColor extends EditedStyle {
 
     @Override
     public void undo(FlowchartWindow instance) {
-        System.out.println("Undo edited fill color");
+        //System.out.println("Undo edited fill color");
         ArrayList<Node> nodes = getEditedNodes();
         for (int i=0; i<nodes.size(); i++) {
             nodes.get(i).getStyle().setFillColor(colors.get(i));

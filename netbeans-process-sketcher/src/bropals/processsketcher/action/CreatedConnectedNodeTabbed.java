@@ -44,7 +44,7 @@ public class CreatedConnectedNodeTabbed extends Action {
     
     @Override
     public void undo(FlowchartWindow instance) {
-        System.out.println("Undo creating a connected node with tab");
+        //System.out.println("Undo creating a connected node with tab");
         Node parent = line.getParent();
         Node child = line.getChild();
         parent.getLinesConnected().remove(line);

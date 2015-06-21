@@ -40,7 +40,7 @@ public class Deleted extends Action {
     
     @Override
     public void undo(FlowchartWindow instance) {
-        System.out.println("Undo deletion");
+        //System.out.println("Undo deletion");
         
         ArrayList<Node> addedNodes = new ArrayList<>();
         ArrayList<NodeLine> addedLines = new ArrayList<>();

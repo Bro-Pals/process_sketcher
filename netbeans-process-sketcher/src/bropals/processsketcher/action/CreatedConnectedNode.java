@@ -41,7 +41,7 @@ public class CreatedConnectedNode extends Action {
     
     @Override
     public void undo(FlowchartWindow instance) {
-        System.out.println("Undo created a node with a connection on it");
+        //System.out.println("Undo created a node with a connection on it");
         Node parent = line.getParent();
         Node child = line.getChild();
         parent.getLinesConnected().remove(line);

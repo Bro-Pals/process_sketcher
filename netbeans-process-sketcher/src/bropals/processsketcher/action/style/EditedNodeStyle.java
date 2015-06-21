@@ -40,7 +40,7 @@ public class EditedNodeStyle extends EditedStyle {
     
     @Override
     public void undo(FlowchartWindow instance) {
-        System.out.println("Undo setting the node style");
+        //System.out.println("Undo setting the node style");
         for (int i=0; i<styles.size(); i++) {
             getEditedNodes().get(i).setStyle(styles.get(i));
         }

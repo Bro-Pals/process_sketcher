@@ -38,7 +38,7 @@ public class Pasted extends Action {
     
     @Override
     public void undo(FlowchartWindow instance) {
-        System.out.println("Undo pasted action");
+        //System.out.println("Undo pasted action");
         instance.getEventManager().getSelectionManager().removeSelectables(pasted);
     }
     

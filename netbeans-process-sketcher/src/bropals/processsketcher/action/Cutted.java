@@ -43,7 +43,7 @@ public class Cutted extends Action {
     
     @Override
     public void undo(FlowchartWindow instance) {
-        System.out.println("Undo the cut action");
+        //System.out.println("Undo the cut action");
         // reset the clipboard back to where it was
         instance.getEventManager().getDragManager().setStuffInClipboard(clipboard);
         

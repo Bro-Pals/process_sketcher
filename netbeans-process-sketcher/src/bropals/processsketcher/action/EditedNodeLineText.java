@@ -40,7 +40,7 @@ public class EditedNodeLineText extends EditedText {
     
     @Override
     public void undo(FlowchartWindow instance) {
-        System.out.println("Undo changing text on a NodeLine");
+        //System.out.println("Undo changing text on a NodeLine");
         switch(partOfLine) {
             case TextTypeManager.CENTER:
                 line.setCenterText(getOldText());

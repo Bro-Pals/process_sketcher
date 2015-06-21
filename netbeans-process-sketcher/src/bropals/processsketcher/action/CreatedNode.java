@@ -37,7 +37,7 @@ public class CreatedNode extends Action {
     
     @Override
     public void undo(FlowchartWindow instance) {
-        System.out.println("Undo adding a new node");
+        //System.out.println("Undo adding a new node");
         instance.getFlowchart().getNodes().remove(node);
     }
     
