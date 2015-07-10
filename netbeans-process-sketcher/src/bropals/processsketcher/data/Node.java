@@ -287,7 +287,7 @@ public class Node implements Selectable, BinaryData {
             linkedStyle = BinaryUtil.bytesToString(arr, pos+18+BinaryUtil.bytesForString(innerText));
             style.setTo(window.getStyleManager().getNodeStyle(linkedStyle));
         } else {
-            style.fromBinary(arr, pos + 16 + BinaryUtil.bytesForString(innerText), window);
+            style.fromBinary(arr, pos + 18 + BinaryUtil.bytesForString(innerText), window);
         }
     }
     

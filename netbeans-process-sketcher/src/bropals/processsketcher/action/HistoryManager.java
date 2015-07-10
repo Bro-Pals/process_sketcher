@@ -100,18 +100,18 @@ public class HistoryManager {
                     (a instanceof EditedNodeLineText && 
                     lastAction instanceof EditedNodeLineText &&
                     (((EditedNodeLineText)lastAction).getPartOfLine() == ((EditedNodeLineText)a).getPartOfLine()) ) ) {
-                System.out.println("Not adding a duplicate action with text editing");
+                //System.out.println("Not adding a duplicate action with text editing");
                 if (a instanceof EditedNodeLineText) {
-                    System.out.println(((EditedNodeLineText)lastAction).getPartOfLine() + " == " + ((EditedNodeLineText)a).getPartOfLine());
+                    //System.out.println(((EditedNodeLineText)lastAction).getPartOfLine() + " == " + ((EditedNodeLineText)a).getPartOfLine());
                 }
                 
             } else {
                 // if the top of the history stack is not the same kind of action, add the new action to the stack
                 //((EditedText)a).setOldText(((EditedText)lastAction).getOldText());
-                System.out.println("Different part: different action");
+                //System.out.println("Different part: different action");
                 actions.add(a);
             }
-            System.out.println("Last action's old text: " + ((EditedText)getLastAction()).getOldText());
+            //System.out.println("Last action's old text: " + ((EditedText)getLastAction()).getOldText());
         } else {
             actions.add(a);
         }

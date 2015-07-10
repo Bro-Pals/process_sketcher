@@ -41,7 +41,7 @@ public class ConnectedNodes extends Action {
     
     @Override
     public void undo(FlowchartWindow instance) {
-        System.out.println("Undid connecting two lines together");
+        //System.out.println("Undid connecting two lines together");
         Node parent = line.getParent();
         Node child = line.getChild();
         parent.getLinesConnected().remove(line);

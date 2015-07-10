@@ -40,7 +40,7 @@ public class AutoFormatted extends Action {
     
     @Override
     public void undo(FlowchartWindow instance) {
-        System.out.println("Undo autoformatting");
+        //System.out.println("Undo autoformatting");
         for (int i=0; i<nodes.size(); i++) {
             nodes.get(i).setX((float)positions.get(i).getX());
             nodes.get(i).setY((float)positions.get(i).getY());

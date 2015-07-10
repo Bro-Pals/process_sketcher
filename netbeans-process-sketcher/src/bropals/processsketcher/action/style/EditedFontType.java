@@ -39,7 +39,7 @@ public class EditedFontType extends EditedStyle {
 
     @Override
     public void undo(FlowchartWindow instance) {
-        System.out.println("Undo editing font type");
+        //System.out.println("Undo editing font type");
         ArrayList<Selectable> things = getSelectables();
         for (int i=0; i<things.size(); i++) {
             things.get(i).getFontStyle().setFontType(fonts.get(i));

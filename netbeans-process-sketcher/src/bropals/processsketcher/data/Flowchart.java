@@ -124,14 +124,14 @@ public class Flowchart implements BinaryData {
         size += nodeLineSize;
         size += nodeStyleSize;
         size += lineStyleSize;
-        System.out.println("Flowchart file byte breakdown");
-        System.out.println("\tHeader: 16 bytes");
-        System.out.println("\tNodes: " + nodeSize + " bytes");
-        System.out.println("\tNode Lines: " + nodeLineSize + " bytes");
-        System.out.println("\tNode Styles: " + nodeStyleSize + " bytes");
-        System.out.println("\tLine Styles: " + lineStyleSize + " bytes");
-        System.out.println("\tTotal: " + size + " bytes");
-        System.out.println();
+        //System.out.println("Flowchart file byte breakdown");
+        //System.out.println("\tHeader: 16 bytes");
+        //System.out.println("\tNodes: " + nodeSize + " bytes");
+        //System.out.println("\tNode Lines: " + nodeLineSize + " bytes");
+        //System.out.println("\tNode Styles: " + nodeStyleSize + " bytes");
+        //System.out.println("\tLine Styles: " + lineStyleSize + " bytes");
+        //System.out.println("\tTotal: " + size + " bytes");
+        //System.out.println();
         return size;
     }
 

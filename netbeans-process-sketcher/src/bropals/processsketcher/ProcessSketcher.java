@@ -45,7 +45,7 @@ public class ProcessSketcher {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch(Exception e) {
-            System.out.println("Could not apply system look and feel: " + e);
+            //System.out.println("Could not apply system look and feel: " + e);
         }
         
         BufferedImage image = null;

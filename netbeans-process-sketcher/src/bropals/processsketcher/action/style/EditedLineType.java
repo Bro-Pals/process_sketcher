@@ -40,7 +40,7 @@ public class EditedLineType extends EditedStyle {
 
     @Override
     public void undo(FlowchartWindow instance) {
-        System.out.println("Undo line type edited");
+        //System.out.println("Undo line type edited");
         ArrayList<NodeLine> lines = getEditedNodeLines();
         for (int i=0; i<lines.size(); i++) {
             lines.get(i).getStyle().setType(types.get(i));

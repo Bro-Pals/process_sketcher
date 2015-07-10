@@ -40,7 +40,7 @@ public class EditedShape extends EditedStyle {
 
     @Override
     public void undo(FlowchartWindow instance) {
-        System.out.println("Undo edted shape");
+        //System.out.println("Undo edted shape");
         ArrayList<Node> nodes = getEditedNodes();
         for (int i=0; i<getEditedNodes().size(); i++) {
             nodes.get(i).getStyle().setShape(shapes.get(i));

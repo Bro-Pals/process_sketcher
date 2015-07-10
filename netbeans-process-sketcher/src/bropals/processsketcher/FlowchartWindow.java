@@ -1435,7 +1435,7 @@ public class FlowchartWindow extends JFrame {
             try {
                 refreshWindowTitle();
                 writeFlowchartData(Files.newOutputStream(file.toPath()));
-                System.out.println("Saved flowchart data to " + file);
+                //System.out.println("Saved flowchart data to " + file);
             } catch (IOException ex) {
                 System.err.println("Could not open output stream to " + file.toString() + ": " + ex);
             }
@@ -1470,7 +1470,7 @@ public class FlowchartWindow extends JFrame {
             try {
                 flowchart = Flowchart.readFlowchartData(Files.newInputStream(file.toPath()), this);
                 refreshWindowTitle();
-                System.out.println("Read flowchart data from " + file);
+                //System.out.println("Read flowchart data from " + file);
             } catch (IOException ex) {
                 System.err.println("Unable to read flowchart data from " + file + ", " + ex);
             }
@@ -1741,7 +1741,7 @@ public class FlowchartWindow extends JFrame {
                 os.flush();
                 os.close();
                 if (status) {
-                    System.out.println("Wrote image " + fc.getSelectedFile());
+                    //System.out.println("Wrote image " + fc.getSelectedFile());
                 }
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(this, "Unable to export image to file: " + ex, "Error", JOptionPane.ERROR_MESSAGE);

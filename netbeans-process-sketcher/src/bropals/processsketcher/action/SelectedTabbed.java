@@ -40,7 +40,7 @@ public class SelectedTabbed extends Action {
     
     @Override
     public void undo(FlowchartWindow instance) {
-        System.out.println("Undo selection with tabbing");
+        //System.out.println("Undo selection with tabbing");
         
         // clear the selection
         instance.getEventManager().getSelectionManager().getSelected().clear();

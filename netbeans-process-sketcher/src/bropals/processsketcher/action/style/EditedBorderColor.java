@@ -40,7 +40,7 @@ public class EditedBorderColor extends EditedStyle {
 
     @Override
     public void undo(FlowchartWindow instance) {
-        System.out.println("Undo edited border color");
+        //System.out.println("Undo edited border color");
         ArrayList<Node> nodes = getEditedNodes();
         for (int i=0; i<nodes.size(); i++) {
             nodes.get(i).getStyle().setBorderColor(colors.get(i));
